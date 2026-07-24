@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Next.js output
+.next/
+out/
+
+# Test output
+coverage/
+playwright-report/
+test-results/
+
+# Environment files (the documented template remains tracked)
+.env
+.env.*
+!.env.example
+
+# Logs and local tooling
+*.log
+.eslintcache
+.vercel/
+
+# OS and editor files
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# TypeScript
+*.tsbuildinfo
+
+# Original extracted handoff package (versioned copy lives in docs/baseline)
+/SecureNet_Full_Documentation_Baseline_v1.0/
