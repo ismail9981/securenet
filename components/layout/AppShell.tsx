@@ -14,6 +14,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { DemoDataBadge } from "@/components/foundation/DemoDataBadge";
+import type { PublicUser } from "@/modules/identity/domain/user";
+import { UserMenu } from "@/modules/identity/presentation/UserMenu";
 
 const navigation = [
   { href: "/dashboard", label: "Dashboard", icon: Activity },
@@ -61,7 +63,10 @@ function NavigationLinks({ onMobile = false }: { onMobile?: boolean }) {
   );
 }
 
-export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
+export function AppShell({
+  children,
+  user,
+}: Readonly<{ children: ReactNode; user: PublicUser }>) {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
       <aside className="hidden border-r bg-[var(--surface-sidebar)] lg:flex lg:min-h-screen lg:flex-col lg:p-4">
@@ -132,6 +137,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
                 Realtime planned
               </div>
               <DemoDataBadge />
+              <UserMenu user={user} />
             </div>
           </div>
         </header>

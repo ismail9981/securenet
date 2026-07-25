@@ -20,4 +20,8 @@ describe("approved core network enums", () => {
   it("rejects undocumented roles", () => {
     expect(() => userRoleSchema.parse("OWNER")).toThrow();
   });
+
+  it("uses the approved Network Engineer role name", () => {
+    expect(userRoleSchema.parse("NETWORK_ENGINEER")).toBe("NETWORK_ENGINEER");
+  });
 });

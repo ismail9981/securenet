@@ -14,10 +14,13 @@ scope/priority precedence.
 | 6 — Reports, settings, and RBAC polish   | Approved P1 reports, CSV, users, settings, alert-rule controls, role UX polish                                                        | FR-012/014—016 and DOC-002 P1 requirements                             | Role matrix regression; report/export tests                                    |
 | 7 — QA, security, deployment, portfolio  | Full regression, accessibility, performance, security, CI/CD, managed deployment, truthful portfolio evidence                         | All AC-01—12 and release gates                                         | 0 blocker/critical defects; release report, live demo, README/video/case study |
 
-## Sprint 1 recommendation
+## Sprint 1 resolution
 
-Begin with a short baseline-resolution gate for IA-001 (Login priority), IA-003
-(Investigating persistence/API), and IA-004 (Health Score formula). Then implement
-the Identity module and server-enforced authorization before connecting the
-Dashboard to application contracts. Do not start device persistence, alert logic,
-realtime, or simulation in Sprint 1.
+The approved clarification resolved IA-001 and IA-004 for Sprint 1. Sprint 1 uses a
+Demo-only identity adapter, signed server-verified sessions, server authorization
+primitives, typed Dashboard contracts, deterministic fixtures, and only the
+unambiguous Health Score deductions. ADR-0002 records the limitations.
+
+Sprint 2 may begin only after Sprint 1 validation and separate approval. Device
+persistence, telemetry, alert processing, realtime transport, simulation, and the
+unresolved Health Score factors are not pulled forward.

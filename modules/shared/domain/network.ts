@@ -26,7 +26,7 @@ export const ALERT_STATUSES = [
   "INVESTIGATING",
   "RESOLVED",
 ] as const;
-export const USER_ROLES = ["ADMIN", "ENGINEER", "VIEWER"] as const;
+export const USER_ROLES = ["ADMIN", "NETWORK_ENGINEER", "VIEWER"] as const;
 export const USER_STATUSES = ["ACTIVE", "DISABLED"] as const;
 export const CONNECTION_TYPES = ["ETHERNET", "WIFI", "VPN", "VIRTUAL"] as const;
 export const CONNECTION_STATUSES = ["ACTIVE", "DEGRADED", "DOWN"] as const;

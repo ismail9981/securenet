@@ -1,9 +1,12 @@
 import type { ReactNode } from "react";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { requireServerSession } from "@/modules/identity/infrastructure/server-session";
 
-export default function OperationsLayout({
+export default async function OperationsLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
-  return <AppShell>{children}</AppShell>;
+  const session = await requireServerSession();
+
+  return <AppShell user={session.user}>{children}</AppShell>;
 }
