@@ -1,15 +1,18 @@
+import { hash } from "bcryptjs";
+
 import type {
   UserRepository,
   UserWithPasswordHash,
 } from "@/modules/identity/application/user-repository";
+import { getDemoPassword } from "@/modules/identity/infrastructure/demo-password";
 
-const DEMO_USERS: readonly UserWithPasswordHash[] = [
+const BCRYPT_COST = 12;
+
+const DEMO_USERS: readonly Omit<UserWithPasswordHash, "passwordHash">[] = [
   {
     id: "01f1c115-4481-4a6e-8d45-5b7510afbd1a",
     name: "Amina Al-Harthi",
     email: "admin@securenet.demo",
-    passwordHash:
-      "$2b$12$.PjQuByGB13x9QiTrWnZP.HYc03EuJ8AjbDBc4wg/lny7lS62ybdq",
     role: "ADMIN",
     status: "ACTIVE",
   },
@@ -17,8 +20,6 @@ const DEMO_USERS: readonly UserWithPasswordHash[] = [
     id: "6f3a8aa8-f6a1-4c24-9252-e49706dc973b",
     name: "Nasser Al-Balushi",
     email: "engineer@securenet.demo",
-    passwordHash:
-      "$2b$12$yaBhOamqY4/SXlRqhzIm1eSVtJr7XGjQBYWe8vd1Gi2NID0aDtMra",
     role: "NETWORK_ENGINEER",
     status: "ACTIVE",
   },
@@ -26,15 +27,40 @@ const DEMO_USERS: readonly UserWithPasswordHash[] = [
     id: "a8785311-78fa-4d3e-8f15-0511adb68597",
     name: "Maha Al-Rashdi",
     email: "viewer@securenet.demo",
-    passwordHash:
-      "$2b$12$fWAiyXTSjQpfvxIVgP3EieDQ.2m2dCGEJMthCqd2IKKNQk9C9xfla",
     role: "VIEWER",
     status: "ACTIVE",
   },
 ] as const;
 
+const passwordHashCache = new Map<
+  string,
+  { readonly password: string; readonly value: Promise<string> }
+>();
+
+function getPasswordHash(userId: string): Promise<string> {
+  const password = getDemoPassword();
+  const cached = passwordHashCache.get(userId);
+
+  if (cached?.password === password) {
+    return cached.value;
+  }
+
+  const value = hash(password, BCRYPT_COST);
+  passwordHashCache.set(userId, { password, value });
+  return value;
+}
+
 export class DemoUserRepository implements UserRepository {
   async findByEmail(email: string): Promise<UserWithPasswordHash | null> {
-    return DEMO_USERS.find((user) => user.email === email) ?? null;
+    const user = DEMO_USERS.find((candidate) => candidate.email === email);
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      ...user,
+      passwordHash: await getPasswordHash(user.id),
+    };
   }
 }

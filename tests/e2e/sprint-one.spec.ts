@@ -4,20 +4,18 @@ import { expect, test, type Page } from "@playwright/test";
 const DEMO_ACCOUNTS = [
   {
     email: "admin@securenet.demo",
-    password: "SecureNet-Demo-Admin-2026!",
     role: "ADMIN",
   },
   {
     email: "engineer@securenet.demo",
-    password: "SecureNet-Demo-Engineer-2026!",
     role: "NETWORK_ENGINEER",
   },
   {
     email: "viewer@securenet.demo",
-    password: "SecureNet-Demo-Viewer-2026!",
     role: "VIEWER",
   },
 ] as const;
+const DOCUMENTED_DEMO_PASSWORD = "SecureNetDemo123";
 
 async function signIn(
   page: Page,
@@ -25,7 +23,7 @@ async function signIn(
 ) {
   await page.goto("/login");
   await page.getByLabel("Email").fill(account.email);
-  await page.getByLabel("Password").fill(account.password);
+  await page.getByLabel("Password").fill(DOCUMENTED_DEMO_PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
 }

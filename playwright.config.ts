@@ -33,6 +33,7 @@ export default defineConfig({
     command: "npm run start -- --port 3100",
     env: {
       AUTH_SECRET: authSecret,
+      SEED_DEMO_PASSWORD: "SecureNetDemo123",
     },
     url: "http://127.0.0.1:3100",
     reuseExistingServer: !process.env.CI,

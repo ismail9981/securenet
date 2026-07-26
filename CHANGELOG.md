@@ -8,6 +8,9 @@ use semantic versioning once releases begin.
 
 ### Fixed
 
+- Unified all three public Demo accounts on the documented
+  `SEED_DEMO_PASSWORD`, with matching bcrypt cost-12 repository hashes and
+  consistent login instructions.
 - Removed the redundant focusable Recharts accessibility layer from the decorative
   traffic SVG; the equivalent textual traffic summary remains available to
   assistive technology.

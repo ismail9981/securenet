@@ -44,7 +44,15 @@ the protected Dashboard flow and redirects unauthenticated users to `/login`.
 
 The login screen presents deterministic fictional accounts for Administrator,
 Network Engineer, and Viewer. Their credentials are public by design so the RBAC
-matrix is repeatable. Do not reuse them or this adapter for real data.
+matrix is repeatable. All three accounts use the local Demo password
+`SecureNetDemo123`, configured through `SEED_DEMO_PASSWORD`. Do not reuse that
+password or this adapter for real data.
+
+| Role             | Email                     |
+| ---------------- | ------------------------- |
+| Administrator    | `admin@securenet.demo`    |
+| Network Engineer | `engineer@securenet.demo` |
+| Viewer           | `viewer@securenet.demo`   |
 
 ## Quality commands
 

@@ -25,12 +25,14 @@ interface LoginError {
 
 const DEFAULT_DEMO_ACCOUNT = DEMO_ACCOUNTS[1];
 
-export function LoginForm() {
+interface LoginFormProps {
+  readonly demoPassword: string;
+}
+
+export function LoginForm({ demoPassword }: LoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState<string>(DEFAULT_DEMO_ACCOUNT.email);
-  const [password, setPassword] = useState<string>(
-    DEFAULT_DEMO_ACCOUNT.password,
-  );
+  const [password, setPassword] = useState<string>(demoPassword);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedRole, setCopiedRole] = useState<string | null>(null);
   const [error, setError] = useState<LoginError | null>(null);
@@ -40,12 +42,12 @@ export function LoginForm() {
     if (!account) return;
 
     setEmail(account.email);
-    setPassword(account.password);
+    setPassword(demoPassword);
     setError(null);
 
     try {
       await navigator.clipboard.writeText(
-        `Email: ${account.email}\nPassword: ${account.password}`,
+        `Email: ${account.email}\nPassword: ${demoPassword}`,
       );
       setCopiedRole(account.role);
       window.setTimeout(() => setCopiedRole(null), 1600);
@@ -178,6 +180,10 @@ export function LoginForm() {
         </h2>
         <p className="text-muted mt-2 text-sm leading-6">
           Choose an account to fill and copy its public Demo credentials.
+        </p>
+        <p className="bg-background text-muted mt-3 rounded-lg border px-3 py-2 text-xs leading-5">
+          All three accounts use the public Demo password{" "}
+          <code className="text-foreground font-mono">{demoPassword}</code>.
         </p>
         <ul className="mt-4 space-y-3">
           {DEMO_ACCOUNTS.map((account, index) => (

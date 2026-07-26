@@ -10,6 +10,7 @@ import { SESSION_COOKIE_NAME } from "@/modules/identity/infrastructure/session";
 
 const TEST_SECRET =
   "route-test-secret-that-is-longer-than-thirty-two-characters";
+const DOCUMENTED_DEMO_PASSWORD = "SecureNetDemo123";
 
 function loginRequest(payload: unknown, client = "198.51.100.10"): NextRequest {
   return new NextRequest("http://localhost/api/v1/auth/login", {
@@ -25,11 +26,13 @@ function loginRequest(payload: unknown, client = "198.51.100.10"): NextRequest {
 describe("Demo authentication routes", () => {
   beforeEach(() => {
     process.env.AUTH_SECRET = TEST_SECRET;
+    process.env.SEED_DEMO_PASSWORD = DOCUMENTED_DEMO_PASSWORD;
     resetLoginRateLimitsForTests();
   });
 
   afterEach(() => {
     delete process.env.AUTH_SECRET;
+    delete process.env.SEED_DEMO_PASSWORD;
   });
 
   it.each(DEMO_ACCOUNTS)(
@@ -37,7 +40,7 @@ describe("Demo authentication routes", () => {
     async (account) => {
       const response = await login(
         loginRequest(
-          { email: account.email, password: account.password },
+          { email: account.email, password: DOCUMENTED_DEMO_PASSWORD },
           account.role,
         ),
       );
@@ -56,15 +59,15 @@ describe("Demo authentication routes", () => {
           },
         },
       });
-      expect(JSON.stringify(body)).not.toContain(account.password);
+      expect(JSON.stringify(body)).not.toContain(DOCUMENTED_DEMO_PASSWORD);
       expect(JSON.stringify(body)).not.toContain("passwordHash");
     },
   );
 
-  it("uses a generic response for invalid credentials", async () => {
+  it("rejects an incorrect password with the generic credential response", async () => {
     const response = await login(
       loginRequest({
-        email: "unknown@securenet.demo",
+        email: DEMO_ACCOUNTS[0].email,
         password: "incorrect-password",
       }),
     );
@@ -94,7 +97,7 @@ describe("Demo authentication routes", () => {
     const account = DEMO_ACCOUNTS[1];
     const loginResponse = await login(
       loginRequest(
-        { email: account.email, password: account.password },
+        { email: account.email, password: DOCUMENTED_DEMO_PASSWORD },
         "198.51.100.30",
       ),
     );

@@ -14,7 +14,7 @@ vi.mock("next/navigation", () => ({
 
 describe("LoginForm", () => {
   it("provides labeled credentials fields and all three Demo roles", () => {
-    render(<LoginForm />);
+    render(<LoginForm demoPassword="SecureNetDemo123" />);
 
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
@@ -22,5 +22,6 @@ describe("LoginForm", () => {
     expect(screen.getByText("Administrator")).toBeInTheDocument();
     expect(screen.getByText("Network Engineer")).toBeInTheDocument();
     expect(screen.getByText("Viewer")).toBeInTheDocument();
+    expect(screen.getByText("SecureNetDemo123")).toBeInTheDocument();
   });
 });

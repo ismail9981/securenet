@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { DemoDataBadge } from "@/components/foundation/DemoDataBadge";
+import { getDemoPassword } from "@/modules/identity/infrastructure/demo-password";
 import { getServerSession } from "@/modules/identity/infrastructure/server-session";
 import { LoginForm } from "@/modules/identity/presentation/LoginForm";
 
@@ -13,6 +14,8 @@ export const metadata: Metadata = {
 export default async function LoginPage() {
   const session = await getServerSession();
   if (session) redirect("/dashboard");
+
+  const demoPassword = getDemoPassword();
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:grid lg:place-items-center">
@@ -44,7 +47,7 @@ export default async function LoginPage() {
             not a production account system.
           </p>
         </header>
-        <LoginForm />
+        <LoginForm demoPassword={demoPassword} />
       </div>
     </main>
   );
