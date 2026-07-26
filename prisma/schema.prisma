@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  NETWORK_ENGINEER
+  VIEWER
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum DeviceType {
+  SERVER
+  ROUTER
+  SWITCH
+  FIREWALL
+  AP
+  WORKSTATION
+  PRINTER
+  NAS
+}
+
+enum DeviceStatus {
+  ONLINE
+  DEGRADED
+  OFFLINE
+  MAINTENANCE
+  UNKNOWN
+}
+
+model User {
+  id           String      @id @default(uuid()) @db.Uuid
+  name         String      @db.VarChar(120)
+  email        String      @unique @db.VarChar(255)
+  passwordHash String      @map("password_hash")
+  role         UserRole
+  status       UserStatus
+  lastLoginAt  DateTime?   @map("last_login_at") @db.Timestamptz(3)
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model Location {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(120)
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  devices     Device[]
+
+  @@map("locations")
+}
+
+model Device {
+  id               String         @id @default(uuid()) @db.Uuid
+  name             String         @db.VarChar(120)
+  hostname         String         @db.VarChar(120)
+  ipAddress        String         @map("ip_address") @db.Inet
+  macAddress       String?        @map("mac_address") @db.VarChar(17)
+  type             DeviceType
+  status           DeviceStatus
+  osName           String?        @map("os_name") @db.VarChar(120)
+  locationId       String         @map("location_id") @db.Uuid
+  parentDeviceId   String?        @map("parent_device_id") @db.Uuid
+  importanceWeight Int            @default(1) @map("importance_weight") @db.SmallInt
+  lastSeenAt       DateTime?      @map("last_seen_at") @db.Timestamptz(3)
+  metadata         Json           @default("{}") @db.JsonB
+  archivedAt       DateTime?      @map("archived_at") @db.Timestamptz(3)
+  createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+  location         Location       @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  parentDevice     Device?        @relation("DeviceHierarchy", fields: [parentDeviceId], references: [id], onDelete: SetNull)
+  childDevices     Device[]       @relation("DeviceHierarchy")
+  metrics          DeviceMetric[]
+
+  @@index([status, type, locationId], map: "devices_status_type_location_id_idx")
+  @@index([parentDeviceId], map: "devices_parent_device_id_idx")
+  @@map("devices")
+}
+
+model DeviceMetric {
+  id            BigInt   @id @default(autoincrement())
+  deviceId      String   @map("device_id") @db.Uuid
+  cpuPct        Decimal? @map("cpu_pct") @db.Decimal(5, 2)
+  ramPct        Decimal? @map("ram_pct") @db.Decimal(5, 2)
+  diskPct       Decimal? @map("disk_pct") @db.Decimal(5, 2)
+  pingMs        Decimal? @map("ping_ms") @db.Decimal(8, 2)
+  packetLossPct Decimal? @map("packet_loss_pct") @db.Decimal(5, 2)
+  downloadMbps  Decimal? @map("download_mbps") @db.Decimal(12, 2)
+  uploadMbps    Decimal? @map("upload_mbps") @db.Decimal(12, 2)
+  uptimeSeconds BigInt?  @map("uptime_seconds")
+  sourceTime    DateTime @map("source_time") @db.Timestamptz(3)
+  receivedAt    DateTime @default(now()) @map("received_at") @db.Timestamptz(3)
+  batchKey      String?  @map("batch_key") @db.Uuid
+  device        Device   @relation(fields: [deviceId], references: [id], onDelete: Restrict)
+
+  @@index([deviceId, sourceTime(sort: Desc)], map: "device_metrics_device_id_source_time_idx")
+  @@map("device_metrics")
+}
+
+model AuditLog {
+  id          BigInt   @id @default(autoincrement())
+  actorUserId String?  @map("actor_user_id") @db.Uuid
+  action      String   @db.VarChar(100)
+  entityType  String   @map("entity_type") @db.VarChar(80)
+  entityId    String?  @map("entity_id") @db.VarChar(100)
+  beforeData  Json?    @map("before_data") @db.JsonB
+  afterData   Json?    @map("after_data") @db.JsonB
+  ipAddress   String?  @map("ip_address") @db.Inet
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  actorUser   User?    @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@index([entityType, entityId, createdAt(sort: Desc)], map: "audit_logs_entity_created_at_idx")
+  @@index([actorUserId, createdAt(sort: Desc)], map: "audit_logs_actor_created_at_idx")
+  @@map("audit_logs")
+}

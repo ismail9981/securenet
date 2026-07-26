@@ -11,6 +11,7 @@ export default defineConfig([
     "node_modules/**",
     "playwright-report/**",
     "test-results/**",
+    "generated/prisma/**",
     "docs/baseline/**",
     "SecureNet_Full_Documentation_Baseline_v1.0/**",
   ]),

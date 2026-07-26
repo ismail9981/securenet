@@ -10,6 +10,9 @@ coverage/
 playwright-report/
 test-results/
 
+# Generated Prisma client
+generated/prisma/
+
 # Environment files (the documented template remains tracked)
 .env
 .env.*

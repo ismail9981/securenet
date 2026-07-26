@@ -8,6 +8,8 @@ use semantic versioning once releases begin.
 
 ### Fixed
 
+- Corrected same-origin mutation checks for equivalent `localhost` and
+  `127.0.0.1` loopback hosts on the same port while retaining cross-origin denial.
 - Unified all three public Demo accounts on the documented
   `SEED_DEMO_PASSWORD`, with matching bcrypt cost-12 repository hashes and
   consistent login instructions.
@@ -19,6 +21,27 @@ use semantic versioning once releases begin.
 
 ### Added
 
+- PostgreSQL/Prisma models and an additive migration for Demo audit users,
+  locations, devices, nullable parent relationships, 24-hour metrics, and
+  append-only audit logs.
+- Deterministic idempotent seed data with 3 users, 3 locations, 30 active devices,
+  and 720 metric snapshots, plus a reset command that refuses any target other
+  than `securenet_test`.
+- Layered Device repository/application boundaries and documented REST endpoints
+  for safe queries, details, metrics, Administrator mutations, exact uniqueness
+  conflicts, and confirmed soft archive.
+- Responsive Device List and Device Details experiences with search, filters,
+  sorting, pagination, current metrics, all documented states, and explicit
+  unavailable-data disclosures.
+- Administrator create/update/archive workflows with transactional actor audit
+  context; Network Engineer and Viewer remain read-only in UI and server use cases.
+- Sprint 2 unit, PostgreSQL integration, route, component, desktop/mobile E2E,
+  accessibility, security, build, audit, and HTTP smoke coverage.
+- ADR-0003, Sprint 2 completion evidence, and updated assumptions, roadmap,
+  traceability, environment, repository, and database documentation.
+- Approved Sprint 2 sequencing for Administrator-only device create, update, and
+  soft archive, with PostgreSQL audit context and persisted metric-history
+  groundwork while historical UI remains deferred.
 - Sprint 1 server-only Demo identity adapter with deterministic Administrator,
   Network Engineer, and Viewer accounts.
 - bcrypt password verification, JOSE-signed HttpOnly sessions, bounded login

@@ -83,8 +83,8 @@ export function AppShell({
               className="text-info mt-0.5 size-4 shrink-0"
             />
             <p className="text-muted text-xs leading-5">
-              Sprint 0 shell. Operational capabilities are documented
-              placeholders.
+              Demo environment. Device inventory is persisted; later monitoring
+              modules remain clearly staged.
             </p>
           </div>
         </div>

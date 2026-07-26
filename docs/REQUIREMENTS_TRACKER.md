@@ -1,6 +1,6 @@
 # Requirements implementation tracker
 
-Updated: 2026-07-25
+Updated: 2026-07-26
 
 Baseline: SecureNet Full Documentation Baseline v1.0
 
@@ -10,20 +10,20 @@ Status vocabulary follows DOC-014: `Not Started`, `In Progress`, `Implemented`,
 
 ## DOC-001 P0 functional requirements
 
-| Requirement ID | Requirement title                         | Priority | Source document | Planned phase | Current status | Related files                             | Related tests                       |
-| -------------- | ----------------------------------------- | -------- | --------------- | ------------- | -------------- | ----------------------------------------- | ----------------------------------- |
-| FR-001         | Device/alert totals and network health    | P0       | DOC-001 §11     | Sprint 1      | Verified       | Dashboard plus deterministic repository   | Contract/component/E2E tests        |
-| FR-002         | Traffic and resource charts by time range | P0       | DOC-001 §11     | Sprint 1      | In Progress    | Fixed 24-hour Demo traffic trend          | Component/E2E tests; selector later |
-| FR-003         | Searchable/filterable/sortable devices    | P0       | DOC-001 §11     | Sprint 2      | In Progress    | `app/(operations)/devices/page.tsx`       | `TC-DEV-001` planned                |
-| FR-004         | Open device details from every reference  | P0       | DOC-001 §11     | Sprint 2      | In Progress    | `/devices`, `/devices/[id]` placeholders  | Playwright navigation planned       |
-| FR-005         | Latest and historical device metrics      | P0       | DOC-001 §11     | Sprint 2      | In Progress    | `app/(operations)/devices/[id]/page.tsx`  | `TC-MET-001` planned                |
-| FR-006         | Simulation-driven automatic device state  | P0       | DOC-001 §11     | Sprint 5      | Not Started    | Planned Simulation/Monitoring modules     | `TC-MET-001`, `TC-SIM-001` planned  |
-| FR-007         | Threshold-based alert creation            | P0       | DOC-001 §11     | Sprint 3      | In Progress    | `app/(operations)/alerts/page.tsx`        | `TC-ALT-001` planned                |
-| FR-008         | Open-alert deduplication                  | P0       | DOC-001 §11     | Sprint 3      | Not Started    | Planned Alerting domain                   | `TC-ALT-002` planned                |
-| FR-009         | Audited acknowledge and resolve           | P0       | DOC-001 §11     | Sprint 3      | In Progress    | Alerts placeholder                        | `TC-ALT-003/004` planned            |
-| FR-010         | Important changes written to Event Log    | P0       | DOC-001 §11     | Sprint 3      | In Progress    | `app/(operations)/events/page.tsx`        | `TC-EVT-001` planned                |
-| FR-011         | Status-aware network topology             | P0       | DOC-001 §11     | Sprint 4      | In Progress    | `app/(operations)/topology/page.tsx`      | `TC-TOP-001` planned                |
-| FR-013         | Automatic Network Health Score            | P0       | DOC-001 §11     | Sprint 1      | In Progress    | Partial documented formula and disclosure | Health Score unit/component tests   |
+| Requirement ID | Requirement title                         | Priority | Source document | Planned phase | Current status | Related files                             | Related tests                        |
+| -------------- | ----------------------------------------- | -------- | --------------- | ------------- | -------------- | ----------------------------------------- | ------------------------------------ |
+| FR-001         | Device/alert totals and network health    | P0       | DOC-001 §11     | Sprint 1      | Verified       | Dashboard plus deterministic repository   | Contract/component/E2E tests         |
+| FR-002         | Traffic and resource charts by time range | P0       | DOC-001 §11     | Sprint 1      | In Progress    | Fixed 24-hour Demo traffic trend          | Component/E2E tests; selector later  |
+| FR-003         | Searchable/filterable/sortable devices    | P0       | DOC-001 §11     | Sprint 2      | Verified       | Device API and responsive inventory UI    | Query/route/component/E2E tests      |
+| FR-004         | Open device details from every reference  | P0       | DOC-001 §11     | Sprint 2      | In Progress    | Inventory references link to details      | Device navigation E2E; later modules |
+| FR-005         | Latest and historical device metrics      | P0       | DOC-001 §11     | Sprint 2      | In Progress    | Persisted history API; latest-snapshot UI | Repository/route/component/E2E tests |
+| FR-006         | Simulation-driven automatic device state  | P0       | DOC-001 §11     | Sprint 5      | Not Started    | Planned Simulation/Monitoring modules     | `TC-MET-001`, `TC-SIM-001` planned   |
+| FR-007         | Threshold-based alert creation            | P0       | DOC-001 §11     | Sprint 3      | In Progress    | `app/(operations)/alerts/page.tsx`        | `TC-ALT-001` planned                 |
+| FR-008         | Open-alert deduplication                  | P0       | DOC-001 §11     | Sprint 3      | Not Started    | Planned Alerting domain                   | `TC-ALT-002` planned                 |
+| FR-009         | Audited acknowledge and resolve           | P0       | DOC-001 §11     | Sprint 3      | In Progress    | Alerts placeholder                        | `TC-ALT-003/004` planned             |
+| FR-010         | Important changes written to Event Log    | P0       | DOC-001 §11     | Sprint 3      | In Progress    | `app/(operations)/events/page.tsx`        | `TC-EVT-001` planned                 |
+| FR-011         | Status-aware network topology             | P0       | DOC-001 §11     | Sprint 4      | In Progress    | `app/(operations)/topology/page.tsx`      | `TC-TOP-001` planned                 |
+| FR-013         | Automatic Network Health Score            | P0       | DOC-001 §11     | Sprint 1      | In Progress    | Partial documented formula and disclosure | Health Score unit/component tests    |
 
 ## DOC-002 P0 product requirements
 
@@ -37,16 +37,17 @@ Status vocabulary follows DOC-014: `Not Started`, `In Progress`, `Implemented`,
 | PRD-DASH-003   | Bandwidth trend                              | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Deterministic Recharts trend             | Dashboard component/E2E tests       |
 | PRD-DASH-004   | Linked latest alerts and events              | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Fixture lists linked to protected routes | Dashboard E2E test                  |
 | PRD-DASH-005   | Update without page reload                   | P0          | DOC-002 §8.2    | Sprint 4      | Not Started    | Planned realtime/cache adapter           | `TC-RT-001` planned                 |
-| PRD-DEV-001    | Device table with status and metrics         | P0          | DOC-002 §8.3    | Sprint 2      | In Progress    | Devices placeholder                      | `TC-DEV-001` planned                |
-| PRD-DEV-002    | Search name/hostname/IP                      | P0          | DOC-002 §8.3    | Sprint 2      | Not Started    | Planned Inventory application            | `TC-DEV-001` planned                |
-| PRD-DEV-003    | Filter type/status/location                  | P0          | DOC-002 §8.3    | Sprint 2      | Not Started    | Planned Inventory application            | Device filter tests planned         |
-| PRD-DEV-004    | Sort and paginate devices                    | P0          | DOC-002 §8.3    | Sprint 2      | Not Started    | Planned Inventory application            | Device pagination tests planned     |
-| PRD-DEV-006    | Unique active IP and hostname                | P0          | DOC-002 §8.3    | Sprint 2      | Not Started    | Planned Inventory domain/repository      | `TC-DEV-002` planned                |
-| PRD-DD-001     | Device identity/location/OS/status/last seen | P0          | DOC-002 §8.4    | Sprint 2      | In Progress    | Device details placeholder               | Device details test planned         |
-| PRD-DD-002     | Device metric summaries                      | P0          | DOC-002 §8.4    | Sprint 2      | In Progress    | Device details placeholder               | Metric component tests planned      |
-| PRD-DD-003     | Metric history by selected range             | P0          | DOC-002 §8.4    | Sprint 2      | Not Started    | Planned Telemetry application            | Metric range tests planned          |
-| PRD-DD-004     | Device alerts and events                     | P0          | DOC-002 §8.4    | Sprint 2/3    | In Progress    | Device details placeholder               | Details integration test planned    |
-| PRD-DD-005     | Explain unavailable data                     | P0          | DOC-002 §8.4    | Sprint 2      | In Progress    | Shared empty/error foundations           | Stale/empty component tests planned |
+| PRD-DEV-001    | Device table with status and metrics         | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | PostgreSQL-backed responsive inventory   | Repository/component/E2E tests      |
+| PRD-DEV-002    | Search name/hostname/IP                      | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Validated query DTO and Device List      | Domain/route/E2E tests              |
+| PRD-DEV-003    | Filter type/status/location                  | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Validated API/UI filters                 | Query/route/E2E tests               |
+| PRD-DEV-004    | Sort and paginate devices                    | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Stable sorting and bounded pagination    | Repository/E2E tests                |
+| PRD-DEV-005    | Administrator device management              | P1 pulled   | DOC-002 §8.3    | Sprint 2      | Verified       | Admin create/update/soft-archive flows   | Service/route/E2E/audit tests       |
+| PRD-DEV-006    | Unique active IP and hostname                | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Partial unique indexes and 409 mapping   | Repository/route conflict tests     |
+| PRD-DD-001     | Device identity/location/OS/status/last seen | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Server-rendered Device Details           | Repository/route/E2E tests          |
+| PRD-DD-002     | Device metric summaries                      | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Current metric snapshot component        | Component/route/E2E tests           |
+| PRD-DD-003     | Metric history by selected range             | P0          | DOC-002 §8.4    | Sprint 2      | In Progress    | 24-hour history persisted/API exposed    | Repository/route tests; UI deferred |
+| PRD-DD-004     | Device alerts and events                     | P0          | DOC-002 §8.4    | Sprint 2/3    | In Progress    | Explicit unavailable panels only         | Device Details E2E                  |
+| PRD-DD-005     | Explain unavailable data                     | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Null/stale/unavailable UI states         | Component/E2E/axe tests             |
 | PRD-ALT-001    | Filter alerts by severity/status/device/time | P0          | DOC-002 §8.5    | Sprint 3      | In Progress    | Alerts placeholder                       | Alert filter tests planned          |
 | PRD-ALT-002    | Acknowledge with actor and time              | P0          | DOC-002 §8.5    | Sprint 3      | Not Started    | Planned Alerting application             | `TC-ALT-003` planned                |
 | PRD-ALT-003    | Resolve with optional note                   | P0          | DOC-002 §8.5    | Sprint 3      | Not Started    | Planned Alerting application             | `TC-ALT-004` planned                |
@@ -60,19 +61,19 @@ Status vocabulary follows DOC-014: `Not Started`, `In Progress`, `Implemented`,
 
 ## DOC-003 P0 software requirements
 
-| Requirement ID | Requirement title                              | Priority | Source document | Planned phase | Current status | Related files                                   | Related tests                           |
-| -------------- | ---------------------------------------------- | -------- | --------------- | ------------- | -------------- | ----------------------------------------------- | --------------------------------------- |
-| SRS-FR-001     | Authenticate protected routes                  | P0       | DOC-003 §4      | Sprint 1      | Verified       | Server session guard and auth routes            | Auth integration/E2E tests              |
-| SRS-FR-002     | Enforce authorization on server                | P0       | DOC-003 §4      | Sprint 1      | In Progress    | Permission matrix; Dashboard use-case assertion | RBAC unit/contract tests                |
-| SRS-FR-003     | Immutable device identifier                    | P0       | DOC-003 §4      | Sprint 2      | Not Started    | Planned Inventory domain                        | Repository tests planned                |
-| SRS-FR-004     | Metric source and received times               | P0       | DOC-003 §4      | Sprint 2      | Not Started    | Planned Telemetry domain                        | `TC-MET-001` planned                    |
-| SRS-FR-005     | Determine stale data by configuration          | P0       | DOC-003 §4      | Sprint 2      | Not Started    | Planned Monitoring domain                       | Stale-data unit tests planned           |
-| SRS-FR-006     | Evaluate alert rules after metric batch        | P0       | DOC-003 §4      | Sprint 3      | Not Started    | Planned Alerting application                    | `TC-ALT-001/002` planned                |
-| SRS-FR-007     | Event for every important transition           | P0       | DOC-003 §4      | Sprint 3      | Not Started    | Planned Event Log application                   | `TC-EVT-001` planned                    |
-| SRS-FR-008     | Realtime client updates                        | P0       | DOC-003 §4      | Sprint 4      | Not Started    | ADR realtime plan only                          | `TC-RT-001` planned                     |
-| SRS-FR-009     | Safe pagination and filters                    | P0       | DOC-003 §4      | Sprint 2/3    | Not Started    | Planned application query DTOs                  | Query validation tests planned          |
-| SRS-FR-010     | No permanent operational-record deletion in UI | P0       | DOC-003 §4      | Sprint 3      | Not Started    | Planned policy/repositories                     | Authorization/integration tests planned |
-| SRS-FR-012     | Actor identity on administrative actions       | P0       | DOC-003 §4      | Sprint 1/3    | In Progress    | Identity established; actions/audit deferred    | Auth tests; audit tests Sprint 3        |
+| Requirement ID | Requirement title                              | Priority | Source document | Planned phase | Current status | Related files                                    | Related tests                  |
+| -------------- | ---------------------------------------------- | -------- | --------------- | ------------- | -------------- | ------------------------------------------------ | ------------------------------ |
+| SRS-FR-001     | Authenticate protected routes                  | P0       | DOC-003 §4      | Sprint 1      | Verified       | Server session guard and auth routes             | Auth integration/E2E tests     |
+| SRS-FR-002     | Enforce authorization on server                | P0       | DOC-003 §4      | Sprint 1      | In Progress    | Server guards plus device use-case authorization | RBAC/service/route/E2E tests   |
+| SRS-FR-003     | Immutable device identifier                    | P0       | DOC-003 §4      | Sprint 2      | Verified       | Database UUID and read-only public contract      | Schema/repository/route tests  |
+| SRS-FR-004     | Metric source and received times               | P0       | DOC-003 §4      | Sprint 2      | Verified       | Append-only metric timestamps                    | Seed/repository/route tests    |
+| SRS-FR-005     | Determine stale data by configuration          | P0       | DOC-003 §4      | Sprint 2      | Verified       | Pure configurable freshness rule                 | Freshness unit/component tests |
+| SRS-FR-006     | Evaluate alert rules after metric batch        | P0       | DOC-003 §4      | Sprint 3      | Not Started    | Planned Alerting application                     | `TC-ALT-001/002` planned       |
+| SRS-FR-007     | Event for every important transition           | P0       | DOC-003 §4      | Sprint 3      | Not Started    | Planned Event Log application                    | `TC-EVT-001` planned           |
+| SRS-FR-008     | Realtime client updates                        | P0       | DOC-003 §4      | Sprint 4      | Not Started    | ADR realtime plan only                           | `TC-RT-001` planned            |
+| SRS-FR-009     | Safe pagination and filters                    | P0       | DOC-003 §4      | Sprint 2/3    | In Progress    | Device DTO bounds verified; later lists remain   | Domain/route/E2E tests         |
+| SRS-FR-010     | No permanent operational-record deletion in UI | P0       | DOC-003 §4      | Sprint 3      | In Progress    | Device archive preserves metrics/audit history   | Route/repository/E2E tests     |
+| SRS-FR-012     | Actor identity on administrative actions       | P0       | DOC-003 §4      | Sprint 1/3    | In Progress    | Device audit rows use stable Demo actor UUIDs    | Repository/route audit tests   |
 
 ## Release quality requirements
 
@@ -133,3 +134,22 @@ intentionally incomplete formulas or later use cases remain `In Progress`.
 | Dashboard desktop/mobile and automated accessibility | Verified | Playwright: 18 passed, including desktop/mobile axe checks |
 | Security headers, bounded input, generic failures    | Verified | Route tests, HTTP smoke, security headers, audit: 0        |
 | ADR, assumptions, roadmap, README, changelog, report | Verified | Documentation updated; format check passed                 |
+
+## Sprint 2 delivery controls
+
+The complete Sprint 2 gate passed on 2026-07-26. Cross-module requirements and
+historical metric presentation remain `In Progress` where their full acceptance
+scope belongs to later sprints.
+
+| Control                                                | Status   | Evidence                                                  |
+| ------------------------------------------------------ | -------- | --------------------------------------------------------- |
+| PostgreSQL/Prisma schema, additive migration, seed     | Verified | Both DBs current; deterministic counts `3/3/30/720`       |
+| Guarded test isolation and idempotent reset            | Verified | Dev target refused; two consecutive test resets passed    |
+| Repository/application boundaries and REST routes      | Verified | 64 Vitest tests and production route manifest             |
+| Device queries, details, current metric snapshot       | Verified | Route/component/desktop/mobile tests                      |
+| Administrator create/update/confirmed soft archive     | Verified | Transaction/audit integration, E2E, and HTTP smoke        |
+| Engineer and Viewer read-only enforcement              | Verified | Service/route/E2E/HTTP 403 evidence                       |
+| Conflict handling and operational-history preservation | Verified | Exact 409 codes; metrics retained after archive           |
+| Responsive behavior and automated accessibility        | Verified | Playwright: 36 passed, including desktop/mobile axe scans |
+| Static, build, dependency, audit, and HTTP gates       | Verified | `validate`, `npm ls`, audit zero, route smoke passed      |
+| ADR, assumptions, roadmap, README, changelog, report   | Verified | Sprint 2 documentation and traceability updated           |
