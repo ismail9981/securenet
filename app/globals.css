@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@xyflow/react/dist/style.css";
 
 @theme inline {
   --font-sans: var(--font-inter);
@@ -82,6 +83,14 @@ input {
 
 ::selection {
   background: rgb(41 184 199 / 30%);
+}
+
+.react-flow__attribution {
+  background: var(--surface-panel) !important;
+}
+
+.react-flow__attribution a {
+  color: var(--text-primary) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -12,6 +12,8 @@ import {
   DeviceStatus,
   DeviceType,
   EventType,
+  NetworkConnectionStatus,
+  NetworkConnectionType,
   PrismaClient,
   UserRole,
   UserStatus,
@@ -82,6 +84,9 @@ interface SeedDevice {
 
 const deviceId = (index: number) =>
   `30000000-0000-4000-8000-${String(index).padStart(12, "0")}`;
+
+const connectionId = (index: number) =>
+  `60000000-0000-4000-8000-${String(index).padStart(12, "0")}`;
 
 const devices: readonly SeedDevice[] = [
   {
@@ -230,6 +235,38 @@ const devices: readonly SeedDevice[] = [
     importanceWeight: 4,
   },
 ];
+
+const deviceById = new Map(devices.map((device) => [device.id, device]));
+const networkConnections = devices
+  .filter(
+    (device): device is SeedDevice & { readonly parentDeviceId: string } =>
+      device.parentDeviceId !== null,
+  )
+  .map((device, index) => {
+    const source = deviceById.get(device.parentDeviceId);
+    const connectionType =
+      device.id === deviceId(3)
+        ? NetworkConnectionType.VPN
+        : NetworkConnectionType.ETHERNET;
+    const status =
+      source?.status === DeviceStatus.OFFLINE ||
+      device.status === DeviceStatus.OFFLINE
+        ? NetworkConnectionStatus.DOWN
+        : source?.status === DeviceStatus.DEGRADED ||
+            device.status === DeviceStatus.DEGRADED
+          ? NetworkConnectionStatus.DEGRADED
+          : NetworkConnectionStatus.ACTIVE;
+
+    return {
+      id: connectionId(index + 1),
+      sourceDeviceId: device.parentDeviceId,
+      targetDeviceId: device.id,
+      connectionType,
+      label: null,
+      bandwidthCapacityMbps: null,
+      status,
+    };
+  });
 
 const ruleId = (index: number) =>
   `${RULE_ID_PREFIX}${String(index).padStart(12, "0")}`;
@@ -382,6 +419,14 @@ export async function seedDatabase(client: PrismaClient): Promise<void> {
           lastSeenAt: seededAt,
           metadata: { source: "DETERMINISTIC_DEMO_FIXTURE" },
         },
+      });
+    }
+
+    for (const connection of networkConnections) {
+      await transaction.networkConnection.upsert({
+        where: { id: connection.id },
+        update: connection,
+        create: connection,
       });
     }
 

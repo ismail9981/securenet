@@ -44,7 +44,8 @@ function pageHref(
 
 export default async function AlertsPage({ searchParams }: Props) {
   const session = await requireServerSession();
-  const query = parseAlertListQuery(params(await searchParams));
+  const search = params(await searchParams);
+  const query = parseAlertListQuery(search);
   const page = await alertService.list(query, { actor: session.user });
   return (
     <div className="mx-auto w-full max-w-7xl">
@@ -60,7 +61,7 @@ export default async function AlertsPage({ searchParams }: Props) {
         </h1>
         <p className="text-muted mt-2 text-sm">
           Synchronous rule-evaluation results with audited lifecycle controls.
-          No realtime transport is active.
+          Connected updates refresh this persisted Alert snapshot.
         </p>
       </header>
 
@@ -144,7 +145,12 @@ export default async function AlertsPage({ searchParams }: Props) {
         </Link>
       </form>
 
-      <AlertList page={page} role={session.user.role} />
+      <AlertList
+        key={search.toString()}
+        page={page}
+        refreshUrl={`/api/v1/alerts?${search.toString()}`}
+        role={session.user.role}
+      />
       <nav
         aria-label="Alert pagination"
         className="mt-6 flex items-center justify-between"

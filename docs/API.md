@@ -45,5 +45,30 @@ contracts and require an active Device Details target. Global Alert/Event result
 continue to include archived device identity and an `archived` flag.
 
 The internal accepted-metric-batch evaluator is not a public route. Sprint 5 may
-call the application service after telemetry acceptance; Sprint 3 adds no
-scheduler, simulation, polling, WebSocket, or SSE.
+call the application service after telemetry acceptance; Sprint 4 adds no
+scheduler, simulation, WebSocket, or client-published transport.
+
+## Topology
+
+`GET /api/v1/topology` requires an authenticated Demo session and returns an
+active snapshot containing Device nodes and `NetworkConnection` links. Nodes
+include identity, hostname, type, status, and nullable location metadata. Links
+include canonical endpoints, type, status, nullable label, and nullable
+`bandwidthCapacityMbps`. Archived Devices and links touching them are excluded.
+`parentDeviceId` is not rendered as a link. There are no connection mutation or
+saved-position endpoints.
+
+## Realtime
+
+`GET /api/v1/realtime` requires the existing signed HttpOnly session cookie and a
+same-origin browser request. It accepts no query token and no client messages.
+The response is `text/event-stream` with a 15-second retry hint, a heartbeat every
+20 seconds, and a 60-second connection lifetime. Limits are three streams per
+authenticated user and 50 total Demo streams.
+
+Named events carry a version-1 envelope with a unique UUID `eventId`, UTC
+timestamp, entity identity, nullable correlation ID, and allow-listed payload.
+Supported types are `device.updated`, `alert.created`, `alert.updated`, and
+`event.created`. Messages are at most 64 KB. Delivery is process-local and
+non-durable; clients suppress duplicates and recover authoritative state through
+REST, using five-second polling only while SSE is unavailable.

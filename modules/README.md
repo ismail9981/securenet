@@ -12,7 +12,7 @@ Each implemented module follows the approved dependency direction:
 4. `presentation/` — route-facing components, hooks, and handlers.
 5. `tests/` — module integration fixtures where colocated tests are insufficient.
 
-Sprint 3 implements:
+Sprint 4 implements or preserves:
 
 - `identity`: the unchanged Sprint 1 Demo identity/session adapter and RBAC rules;
 - `inventory`: device schemas, repository port, authorized application service,
@@ -24,6 +24,10 @@ Sprint 3 implements:
   application boundary, Prisma adapter, and timeline UI;
 - `telemetry`: the pure configurable metric-freshness rule;
 - `monitoring`: the intentionally partial Sprint 1 Health Score rules; and
+- `topology`: connection contracts, authorized snapshot port/service, Prisma
+  adapter, deterministic React Flow layout, and accessible presentation;
+- `realtime`: versioned message contracts, publisher port, bounded process-local
+  adapter, authenticated SSE route, and client recovery/polling state; and
 - `shared`: common network enums and schemas.
 
 Inventory domain/application code does not import Prisma. API routes and
@@ -32,3 +36,8 @@ the application service repeats authoritative permission checks close to every
 device use case. Alert lifecycle updates, their Event, and their AuditLog record
 share one database transaction. The metric-batch evaluator is synchronous and
 has no scheduler or realtime transport.
+
+Sprint 4 publications are post-commit cache-invalidation signals and cannot
+change committed operation outcomes. REST remains authoritative. Topology never
+derives links from `parentDeviceId`, and no connection CRUD or persisted layout
+boundary exists.

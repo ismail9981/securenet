@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import type { AlertPage } from "@/modules/alerting/application/alert-contracts";
 import { AlertActions } from "@/modules/alerting/presentation/AlertActions";
 import { formatDateTime } from "@/modules/inventory/presentation/device-format";
+import type { RealtimeEnvelope } from "@/modules/realtime/application/realtime-contracts";
 import type { UserRole } from "@/modules/shared/domain/network";
 
 function badgeClass(value: string): string {
@@ -19,12 +23,53 @@ function badgeClass(value: string): string {
 }
 
 export function AlertList({
-  page,
+  page: initialPage,
+  refreshUrl,
   role,
 }: {
   readonly page: AlertPage;
+  readonly refreshUrl?: string;
   readonly role: UserRole;
 }) {
+  const [page, setPage] = useState(initialPage);
+
+  useEffect(() => {
+    if (!refreshUrl) return;
+    let cancelled = false;
+    const refresh = (event?: Event) => {
+      const envelope = (event as CustomEvent<RealtimeEnvelope> | undefined)
+        ?.detail;
+      if (
+        envelope &&
+        envelope.eventType !== "alert.created" &&
+        envelope.eventType !== "alert.updated"
+      ) {
+        return;
+      }
+      void fetch(refreshUrl, {
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      })
+        .then(async (response) => {
+          if (!response.ok) throw new Error("Alert refresh failed.");
+          return (await response.json()) as AlertPage;
+        })
+        .then((nextPage) => {
+          if (!cancelled) setPage(nextPage);
+        })
+        .catch(() => {
+          // Reconnect recovery and conditional polling remain available.
+        });
+    };
+    window.addEventListener("securenet:realtime", refresh);
+    window.addEventListener("securenet:snapshot-recovery", refresh);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("securenet:realtime", refresh);
+      window.removeEventListener("securenet:snapshot-recovery", refresh);
+    };
+  }, [refreshUrl]);
+
   if (!page.data.length) {
     return (
       <div className="bg-panel rounded-xl border p-8 text-center">

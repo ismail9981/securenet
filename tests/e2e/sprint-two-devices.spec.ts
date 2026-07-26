@@ -41,7 +41,9 @@ for (const [role, email] of Object.entries(accounts)) {
     await expect(
       page.getByText(/Historical charts.*In Progress/),
     ).toBeVisible();
-    await expect(page.getByText("Active alerts")).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Overview" }).getByText("Active alerts"),
+    ).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Related alerts" }),
     ).toBeVisible();
@@ -57,7 +59,9 @@ test("filters, sorts, and paginates active device inventory", async ({
   await signIn(page, accounts.engineer);
   await page.goto("/devices?type=WORKSTATION&sort=ping&order=desc&pageSize=10");
 
-  await expect(page.getByText(/active devices/)).toBeVisible();
+  await expect(
+    page.getByText(/active devices/).filter({ visible: true }),
+  ).toBeVisible();
   await expect(
     page.getByRole("combobox", { name: "Status", exact: true }),
   ).toHaveValue("");
@@ -84,11 +88,13 @@ for (const [role, email] of [
     await page.goto("/devices");
 
     await expect(
-      page.getByText(
-        new RegExp(
-          `${role === "engineer" ? "network engineer" : "viewer"} account has read-only`,
+      page
+        .getByRole("main")
+        .getByText(
+          new RegExp(
+            `${role === "engineer" ? "network engineer" : "viewer"} account has read-only`,
+          ),
         ),
-      ),
     ).toBeVisible();
     await expect(page.getByText("Add device", { exact: true })).toHaveCount(0);
 
@@ -126,7 +132,9 @@ test("Administrator creates, updates, and confirms soft archive", async ({
 
   await signIn(page, accounts.admin);
   await page.goto("/devices");
-  const addPanel = page.locator("details").filter({ hasText: "Add device" });
+  const addPanel = page
+    .locator("details:visible")
+    .filter({ hasText: "Add device" });
   await addPanel.locator("summary").click();
   await addPanel.getByLabel("Device name").fill(`E2E ${suffix} Server`);
   await addPanel.getByLabel("Hostname").fill(hostname);
@@ -143,18 +151,24 @@ test("Administrator creates, updates, and confirms soft archive", async ({
     page.getByRole("heading", { level: 1, name: `E2E ${suffix} Server` }),
   ).toBeVisible();
 
-  const editPanel = page.locator("details").filter({ hasText: "Edit device" });
-  await editPanel.locator("summary").click();
+  const currentMain = page.locator("main:visible").last();
+  const editPanel = currentMain
+    .locator("details:visible")
+    .filter({ hasText: "Edit device" });
+  await editPanel.locator("summary").press("Enter");
   await editPanel
     .getByLabel("Device name")
     .fill(`Updated E2E ${suffix} Server`);
-  await editPanel.getByRole("button", { name: "Save changes" }).click();
+  await editPanel.getByRole("button", { name: "Save changes" }).press("Enter");
   await expect(
     page.getByText("Device changes saved and audited."),
   ).toBeVisible();
 
   page.once("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "Archive device" }).click();
+  await page
+    .getByRole("button", { name: "Archive device" })
+    .filter({ visible: true })
+    .press("Enter");
   await expect(page).toHaveURL(/\/devices(?:\?.*)?$/);
 
   await page

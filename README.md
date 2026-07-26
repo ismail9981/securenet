@@ -5,10 +5,10 @@ device state, alerts, operational events, and topology from one interface. Versi
 1.0 is a portfolio/demo product: it does **not** monitor a real network, discover
 devices, or connect through SNMP, WMI, SSH, or agents.
 
-This repository contains the validated Sprint 0–2 implementation and the Sprint 3
-Alerting/Event Log implementation: the application foundation, Demo identity and
-Dashboard, PostgreSQL-backed Device Inventory, synchronous alert evaluation, and
-immutable operational history.
+This repository contains the Sprint 0–4 implementation: the application
+foundation, Demo identity and Dashboard, PostgreSQL-backed Device Inventory,
+synchronous alert evaluation, immutable operational history, active network
+topology, and single-instance Demo realtime refresh.
 Authentication and every Dashboard value remain deliberately demonstration-only;
 they must not protect or represent a real monitored network.
 
@@ -22,11 +22,13 @@ they must not protect or represent a real monitored network.
 - Zod for boundary schemas and shared type inference
 - bcrypt password verification and JOSE-signed HttpOnly Demo sessions
 - Recharts for the deterministic accessible Dashboard trend
+- React Flow for the interactive Topology canvas with a complete accessible list
 - PostgreSQL 17 with Prisma for device, metric, Alert, Event, and audit persistence
 - Vitest/Testing Library for unit, integration, and component tests; Playwright and
   axe-core for browser and accessibility tests
-- TanStack Query, React Flow, production identity, and realtime adapters remain
-  deferred until an approved sprint uses them
+- Native Server-Sent Events with REST recovery and conditional polling
+- TanStack Query, production identity, and distributed realtime adapters remain
+  deferred
 
 ## Requirements
 
@@ -106,7 +108,9 @@ npm run validate
 | `/api/v1/events`                       | Filtered, searchable cursor-paginated Event history       |
 | `/api/v1/devices/{id}/alerts`          | Active-device related Alert history                       |
 | `/api/v1/devices/{id}/events`          | Active-device related Event history                       |
-| `/topology`                            | Protected placeholder for Sprint 4                        |
+| `/topology`                            | Interactive active topology and accessible list           |
+| `/api/v1/topology`                     | Authorized active Device/connection snapshot              |
+| `/api/v1/realtime`                     | Authenticated, same-origin read-only SSE stream           |
 
 `proxy.ts` performs only an optimistic cookie-presence redirect. Every protected
 server render verifies the signature and expiry, and protected application use
@@ -129,6 +133,16 @@ worker, simulation, polling, WebSocket, or SSE transport invokes it yet. Alert
 lifecycle changes write the Alert, Event, and AuditLog atomically. Events have no
 mutation API and permanent Demo retention. The bandwidth rule is disabled until
 link capacity exists.
+
+Sprint 4 persists canonical, visually undirected network connections and renders
+only active Devices and their links. `parentDeviceId` remains independent
+metadata. The topology uses deterministic client layout, provides keyboard
+controls and a complete accessible list, and exposes no connection mutations or
+saved coordinates. Native SSE supplies cache-invalidation signals to Topology,
+Alerts, Events, and the shell indicator; REST remains authoritative and
+five-second polling runs only while SSE is unavailable. The process-local
+publisher is Demo-only, non-durable, and not suitable for multi-instance
+production deployment.
 
 ## Repository structure
 
@@ -153,12 +167,15 @@ scripts/         Documented maintenance and simulation scripts when implemented
 - [Demo identity and Dashboard decision](docs/adr/0002-demo-identity-and-dashboard-contracts.md)
 - [PostgreSQL Device persistence decision](docs/adr/0003-postgresql-device-persistence.md)
 - [Alert lifecycle and Event contract decision](docs/adr/0004-alert-lifecycle-and-event-contracts.md)
+- [Topology and realtime decision](docs/adr/0005-topology-and-realtime-architecture.md)
 - [REST API reference](docs/API.md)
+- [Security and realtime limitations](docs/SECURITY.md)
 - [Testing and database-safety guide](docs/TESTING.md)
 - [Sprint 0 completion report](docs/SPRINT_0_COMPLETION_REPORT.md)
 - [Sprint 1 completion report](docs/SPRINT_1_COMPLETION_REPORT.md)
 - [Sprint 2 completion report](docs/SPRINT_2_COMPLETION_REPORT.md)
 - [Sprint 3 completion report](docs/SPRINT_3_COMPLETION_REPORT.md)
+- [Sprint 4 completion report](docs/SPRINT_4_COMPLETION_REPORT.md)
 - [Approved baseline package](docs/baseline/README_AR.txt)
 
 The source documents in `docs/baseline/` are authoritative. Changes to scope require

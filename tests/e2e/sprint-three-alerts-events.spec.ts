@@ -22,7 +22,9 @@ test("all roles can browse filtered Alerts and immutable Events", async ({
   await expect(
     page.getByRole("combobox", { name: "Severity", exact: true }),
   ).toHaveValue("CRITICAL");
-  await expect(page.getByText("Core router is offline")).toBeVisible();
+  await expect(
+    page.getByText("Core router is offline").filter({ visible: true }),
+  ).toBeVisible();
   await expect(page.getByRole("button", { name: "Acknowledge" })).toHaveCount(
     0,
   );
@@ -31,7 +33,9 @@ test("all roles can browse filtered Alerts and immutable Events", async ({
   await expect(
     page.getByRole("heading", { level: 1, name: "Events" }),
   ).toBeVisible();
-  await expect(page.getByLabel("Search event messages")).toHaveValue("Alert");
+  await expect(
+    page.getByLabel("Search event messages").filter({ visible: true }),
+  ).toHaveValue("Alert");
   await expect(
     page.getByRole("list", { name: "Operational Event timeline" }),
   ).toBeVisible();
@@ -42,7 +46,7 @@ test("authorized operators see canonical lifecycle controls", async ({
 }) => {
   await signIn(page, "admin@securenet.demo");
   await page.goto("/alerts?status=OPEN");
-  const alert = page.locator("details").filter({
+  const alert = page.locator("details:visible").filter({
     hasText: "Core router is offline",
   });
   await alert.locator("summary").click();

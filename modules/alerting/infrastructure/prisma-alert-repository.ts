@@ -30,6 +30,7 @@ import {
 } from "@/modules/alerting/domain/alert";
 import type { DeviceMutationContext } from "@/modules/inventory/application/device-repository";
 import { DeviceNotFoundError } from "@/modules/inventory/application/device-errors";
+import { publishRealtimeSafely } from "@/modules/realtime/infrastructure/in-process-realtime-publisher";
 import { isMetricStale } from "@/modules/telemetry/domain/freshness";
 
 const activeStatuses: AlertStatus[] = [
@@ -372,6 +373,27 @@ export class PrismaAlertRepository implements AlertRepository {
       });
       return { alert: mapAlert(updated), eventId: event.id.toString() };
     });
+    publishRealtimeSafely({
+      eventType: "alert.updated",
+      entityType: "alert",
+      entityId: result.alert.id,
+      payload: {
+        alertId: result.alert.id,
+        status: result.alert.status,
+        actor: {
+          id: context.actor.id,
+          name: context.actor.name,
+          role: context.actor.role,
+        },
+        timestamp: new Date().toISOString(),
+      },
+    });
+    publishRealtimeSafely({
+      eventType: "event.created",
+      entityType: "event",
+      entityId: result.eventId,
+      payload: { event: { id: result.eventId } },
+    });
     return result;
   }
 
@@ -428,7 +450,7 @@ export class PrismaAlertRepository implements AlertRepository {
               lastTriggeredAt: trigger.triggeredAt,
             },
           });
-          await transaction.event.create({
+          const event = await transaction.event.create({
             data: {
               deviceId,
               alertId: active.id,
@@ -444,7 +466,11 @@ export class PrismaAlertRepository implements AlertRepository {
               createdAt: trigger.triggeredAt,
             },
           });
-          return "retriggered" as const;
+          return {
+            kind: "retriggered" as const,
+            alertId: active.id,
+            eventId: event.id.toString(),
+          };
         }
 
         const alert = await transaction.alert.create({
@@ -461,7 +487,7 @@ export class PrismaAlertRepository implements AlertRepository {
             lastTriggeredAt: trigger.triggeredAt,
           },
         });
-        await transaction.event.create({
+        const event = await transaction.event.create({
           data: {
             deviceId,
             alertId: alert.id,
@@ -477,11 +503,36 @@ export class PrismaAlertRepository implements AlertRepository {
             createdAt: trigger.triggeredAt,
           },
         });
-        return "opened" as const;
+        return {
+          kind: "opened" as const,
+          alertId: alert.id,
+          eventId: event.id.toString(),
+        };
       });
 
     try {
-      return await persist();
+      const result = await persist();
+      publishRealtimeSafely({
+        eventType: result.kind === "opened" ? "alert.created" : "alert.updated",
+        entityType: "alert",
+        entityId: result.alertId,
+        payload:
+          result.kind === "opened"
+            ? { alert: { id: result.alertId } }
+            : {
+                alertId: result.alertId,
+                status: "OPEN",
+                actor: null,
+                timestamp: trigger.triggeredAt.toISOString(),
+              },
+      });
+      publishRealtimeSafely({
+        eventType: "event.created",
+        entityType: "event",
+        entityId: result.eventId,
+        payload: { event: { id: result.eventId } },
+      });
+      return result.kind;
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -495,7 +546,7 @@ export class PrismaAlertRepository implements AlertRepository {
           },
         });
         if (!existing) throw new AlertActiveConflictError();
-        await prisma.$transaction([
+        const [, event] = await prisma.$transaction([
           prisma.alert.update({
             where: { id: existing.id },
             data: {
@@ -515,6 +566,23 @@ export class PrismaAlertRepository implements AlertRepository {
             },
           }),
         ]);
+        publishRealtimeSafely({
+          eventType: "alert.updated",
+          entityType: "alert",
+          entityId: existing.id,
+          payload: {
+            alertId: existing.id,
+            status: existing.status,
+            actor: null,
+            timestamp: trigger.triggeredAt.toISOString(),
+          },
+        });
+        publishRealtimeSafely({
+          eventType: "event.created",
+          entityType: "event",
+          entityId: event.id.toString(),
+          payload: { event: { id: event.id.toString() } },
+        });
         return "retriggered";
       }
       throw error;

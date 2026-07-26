@@ -48,3 +48,18 @@ Scheduler, worker, simulation, polling, WebSocket, SSE, realtime UI, topology,
 AlertRule management UI, reports, notifications, and user management remain in
 their approved later sprints. The Sprint 1 Dashboard fixture repository remains
 unchanged.
+
+## Sprint 4 resolution
+
+The approved Sprint 4 decisions make `NetworkConnection` the sole source of
+rendered topology links and retain `parentDeviceId` as unrelated hierarchy
+metadata. Active snapshots omit archived Devices and their links while preserving
+all connection rows. The client uses a deterministic non-persisted layout and a
+complete accessible list; connection CRUD and saved positions remain deferred.
+
+Realtime uses authenticated same-origin SSE with a single-instance in-process
+publisher, REST snapshot recovery, and five-second polling only during SSE
+unavailability. Publications occur after successful database commits and cannot
+roll back business operations. Consumers are limited to Topology status, the
+shell indicator, Alerts, and Events. Dashboard fixtures remain unchanged,
+bandwidth evaluation remains disabled, and Sprint 5 simulation is not started.

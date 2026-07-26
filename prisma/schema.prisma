@@ -37,6 +37,19 @@ enum DeviceStatus {
   UNKNOWN
 }
 
+enum NetworkConnectionType {
+  ETHERNET
+  WIFI
+  VPN
+  VIRTUAL
+}
+
+enum NetworkConnectionStatus {
+  ACTIVE
+  DEGRADED
+  DOWN
+}
+
 enum AlertMetric {
   CPU
   RAM
@@ -137,10 +150,31 @@ model Device {
   metrics          DeviceMetric[]
   alerts           Alert[]
   events           Event[]
+  sourceConnections NetworkConnection[] @relation("ConnectionSource")
+  targetConnections NetworkConnection[] @relation("ConnectionTarget")
 
   @@index([status, type, locationId], map: "devices_status_type_location_id_idx")
   @@index([parentDeviceId], map: "devices_parent_device_id_idx")
   @@map("devices")
+}
+
+model NetworkConnection {
+  id                    String                  @id @default(uuid()) @db.Uuid
+  sourceDeviceId        String                  @map("source_device_id") @db.Uuid
+  targetDeviceId        String                  @map("target_device_id") @db.Uuid
+  connectionType        NetworkConnectionType   @map("connection_type")
+  label                 String?                 @db.VarChar(120)
+  bandwidthCapacityMbps Decimal?                @map("bandwidth_capacity_mbps") @db.Decimal(12, 2)
+  status                NetworkConnectionStatus
+  createdAt             DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+  sourceDevice          Device                  @relation("ConnectionSource", fields: [sourceDeviceId], references: [id], onDelete: Restrict)
+  targetDevice          Device                  @relation("ConnectionTarget", fields: [targetDeviceId], references: [id], onDelete: Restrict)
+
+  @@unique([sourceDeviceId, targetDeviceId, connectionType], map: "network_connections_endpoints_type_key")
+  @@index([sourceDeviceId], map: "network_connections_source_device_id_idx")
+  @@index([targetDeviceId], map: "network_connections_target_device_id_idx")
+  @@map("network_connections")
 }
 
 model DeviceMetric {

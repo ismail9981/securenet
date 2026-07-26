@@ -21,6 +21,22 @@ use semantic versioning once releases begin.
 
 ### Added
 
+- Additive Sprint 4 `NetworkConnection` persistence with canonical undirected
+  endpoints, restrictive history relationships, nullable capacity metadata, and
+  deterministic idempotent seed links.
+- Authorized active Topology snapshot API, deterministic React Flow layout,
+  interactive controls, status-aware nodes, Device navigation, and complete
+  accessible-list alternative across desktop and 320-pixel mobile.
+- Same-origin authenticated SSE endpoint, versioned bounded envelopes,
+  process-local publisher limits, heartbeat/lifetime handling, reconnect snapshot
+  recovery, and conditional five-second polling.
+- After-commit Device, Alert, and Event publication with non-rollback failure
+  handling, live Topology/Alerts/Event consumers, and the shell connection-state
+  indicator.
+- Sprint 4 domain, database, route, component, realtime, desktop/mobile,
+  accessibility, security, recovery, and regression coverage.
+- ADR-0005 plus Sprint 4 API, testing, security, assumptions, roadmap,
+  traceability, and completion documentation.
 - Additive Sprint 3 AlertRule, Alert, and Event migration with fixed enums,
   restrictive history relationships, consecutive-sample rules, and a partial
   unique active-Alert constraint.

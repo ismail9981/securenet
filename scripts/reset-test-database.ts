@@ -22,6 +22,7 @@ export async function resetTestDatabase(): Promise<void> {
       client.alert.deleteMany(),
       client.alertRule.deleteMany(),
       client.deviceMetric.deleteMany(),
+      client.networkConnection.deleteMany(),
       client.device.deleteMany(),
       client.location.deleteMany(),
       client.user.deleteMany(),

@@ -27,3 +27,13 @@ and filtering, Event cursor/filter/search, malformed inputs, related-device
 history, archive preservation, idempotent seed/migration checks, desktop and
 320-pixel mobile flows, and axe WCAG A/AA checks. Browser tests run serially
 against a freshly reset `securenet_test`.
+
+Sprint 4 coverage adds connection validation and database constraints, canonical
+undirected duplicates, cycles, disconnected and orphan nodes, archived
+exclusion/history preservation, deterministic seed idempotence, authorized
+Topology DTOs, React Flow and accessible-list parity, keyboard/mobile/reduced
+motion/axe behavior, SSE authentication and same-origin enforcement, connection
+and message limits, malformed/duplicate suppression, reconnect snapshot recovery,
+polling fallback, after-commit publication, non-rollback publication failures,
+and live Topology/Alert/Event refresh. Browser tests continue to run serially
+against a freshly reset `securenet_test`.

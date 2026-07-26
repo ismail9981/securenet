@@ -44,7 +44,8 @@ function cursorHref(
 
 export default async function EventsPage({ searchParams }: Props) {
   const session = await requireServerSession();
-  const query = parseEventListQuery(params(await searchParams));
+  const search = params(await searchParams);
+  const query = parseEventListQuery(search);
   const page = await eventService.list(query, { actor: session.user });
   return (
     <div className="mx-auto w-full max-w-7xl">
@@ -161,7 +162,11 @@ export default async function EventsPage({ searchParams }: Props) {
           Clear
         </Link>
       </form>
-      <EventTimeline page={page} />
+      <EventTimeline
+        key={search.toString()}
+        page={page}
+        refreshUrl={`/api/v1/events?${search.toString()}`}
+      />
       <div className="mt-6 flex justify-end">
         {page.meta.nextCursor ? (
           <Link

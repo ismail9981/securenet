@@ -31,6 +31,7 @@ import type {
   MetricCursorQuery,
   UpdateDeviceInput,
 } from "@/modules/inventory/domain/device";
+import { publishRealtimeSafely } from "@/modules/realtime/infrastructure/in-process-realtime-publisher";
 import { isMetricStale } from "@/modules/telemetry/domain/freshness";
 
 const deviceInclude = {
@@ -379,7 +380,7 @@ export class PrismaDeviceRepository implements DeviceRepository {
     context: DeviceMutationContext,
   ): Promise<DeviceDetails> {
     try {
-      const id = await prisma.$transaction(async (transaction) => {
+      const committed = await prisma.$transaction(async (transaction) => {
         await assertReferences(
           transaction,
           input.locationId,
@@ -407,7 +408,7 @@ export class PrismaDeviceRepository implements DeviceRepository {
             ipAddress: context.requestIp,
           },
         });
-        await transaction.event.create({
+        const event = await transaction.event.create({
           data: {
             actorUserId: context.actor.id,
             deviceId: created.id,
@@ -417,10 +418,28 @@ export class PrismaDeviceRepository implements DeviceRepository {
             payload: { source: "USER_ACTION" },
           },
         });
-        return created.id;
+        return { id: created.id, eventId: event.id.toString() };
       });
 
-      return (await this.getById(id)) as DeviceDetails;
+      const device = (await this.getById(committed.id)) as DeviceDetails;
+      publishRealtimeSafely({
+        eventType: "device.updated",
+        entityType: "device",
+        entityId: device.id,
+        payload: {
+          deviceId: device.id,
+          status: device.status,
+          latestMetrics: device.latestMetrics,
+          lastSeenAt: device.lastSeenAt,
+        },
+      });
+      publishRealtimeSafely({
+        eventType: "event.created",
+        entityType: "event",
+        entityId: committed.eventId,
+        payload: { event: { id: committed.eventId } },
+      });
+      return device;
     } catch (error) {
       if (isUniqueConstraintError(error)) {
         return resolveIdentityConflict(input.hostname, input.ipAddress);
@@ -435,7 +454,7 @@ export class PrismaDeviceRepository implements DeviceRepository {
     context: DeviceMutationContext,
   ): Promise<DeviceDetails> {
     try {
-      await prisma.$transaction(async (transaction) => {
+      const committed = await prisma.$transaction(async (transaction) => {
         const existing = await transaction.device.findFirst({
           where: { id, archivedAt: null },
         });
@@ -500,7 +519,7 @@ export class PrismaDeviceRepository implements DeviceRepository {
             ipAddress: context.requestIp,
           },
         });
-        await transaction.event.create({
+        const updatedEvent = await transaction.event.create({
           data: {
             actorUserId: context.actor.id,
             deviceId: updated.id,
@@ -510,8 +529,9 @@ export class PrismaDeviceRepository implements DeviceRepository {
             payload: { source: "USER_ACTION" },
           },
         });
+        let statusEventId: string | null = null;
         if (existing.status !== updated.status) {
-          await transaction.event.create({
+          const statusEvent = await transaction.event.create({
             data: {
               actorUserId: context.actor.id,
               deviceId: updated.id,
@@ -530,10 +550,36 @@ export class PrismaDeviceRepository implements DeviceRepository {
               },
             },
           });
+          statusEventId = statusEvent.id.toString();
         }
+        return {
+          eventIds: [updatedEvent.id.toString(), statusEventId].filter(
+            (eventId): eventId is string => eventId !== null,
+          ),
+        };
       });
 
-      return (await this.getById(id)) as DeviceDetails;
+      const device = (await this.getById(id)) as DeviceDetails;
+      publishRealtimeSafely({
+        eventType: "device.updated",
+        entityType: "device",
+        entityId: device.id,
+        payload: {
+          deviceId: device.id,
+          status: device.status,
+          latestMetrics: device.latestMetrics,
+          lastSeenAt: device.lastSeenAt,
+        },
+      });
+      for (const eventId of committed.eventIds) {
+        publishRealtimeSafely({
+          eventType: "event.created",
+          entityType: "event",
+          entityId: eventId,
+          payload: { event: { id: eventId } },
+        });
+      }
+      return device;
     } catch (error) {
       if (isUniqueConstraintError(error)) {
         const existing = await prisma.device.findUnique({
@@ -556,7 +602,7 @@ export class PrismaDeviceRepository implements DeviceRepository {
   ): Promise<{ readonly id: string; readonly archivedAt: string }> {
     const archivedAt = new Date();
 
-    await prisma.$transaction(async (transaction) => {
+    const committed = await prisma.$transaction(async (transaction) => {
       const existing = await transaction.device.findFirst({
         where: { id, archivedAt: null },
       });
@@ -577,7 +623,7 @@ export class PrismaDeviceRepository implements DeviceRepository {
           ipAddress: context.requestIp,
         },
       });
-      await transaction.event.create({
+      const event = await transaction.event.create({
         data: {
           actorUserId: context.actor.id,
           deviceId: archived.id,
@@ -587,8 +633,30 @@ export class PrismaDeviceRepository implements DeviceRepository {
           payload: { source: "USER_ACTION" },
         },
       });
+      return {
+        eventId: event.id.toString(),
+        status: archived.status,
+        lastSeenAt: archived.lastSeenAt?.toISOString() ?? null,
+      };
     });
 
+    publishRealtimeSafely({
+      eventType: "device.updated",
+      entityType: "device",
+      entityId: id,
+      payload: {
+        deviceId: id,
+        status: committed.status,
+        latestMetrics: null,
+        lastSeenAt: committed.lastSeenAt,
+      },
+    });
+    publishRealtimeSafely({
+      eventType: "event.created",
+      entityType: "event",
+      entityId: committed.eventId,
+      payload: { event: { id: committed.eventId } },
+    });
     return { id, archivedAt: archivedAt.toISOString() };
   }
 }

@@ -48,7 +48,7 @@ export function UserMenu({ user }: { readonly user: PublicUser }) {
       </div>
       <div
         aria-hidden="true"
-        className="bg-panel text-muted grid size-9 place-items-center rounded-full border"
+        className="bg-panel text-muted hidden size-9 place-items-center rounded-full border sm:grid"
       >
         <UserRound className="size-4" />
       </div>

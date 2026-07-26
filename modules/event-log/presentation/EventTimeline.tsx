@@ -1,9 +1,52 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import type { EventPage } from "@/modules/event-log/application/event-contracts";
 import { formatDateTime } from "@/modules/inventory/presentation/device-format";
+import type { RealtimeEnvelope } from "@/modules/realtime/application/realtime-contracts";
 
-export function EventTimeline({ page }: { readonly page: EventPage }) {
+export function EventTimeline({
+  page: initialPage,
+  refreshUrl,
+}: {
+  readonly page: EventPage;
+  readonly refreshUrl?: string;
+}) {
+  const [page, setPage] = useState(initialPage);
+
+  useEffect(() => {
+    if (!refreshUrl) return;
+    let cancelled = false;
+    const refresh = (event?: Event) => {
+      const envelope = (event as CustomEvent<RealtimeEnvelope> | undefined)
+        ?.detail;
+      if (envelope && envelope.eventType !== "event.created") return;
+      void fetch(refreshUrl, {
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      })
+        .then(async (response) => {
+          if (!response.ok) throw new Error("Event refresh failed.");
+          return (await response.json()) as EventPage;
+        })
+        .then((nextPage) => {
+          if (!cancelled) setPage(nextPage);
+        })
+        .catch(() => {
+          // Reconnect recovery and conditional polling remain available.
+        });
+    };
+    window.addEventListener("securenet:realtime", refresh);
+    window.addEventListener("securenet:snapshot-recovery", refresh);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("securenet:realtime", refresh);
+      window.removeEventListener("securenet:snapshot-recovery", refresh);
+    };
+  }, [refreshUrl]);
+
   if (!page.data.length) {
     return (
       <div className="bg-panel rounded-xl border p-8 text-center">

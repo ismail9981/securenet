@@ -9,6 +9,7 @@ import {
   DeviceNotFoundError,
 } from "@/modules/inventory/application/device-errors";
 import type { PublicUser } from "@/modules/identity/domain/user";
+import { realtimeHub } from "@/modules/realtime/infrastructure/in-process-realtime-publisher";
 import { resetTestDatabase } from "@/scripts/reset-test-database";
 
 config({ path: ".env.local", quiet: true });
@@ -114,6 +115,10 @@ describe("Prisma device repository", () => {
   });
 
   it("creates, updates, and archives atomically with audit history", async () => {
+    const published: string[] = [];
+    const release = realtimeHub.subscribe(admin.id, (envelope) =>
+      published.push(envelope.eventType),
+    );
     const created = await service.create(
       {
         name: "Audit Test Server",
@@ -152,5 +157,9 @@ describe("Prisma device repository", () => {
         where: { id: created.id, archivedAt: { not: null } },
       }),
     ).toBe(1);
+    expect(published).toEqual(
+      expect.arrayContaining(["device.updated", "event.created"]),
+    );
+    release?.();
   });
 });
