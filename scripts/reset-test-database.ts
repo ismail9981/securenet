@@ -17,7 +17,10 @@ export async function resetTestDatabase(): Promise<void> {
 
   try {
     await client.$transaction([
+      client.event.deleteMany(),
       client.auditLog.deleteMany(),
+      client.alert.deleteMany(),
+      client.alertRule.deleteMany(),
       client.deviceMetric.deleteMany(),
       client.device.deleteMany(),
       client.location.deleteMany(),

@@ -1,6 +1,8 @@
 import { isIP } from "node:net";
 
 import {
+  AlertSeverity,
+  EventType,
   Prisma,
   type Device as PrismaDevice,
   type DeviceMetric as PrismaDeviceMetric,
@@ -39,6 +41,12 @@ const deviceInclude = {
   metrics: {
     orderBy: [{ sourceTime: "desc" }, { id: "desc" }],
     take: 1,
+  },
+  alerts: {
+    where: {
+      status: { in: ["OPEN", "ACKNOWLEDGED", "INVESTIGATING"] },
+    },
+    select: { id: true },
   },
 } satisfies Prisma.DeviceInclude;
 
@@ -80,7 +88,7 @@ function mapSummary(device: DeviceRecord): DeviceSummary {
     },
     latestMetrics: device.metrics[0] ? mapMetric(device.metrics[0]) : null,
     lastSeenAt: device.lastSeenAt?.toISOString() ?? null,
-    activeAlertCount: null,
+    activeAlertCount: device.alerts.length,
   };
 }
 
@@ -399,6 +407,16 @@ export class PrismaDeviceRepository implements DeviceRepository {
             ipAddress: context.requestIp,
           },
         });
+        await transaction.event.create({
+          data: {
+            actorUserId: context.actor.id,
+            deviceId: created.id,
+            type: EventType.DEVICE_CREATED,
+            severity: AlertSeverity.INFO,
+            message: `${context.actor.name} created ${created.name} (${created.hostname}).`,
+            payload: { source: "USER_ACTION" },
+          },
+        });
         return created.id;
       });
 
@@ -482,6 +500,37 @@ export class PrismaDeviceRepository implements DeviceRepository {
             ipAddress: context.requestIp,
           },
         });
+        await transaction.event.create({
+          data: {
+            actorUserId: context.actor.id,
+            deviceId: updated.id,
+            type: EventType.DEVICE_UPDATED,
+            severity: AlertSeverity.INFO,
+            message: `${context.actor.name} updated ${updated.name} (${updated.hostname}).`,
+            payload: { source: "USER_ACTION" },
+          },
+        });
+        if (existing.status !== updated.status) {
+          await transaction.event.create({
+            data: {
+              actorUserId: context.actor.id,
+              deviceId: updated.id,
+              type: EventType.DEVICE_STATUS_CHANGED,
+              severity:
+                updated.status === "OFFLINE"
+                  ? AlertSeverity.CRITICAL
+                  : updated.status === "DEGRADED"
+                    ? AlertSeverity.WARNING
+                    : AlertSeverity.INFO,
+              message: `${updated.hostname} changed from ${existing.status} to ${updated.status}.`,
+              payload: {
+                source: "USER_ACTION",
+                previousStatus: existing.status,
+                currentStatus: updated.status,
+              },
+            },
+          });
+        }
       });
 
       return (await this.getById(id)) as DeviceDetails;
@@ -526,6 +575,16 @@ export class PrismaDeviceRepository implements DeviceRepository {
           beforeData: auditSnapshot(existing),
           afterData: auditSnapshot(archived),
           ipAddress: context.requestIp,
+        },
+      });
+      await transaction.event.create({
+        data: {
+          actorUserId: context.actor.id,
+          deviceId: archived.id,
+          type: EventType.DEVICE_ARCHIVED,
+          severity: AlertSeverity.INFO,
+          message: `${context.actor.name} archived ${archived.name} (${archived.hostname}).`,
+          payload: { source: "USER_ACTION" },
         },
       });
     });

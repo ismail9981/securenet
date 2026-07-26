@@ -6,6 +6,7 @@ import { ZodError } from "zod";
 
 import { logEvent } from "@/lib/logger";
 import { AuthorizationError } from "@/modules/identity/domain/permissions";
+import type { Permission } from "@/modules/identity/domain/permissions";
 import {
   SESSION_COOKIE_NAME,
   verifySessionToken,
@@ -16,6 +17,11 @@ import {
   DeviceNotFoundError,
   DeviceReferenceError,
 } from "@/modules/inventory/application/device-errors";
+import {
+  AlertActiveConflictError,
+  AlertNotFoundError,
+} from "@/modules/alerting/application/alert-errors";
+import { AlertLifecycleError } from "@/modules/alerting/domain/alert";
 
 const MAX_JSON_BODY_BYTES = 16_384;
 
@@ -102,7 +108,10 @@ export async function readJsonBody(request: NextRequest): Promise<unknown> {
   }
 }
 
-export function assertSameOrigin(request: NextRequest): void {
+export function assertSameOrigin(
+  request: NextRequest,
+  permission: Permission = "MANAGE_DEVICES",
+): void {
   const origin = request.headers.get("origin");
   if (!origin) return;
 
@@ -119,7 +128,7 @@ export function assertSameOrigin(request: NextRequest): void {
   try {
     originUrl = new URL(origin);
   } catch {
-    throw new AuthorizationError("MANAGE_DEVICES");
+    throw new AuthorizationError(permission);
   }
 
   const originHost = originUrl.host.toLowerCase();
@@ -132,7 +141,7 @@ export function assertSameOrigin(request: NextRequest): void {
     requestPort === originUrl.port;
 
   if (!requestHost || (originHost !== requestHost && !isEquivalentLoopback)) {
-    throw new AuthorizationError("MANAGE_DEVICES");
+    throw new AuthorizationError(permission);
   }
 }
 
@@ -187,6 +196,20 @@ export function handleApiError(error: unknown): NextResponse {
     return apiError(400, error.code, error.message, correlationId, {
       [error.field]: [error.message],
     });
+  }
+  if (error instanceof AlertNotFoundError) {
+    return apiError(404, error.code, error.message, correlationId);
+  }
+  if (error instanceof AlertLifecycleError) {
+    return apiError(
+      error.code === "ALERT_OVERRIDE_REASON_REQUIRED" ? 400 : 409,
+      error.code,
+      error.message,
+      correlationId,
+    );
+  }
+  if (error instanceof AlertActiveConflictError) {
+    return apiError(409, error.code, error.message, correlationId);
   }
 
   logEvent("error", "api.request.failed", {

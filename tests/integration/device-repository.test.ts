@@ -68,7 +68,7 @@ describe("Prisma device repository", () => {
     expect(all.meta.total).toBe(30);
     expect(search.data).toHaveLength(1);
     expect(search.data[0]?.hostname).toBe("RTR-CORE-01");
-    expect(search.data[0]?.activeAlertCount).toBeNull();
+    expect(search.data[0]?.activeAlertCount).toBe(1);
   });
 
   it("returns 24 persisted metric fixtures with source and received time", async () => {
@@ -144,6 +144,9 @@ describe("Prisma device repository", () => {
     expect(
       await database.auditLog.count({ where: { entityId: created.id } }),
     ).toBe(3);
+    expect(
+      await database.event.count({ where: { deviceId: created.id } }),
+    ).toBe(4);
     expect(
       await database.device.count({
         where: { id: created.id, archivedAt: { not: null } },

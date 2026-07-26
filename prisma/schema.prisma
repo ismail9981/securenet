@@ -37,17 +37,69 @@ enum DeviceStatus {
   UNKNOWN
 }
 
+enum AlertMetric {
+  CPU
+  RAM
+  DISK
+  PING
+  PACKET_LOSS
+  STATUS
+  BANDWIDTH
+}
+
+enum AlertOperator {
+  GT
+  GTE
+  LT
+  LTE
+  EQ
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum AlertStatus {
+  OPEN
+  ACKNOWLEDGED
+  INVESTIGATING
+  RESOLVED
+}
+
+enum AlertSource {
+  METRIC_RULE
+  DEVICE_STATUS
+}
+
+enum EventType {
+  ALERT_OPENED
+  ALERT_RETRIGGERED
+  ALERT_ACKNOWLEDGED
+  ALERT_INVESTIGATION_STARTED
+  ALERT_RESOLVED
+  DEVICE_CREATED
+  DEVICE_UPDATED
+  DEVICE_ARCHIVED
+  DEVICE_STATUS_CHANGED
+}
+
 model User {
-  id           String      @id @default(uuid()) @db.Uuid
-  name         String      @db.VarChar(120)
-  email        String      @unique @db.VarChar(255)
-  passwordHash String      @map("password_hash")
-  role         UserRole
-  status       UserStatus
-  lastLoginAt  DateTime?   @map("last_login_at") @db.Timestamptz(3)
-  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt    DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
-  auditLogs    AuditLog[]
+  id                 String     @id @default(uuid()) @db.Uuid
+  name               String     @db.VarChar(120)
+  email              String     @unique @db.VarChar(255)
+  passwordHash       String     @map("password_hash")
+  role               UserRole
+  status             UserStatus
+  lastLoginAt        DateTime?  @map("last_login_at") @db.Timestamptz(3)
+  createdAt          DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+  auditLogs          AuditLog[]
+  acknowledgedAlerts Alert[]    @relation("AlertAcknowledgedBy")
+  resolvedAlerts     Alert[]    @relation("AlertResolvedBy")
+  assignedAlerts     Alert[]    @relation("AlertAssignee")
+  events             Event[]
 
   @@map("users")
 }
@@ -83,6 +135,8 @@ model Device {
   parentDevice     Device?        @relation("DeviceHierarchy", fields: [parentDeviceId], references: [id], onDelete: SetNull)
   childDevices     Device[]       @relation("DeviceHierarchy")
   metrics          DeviceMetric[]
+  alerts           Alert[]
+  events           Event[]
 
   @@index([status, type, locationId], map: "devices_status_type_location_id_idx")
   @@index([parentDeviceId], map: "devices_parent_device_id_idx")
@@ -107,6 +161,78 @@ model DeviceMetric {
 
   @@index([deviceId, sourceTime(sort: Desc)], map: "device_metrics_device_id_source_time_idx")
   @@map("device_metrics")
+}
+
+model AlertRule {
+  id                 String        @id @default(uuid()) @db.Uuid
+  code               String        @unique @db.VarChar(80)
+  name               String        @db.VarChar(160)
+  metric             AlertMetric
+  operator           AlertOperator
+  warningThreshold   Decimal?      @map("warning_threshold") @db.Decimal(12, 2)
+  criticalThreshold  Decimal?      @map("critical_threshold") @db.Decimal(12, 2)
+  durationSeconds    Int           @default(0) @map("duration_seconds")
+  consecutiveSamples Int?          @map("consecutive_samples")
+  enabled            Boolean       @default(true)
+  scope              Json          @default("{}") @db.JsonB
+  createdAt          DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+  alerts             Alert[]
+
+  @@map("alert_rules")
+}
+
+model Alert {
+  id                  String        @id @default(uuid()) @db.Uuid
+  deviceId            String        @map("device_id") @db.Uuid
+  alertRuleId         String?       @map("alert_rule_id") @db.Uuid
+  dedupeKey           String        @map("dedupe_key") @db.VarChar(255)
+  title               String        @db.VarChar(200)
+  description         String
+  severity            AlertSeverity
+  status              AlertStatus
+  source              AlertSource
+  openedAt            DateTime      @map("opened_at") @db.Timestamptz(3)
+  acknowledgedAt      DateTime?     @map("acknowledged_at") @db.Timestamptz(3)
+  acknowledgedById    String?       @map("acknowledged_by") @db.Uuid
+  acknowledgementNote String?       @map("acknowledgement_note")
+  assigneeUserId      String?       @map("assignee_user_id") @db.Uuid
+  resolvedAt          DateTime?     @map("resolved_at") @db.Timestamptz(3)
+  resolvedById        String?       @map("resolved_by") @db.Uuid
+  resolutionNote      String?       @map("resolution_note")
+  lastTriggeredAt     DateTime      @map("last_triggered_at") @db.Timestamptz(3)
+  device              Device        @relation(fields: [deviceId], references: [id], onDelete: Restrict)
+  alertRule           AlertRule?    @relation(fields: [alertRuleId], references: [id], onDelete: Restrict)
+  acknowledgedBy      User?         @relation("AlertAcknowledgedBy", fields: [acknowledgedById], references: [id], onDelete: Restrict)
+  resolvedBy          User?         @relation("AlertResolvedBy", fields: [resolvedById], references: [id], onDelete: Restrict)
+  assigneeUser        User?         @relation("AlertAssignee", fields: [assigneeUserId], references: [id], onDelete: Restrict)
+  events              Event[]
+
+  @@index([status, severity, openedAt(sort: Desc)], map: "alerts_status_severity_opened_at_idx")
+  @@index([deviceId, status], map: "alerts_device_id_status_idx")
+  @@index([dedupeKey], map: "alerts_dedupe_key_idx")
+  @@map("alerts")
+}
+
+model Event {
+  id          BigInt        @id @default(autoincrement())
+  deviceId    String?       @map("device_id") @db.Uuid
+  alertId     String?       @map("alert_id") @db.Uuid
+  actorUserId String?       @map("actor_user_id") @db.Uuid
+  type        EventType
+  severity    AlertSeverity
+  message     String
+  payload     Json          @default("{}") @db.JsonB
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  device      Device?       @relation(fields: [deviceId], references: [id], onDelete: Restrict)
+  alert       Alert?        @relation(fields: [alertId], references: [id], onDelete: Restrict)
+  actorUser   User?         @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@index([createdAt(sort: Desc)], map: "events_created_at_idx")
+  @@index([deviceId, createdAt(sort: Desc)], map: "events_device_id_created_at_idx")
+  @@index([alertId, createdAt(sort: Desc)], map: "events_alert_id_created_at_idx")
+  @@index([actorUserId, createdAt(sort: Desc)], map: "events_actor_user_id_created_at_idx")
+  @@map("events")
 }
 
 model AuditLog {

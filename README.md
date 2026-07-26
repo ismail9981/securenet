@@ -5,8 +5,10 @@ device state, alerts, operational events, and topology from one interface. Versi
 1.0 is a portfolio/demo product: it does **not** monitor a real network, discover
 devices, or connect through SNMP, WMI, SSH, or agents.
 
-This repository contains the validated Sprint 0–2 implementation: the application
-foundation, Demo identity and Dashboard, and PostgreSQL-backed Device Inventory.
+This repository contains the validated Sprint 0–2 implementation and the Sprint 3
+Alerting/Event Log implementation: the application foundation, Demo identity and
+Dashboard, PostgreSQL-backed Device Inventory, synchronous alert evaluation, and
+immutable operational history.
 Authentication and every Dashboard value remain deliberately demonstration-only;
 they must not protect or represent a real monitored network.
 
@@ -20,7 +22,7 @@ they must not protect or represent a real monitored network.
 - Zod for boundary schemas and shared type inference
 - bcrypt password verification and JOSE-signed HttpOnly Demo sessions
 - Recharts for the deterministic accessible Dashboard trend
-- PostgreSQL 17 with Prisma for device, location, metric, and audit persistence
+- PostgreSQL 17 with Prisma for device, metric, Alert, Event, and audit persistence
 - Vitest/Testing Library for unit, integration, and component tests; Playwright and
   axe-core for browser and accessibility tests
 - TanStack Query, React Flow, production identity, and realtime adapters remain
@@ -94,7 +96,16 @@ npm run validate
 | `/api/v1/devices`                      | List/search/filter/sort/page and Administrator create     |
 | `/api/v1/devices/{id}`                 | Details, Administrator update, and confirmed soft archive |
 | `/api/v1/devices/{id}/metrics`         | Persisted metric history API; latest snapshot rendered    |
-| `/alerts`, `/events`                   | Protected placeholders for Sprint 3                       |
+| `/alerts`                              | Filtered Alert list/details and authorized lifecycle UI   |
+| `/events`                              | Searchable immutable Event timeline with cursor paging    |
+| `/api/v1/alerts`                       | Filtered, bounded Alert pagination                        |
+| `/api/v1/alerts/{id}`                  | Alert details                                             |
+| `/api/v1/alerts/{id}/acknowledge`      | Admin/Engineer acknowledgement                            |
+| `/api/v1/alerts/{id}/investigate`      | Admin/Engineer acknowledged-to-investigating transition   |
+| `/api/v1/alerts/{id}/resolve`          | Role/state/condition-aware resolution                     |
+| `/api/v1/events`                       | Filtered, searchable cursor-paginated Event history       |
+| `/api/v1/devices/{id}/alerts`          | Active-device related Alert history                       |
+| `/api/v1/devices/{id}/events`          | Active-device related Event history                       |
 | `/topology`                            | Protected placeholder for Sprint 4                        |
 
 `proxy.ts` performs only an optimistic cookie-presence redirect. Every protected
@@ -110,8 +121,14 @@ The Device module persists deterministic Demo inventory and 24 hourly metric
 fixtures. Administrator can create, update, and confirm a soft archive. Network
 Engineer and Viewer are read-only. Archives never hard-delete devices, metrics, or
 audit history. The UI deliberately shows only the current metric snapshot;
-historical charts, alert/event data, realtime updates, and topology behavior remain
-outside Sprint 2.
+historical charts, realtime updates, and topology behavior remain deferred.
+
+Sprint 3 persists Alert rules, Alerts, and Events. Accepted metric batches can be
+evaluated synchronously through an internal application service; no scheduler,
+worker, simulation, polling, WebSocket, or SSE transport invokes it yet. Alert
+lifecycle changes write the Alert, Event, and AuditLog atomically. Events have no
+mutation API and permanent Demo retention. The bandwidth rule is disabled until
+link capacity exists.
 
 ## Repository structure
 
@@ -135,9 +152,13 @@ scripts/         Documented maintenance and simulation scripts when implemented
 - [Architecture decisions](docs/adr/0001-project-foundation.md)
 - [Demo identity and Dashboard decision](docs/adr/0002-demo-identity-and-dashboard-contracts.md)
 - [PostgreSQL Device persistence decision](docs/adr/0003-postgresql-device-persistence.md)
+- [Alert lifecycle and Event contract decision](docs/adr/0004-alert-lifecycle-and-event-contracts.md)
+- [REST API reference](docs/API.md)
+- [Testing and database-safety guide](docs/TESTING.md)
 - [Sprint 0 completion report](docs/SPRINT_0_COMPLETION_REPORT.md)
 - [Sprint 1 completion report](docs/SPRINT_1_COMPLETION_REPORT.md)
 - [Sprint 2 completion report](docs/SPRINT_2_COMPLETION_REPORT.md)
+- [Sprint 3 completion report](docs/SPRINT_3_COMPLETION_REPORT.md)
 - [Approved baseline package](docs/baseline/README_AR.txt)
 
 The source documents in `docs/baseline/` are authoritative. Changes to scope require

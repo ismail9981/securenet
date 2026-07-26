@@ -3,6 +3,8 @@ import type { UserRole } from "@/modules/shared/domain/network";
 export const PERMISSIONS = [
   "VIEW_DASHBOARD",
   "VIEW_DEVICES",
+  "VIEW_ALERTS",
+  "VIEW_EVENTS",
   "MANAGE_DEVICES",
   "ACKNOWLEDGE_ALERTS",
   "RUN_SIMULATION",
@@ -18,10 +20,17 @@ const ROLE_PERMISSIONS: Readonly<Record<UserRole, ReadonlySet<Permission>>> = {
   NETWORK_ENGINEER: new Set([
     "VIEW_DASHBOARD",
     "VIEW_DEVICES",
+    "VIEW_ALERTS",
+    "VIEW_EVENTS",
     "ACKNOWLEDGE_ALERTS",
     "VIEW_AUDIT_LOG",
   ]),
-  VIEWER: new Set(["VIEW_DASHBOARD", "VIEW_DEVICES"]),
+  VIEWER: new Set([
+    "VIEW_DASHBOARD",
+    "VIEW_DEVICES",
+    "VIEW_ALERTS",
+    "VIEW_EVENTS",
+  ]),
 };
 
 export function hasPermission(role: UserRole, permission: Permission): boolean {

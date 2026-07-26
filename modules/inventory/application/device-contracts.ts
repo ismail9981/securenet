@@ -30,7 +30,7 @@ export interface DeviceSummary {
   readonly location: LocationOption;
   readonly latestMetrics: MetricSnapshot | null;
   readonly lastSeenAt: string | null;
-  readonly activeAlertCount: null;
+  readonly activeAlertCount: number;
 }
 
 export interface DeviceDetails extends DeviceSummary {

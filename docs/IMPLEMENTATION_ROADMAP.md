@@ -33,3 +33,18 @@ store devices, locations, deterministic 24-hour metrics, Demo audit principals,
 and append-only device-operation audit records. The UI shows only the latest metric
 snapshot; historical charts and range selection remain In Progress. Sprint 1
 identity and Dashboard fixtures remain unchanged and disconnected from PostgreSQL.
+
+## Sprint 3 resolution
+
+The approved Sprint 3 decisions establish a four-state Alert lifecycle, an
+explicit investigate command, role-specific resolution transitions, transactional
+Event/Audit recording, active device/rule deduplication, permanent append-only
+Event retention, and preserved archived-device history. AlertRule gains
+`consecutiveSamples`; bandwidth evaluation remains deferred because link capacity
+does not exist.
+
+Threshold evaluation is a synchronous internal application boundary only.
+Scheduler, worker, simulation, polling, WebSocket, SSE, realtime UI, topology,
+AlertRule management UI, reports, notifications, and user management remain in
+their approved later sprints. The Sprint 1 Dashboard fixture repository remains
+unchanged.

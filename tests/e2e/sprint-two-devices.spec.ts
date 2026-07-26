@@ -41,7 +41,13 @@ for (const [role, email] of Object.entries(accounts)) {
     await expect(
       page.getByText(/Historical charts.*In Progress/),
     ).toBeVisible();
-    await expect(page.getByText(/activeAlertCount.*unavailable/)).toBeVisible();
+    await expect(page.getByText("Active alerts")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Related alerts" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Related events" }),
+    ).toBeVisible();
   });
 }
 

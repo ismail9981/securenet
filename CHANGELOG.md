@@ -21,6 +21,23 @@ use semantic versioning once releases begin.
 
 ### Added
 
+- Additive Sprint 3 AlertRule, Alert, and Event migration with fixed enums,
+  restrictive history relationships, consecutive-sample rules, and a partial
+  unique active-Alert constraint.
+- Deterministic idempotent Sprint 3 rules, Alerts, and Events; bandwidth
+  evaluation is explicitly disabled until link capacity exists.
+- Pure threshold/duration/consecutive evaluation, synchronous accepted-batch
+  service, active deduplication/retrigger behavior, and the four-state Alert
+  lifecycle.
+- Transactional Alert lifecycle Event/AuditLog recording and prospective
+  device-create/update/archive/status Events with permanent Demo retention.
+- Validated Alert/Event REST APIs, related-device endpoints, responsive Alerts
+  and Events pages, role-aware lifecycle controls, archived history treatment,
+  and Device Details integration.
+- Sprint 3 unit, database, route, component, desktop/mobile, accessibility,
+  security, concurrency, rollback, retention, and regression coverage.
+- ADR-0004 and Sprint 3 assumptions, API, testing, traceability, and completion
+  documentation.
 - PostgreSQL/Prisma models and an additive migration for Demo audit users,
   locations, devices, nullable parent relationships, 24-hour metrics, and
   append-only audit logs.

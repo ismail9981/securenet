@@ -83,8 +83,8 @@ export function AppShell({
               className="text-info mt-0.5 size-4 shrink-0"
             />
             <p className="text-muted text-xs leading-5">
-              Demo environment. Device inventory is persisted; later monitoring
-              modules remain clearly staged.
+              Demo environment. Device inventory, Alerts, and Events are
+              persisted; realtime transport remains staged.
             </p>
           </div>
         </div>

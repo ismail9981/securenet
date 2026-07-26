@@ -5,6 +5,12 @@ import { notFound } from "next/navigation";
 
 import { hasPermission } from "@/modules/identity/domain/permissions";
 import { requireServerSession } from "@/modules/identity/infrastructure/server-session";
+import { alertListQuerySchema } from "@/modules/alerting/domain/alert";
+import { alertService } from "@/modules/alerting/infrastructure/alert-service";
+import { AlertList } from "@/modules/alerting/presentation/AlertList";
+import { eventListQuerySchema } from "@/modules/event-log/domain/event";
+import { eventService } from "@/modules/event-log/infrastructure/event-service";
+import { EventTimeline } from "@/modules/event-log/presentation/EventTimeline";
 import { DeviceNotFoundError } from "@/modules/inventory/application/device-errors";
 import {
   deviceIdSchema,
@@ -43,6 +49,18 @@ export default async function DeviceDetailsPage({
   }
 
   const canManage = hasPermission(session.user.role, "MANAGE_DEVICES");
+  const [relatedAlerts, relatedEvents] = await Promise.all([
+    alertService.listForDevice(
+      id,
+      alertListQuerySchema.parse({ pageSize: 10 }),
+      actor,
+    ),
+    eventService.listForDevice(
+      id,
+      eventListQuerySchema.parse({ limit: 10 }),
+      actor,
+    ),
+  ]);
   const [locations, parentCandidates] = canManage
     ? await Promise.all([
         deviceService.listLocations(actor),
@@ -66,6 +84,7 @@ export default async function DeviceDetailsPage({
         ? `${device.parentDevice.name} · ${device.parentDevice.hostname}`
         : "No parent recorded",
     ],
+    ["Active alerts", String(device.activeAlertCount)],
     ["Importance", `${device.importanceWeight} / 5`],
     ["Last seen", formatDateTime(device.lastSeenAt)],
     ["Created", formatDateTime(device.createdAt)],
@@ -127,34 +146,26 @@ export default async function DeviceDetailsPage({
         <DeviceMetricSnapshot snapshot={device.latestMetrics} />
       </div>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <section
-          aria-labelledby="related-alerts"
-          className="bg-panel rounded-xl border p-5"
-        >
-          <CircleAlert aria-hidden="true" className="text-muted size-5" />
-          <h2 className="mt-3 font-semibold" id="related-alerts">
-            Related alerts unavailable
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <section aria-labelledby="related-alerts" className="min-w-0">
+          <h2
+            className="mb-4 flex items-center gap-2 font-semibold"
+            id="related-alerts"
+          >
+            <CircleAlert aria-hidden="true" className="text-muted size-5" />
+            Related alerts
           </h2>
-          <p className="text-muted mt-2 text-sm leading-6">
-            Alert persistence and evaluation belong to Sprint 3.
-            activeAlertCount is intentionally unavailable rather than reported
-            as zero.
-          </p>
+          <AlertList page={relatedAlerts} role={session.user.role} />
         </section>
-        <section
-          aria-labelledby="related-events"
-          className="bg-panel rounded-xl border p-5"
-        >
-          <History aria-hidden="true" className="text-muted size-5" />
-          <h2 className="mt-3 font-semibold" id="related-events">
-            Related events unavailable
+        <section aria-labelledby="related-events" className="min-w-0">
+          <h2
+            className="mb-4 flex items-center gap-2 font-semibold"
+            id="related-events"
+          >
+            <History aria-hidden="true" className="text-muted size-5" />
+            Related events
           </h2>
-          <p className="text-muted mt-2 text-sm leading-6">
-            Full Event Log persistence and browsing remain Sprint 3. Device
-            mutation audit records are stored server-side but have no Sprint 2
-            UI.
-          </p>
+          <EventTimeline page={relatedEvents} />
         </section>
       </div>
 

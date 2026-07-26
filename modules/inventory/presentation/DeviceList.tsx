@@ -65,6 +65,10 @@ function MobileDeviceCard({ device }: { readonly device: DeviceSummary }) {
             {formatMetric(device.latestMetrics?.pingMs, "ms")}
           </dd>
         </div>
+        <div>
+          <dt className="text-muted text-xs">Active alerts</dt>
+          <dd className="mt-1">{device.activeAlertCount}</dd>
+        </div>
       </dl>
       <p className="text-muted mt-3 text-xs">
         Last seen: {formatDateTime(device.lastSeenAt)}
@@ -123,6 +127,7 @@ export function DeviceList({
                 "RAM",
                 "Ping",
                 "Loss",
+                "Alerts",
                 "Last seen",
               ].map((label) => (
                 <th className="px-4 py-3 font-semibold" key={label} scope="col">
@@ -170,6 +175,7 @@ export function DeviceList({
                 <td className="px-4 py-3">
                   {formatMetric(device.latestMetrics?.packetLossPct, "%")}
                 </td>
+                <td className="px-4 py-3">{device.activeAlertCount}</td>
                 <td className="px-4 py-3 text-xs">
                   {formatDateTime(device.lastSeenAt)}
                 </td>

@@ -88,7 +88,7 @@ describe("device routes", () => {
       expect(listResponse.status).toBe(200);
       expect(metricResponse.status).toBe(200);
       await expect(listResponse.json()).resolves.toMatchObject({
-        data: [{ hostname: "RTR-CORE-01", activeAlertCount: null }],
+        data: [{ hostname: "RTR-CORE-01", activeAlertCount: 1 }],
       });
       await expect(metricResponse.json()).resolves.toMatchObject({
         data: expect.arrayContaining([

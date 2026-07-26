@@ -4,8 +4,14 @@ import { config } from "dotenv";
 import { pathToFileURL } from "node:url";
 
 import {
+  AlertMetric,
+  AlertOperator,
+  AlertSeverity,
+  AlertSource,
+  AlertStatus,
   DeviceStatus,
   DeviceType,
+  EventType,
   PrismaClient,
   UserRole,
   UserStatus,
@@ -17,6 +23,9 @@ config({ path: ".env.local", quiet: true });
 
 const BCRYPT_COST = 12;
 const METRIC_BATCH_KEY = "20000000-0000-4000-8000-000000000001";
+const RULE_ID_PREFIX = "40000000-0000-4000-8000-";
+const ALERT_ID_PREFIX = "50000000-0000-4000-8000-";
+const DEMO_EVENT_PAYLOAD = { source: "DETERMINISTIC_DEMO_FIXTURE" } as const;
 
 const auditUsers = [
   {
@@ -222,6 +231,99 @@ const devices: readonly SeedDevice[] = [
   },
 ];
 
+const ruleId = (index: number) =>
+  `${RULE_ID_PREFIX}${String(index).padStart(12, "0")}`;
+
+const alertId = (index: number) =>
+  `${ALERT_ID_PREFIX}${String(index).padStart(12, "0")}`;
+
+const alertRules = [
+  {
+    id: ruleId(1),
+    code: "AR-CPU-01",
+    name: "Critical CPU",
+    metric: AlertMetric.CPU,
+    operator: AlertOperator.GTE,
+    warningThreshold: null,
+    criticalThreshold: 90,
+    durationSeconds: 60,
+    consecutiveSamples: null,
+    enabled: true,
+  },
+  {
+    id: ruleId(2),
+    code: "AR-RAM-01",
+    name: "Critical RAM",
+    metric: AlertMetric.RAM,
+    operator: AlertOperator.GTE,
+    warningThreshold: null,
+    criticalThreshold: 92,
+    durationSeconds: 60,
+    consecutiveSamples: null,
+    enabled: true,
+  },
+  {
+    id: ruleId(3),
+    code: "AR-DISK-01",
+    name: "Critical disk usage",
+    metric: AlertMetric.DISK,
+    operator: AlertOperator.GTE,
+    warningThreshold: null,
+    criticalThreshold: 90,
+    durationSeconds: 0,
+    consecutiveSamples: null,
+    enabled: true,
+  },
+  {
+    id: ruleId(4),
+    code: "AR-PING-01",
+    name: "High ping",
+    metric: AlertMetric.PING,
+    operator: AlertOperator.GTE,
+    warningThreshold: 120,
+    criticalThreshold: null,
+    durationSeconds: 0,
+    consecutiveSamples: 3,
+    enabled: true,
+  },
+  {
+    id: ruleId(5),
+    code: "AR-LOSS-01",
+    name: "Critical packet loss",
+    metric: AlertMetric.PACKET_LOSS,
+    operator: AlertOperator.GTE,
+    warningThreshold: null,
+    criticalThreshold: 8,
+    durationSeconds: 0,
+    consecutiveSamples: 3,
+    enabled: true,
+  },
+  {
+    id: ruleId(6),
+    code: "AR-OFFLINE-01",
+    name: "Device offline",
+    metric: AlertMetric.STATUS,
+    operator: AlertOperator.EQ,
+    warningThreshold: null,
+    criticalThreshold: null,
+    durationSeconds: 0,
+    consecutiveSamples: 3,
+    enabled: true,
+  },
+  {
+    id: ruleId(7),
+    code: "AR-BW-01",
+    name: "High bandwidth utilization",
+    metric: AlertMetric.BANDWIDTH,
+    operator: AlertOperator.GTE,
+    warningThreshold: 90,
+    criticalThreshold: null,
+    durationSeconds: 0,
+    consecutiveSamples: null,
+    enabled: false,
+  },
+] as const;
+
 function metricValue(
   deviceIndex: number,
   hour: number,
@@ -300,12 +402,15 @@ export async function seedDatabase(client: PrismaClient): Promise<void> {
             deviceId: device.id,
             cpuPct: offline
               ? null
-              : metricValue(
-                  deviceOffset,
-                  hourOffset,
-                  degraded ? 76 : 18,
-                  degraded ? 14 : 42,
-                ),
+              : device.id === deviceId(8) &&
+                  (hourOffset === 20 || hourOffset === 21)
+                ? 94
+                : metricValue(
+                    deviceOffset,
+                    hourOffset,
+                    degraded ? 76 : 18,
+                    degraded ? 14 : 42,
+                  ),
             ramPct: offline
               ? null
               : metricValue(
@@ -327,12 +432,16 @@ export async function seedDatabase(client: PrismaClient): Promise<void> {
                 ),
             packetLossPct: offline
               ? 100
-              : metricValue(
-                  deviceOffset,
-                  hourOffset,
-                  degraded ? 2.2 : 0,
-                  degraded ? 5 : 2,
-                ),
+              : device.id === deviceId(12) &&
+                  hourOffset >= 19 &&
+                  hourOffset <= 21
+                ? 9 + ((hourOffset - 19) % 2)
+                : metricValue(
+                    deviceOffset,
+                    hourOffset,
+                    degraded ? 2.2 : 0,
+                    degraded ? 5 : 2,
+                  ),
             downloadMbps: offline
               ? 0
               : metricValue(deviceOffset, hourOffset, 12, 280),
@@ -348,6 +457,170 @@ export async function seedDatabase(client: PrismaClient): Promise<void> {
           };
         }),
       ),
+    });
+
+    for (const rule of alertRules) {
+      await transaction.alertRule.upsert({
+        where: { id: rule.id },
+        update: {
+          ...rule,
+          scope: {},
+        },
+        create: {
+          ...rule,
+          scope: {},
+        },
+      });
+    }
+
+    const seededAlerts = [
+      {
+        id: alertId(1),
+        deviceId: deviceId(2),
+        alertRuleId: ruleId(6),
+        dedupeKey: `${deviceId(2)}:${ruleId(6)}`,
+        title: "Core router is offline",
+        description:
+          "The Core Router failed three consecutive response checks.",
+        severity: AlertSeverity.CRITICAL,
+        status: AlertStatus.OPEN,
+        source: AlertSource.DEVICE_STATUS,
+        openedAt: new Date(seededAt.getTime() - 46 * 60_000),
+        acknowledgedAt: null,
+        acknowledgedById: null,
+        acknowledgementNote: null,
+        assigneeUserId: null,
+        resolvedAt: null,
+        resolvedById: null,
+        resolutionNote: null,
+        lastTriggeredAt: new Date(seededAt.getTime() - 2 * 60_000),
+      },
+      {
+        id: alertId(2),
+        deviceId: deviceId(8),
+        alertRuleId: ruleId(1),
+        dedupeKey: `${deviceId(8)}:${ruleId(1)}`,
+        title: "Application server CPU threshold exceeded",
+        description:
+          "CPU remained at or above 90% for the configured duration.",
+        severity: AlertSeverity.CRITICAL,
+        status: AlertStatus.ACKNOWLEDGED,
+        source: AlertSource.METRIC_RULE,
+        openedAt: new Date(seededAt.getTime() - 35 * 60_000),
+        acknowledgedAt: new Date(seededAt.getTime() - 28 * 60_000),
+        acknowledgedById: auditUsers[1].id,
+        acknowledgementNote: "Reviewing the recent workload.",
+        assigneeUserId: auditUsers[1].id,
+        resolvedAt: null,
+        resolvedById: null,
+        resolutionNote: null,
+        lastTriggeredAt: new Date(seededAt.getTime() - 20 * 60_000),
+      },
+      {
+        id: alertId(3),
+        deviceId: deviceId(12),
+        alertRuleId: ruleId(5),
+        dedupeKey: `${deviceId(12)}:${ruleId(5)}`,
+        title: "Access point packet loss was critical",
+        description: "Packet loss exceeded 8% for three consecutive readings.",
+        severity: AlertSeverity.CRITICAL,
+        status: AlertStatus.INVESTIGATING,
+        source: AlertSource.METRIC_RULE,
+        openedAt: new Date(seededAt.getTime() - 22 * 60_000),
+        acknowledgedAt: new Date(seededAt.getTime() - 18 * 60_000),
+        acknowledgedById: auditUsers[0].id,
+        acknowledgementNote: "Checking wireless interference.",
+        assigneeUserId: auditUsers[0].id,
+        resolvedAt: null,
+        resolvedById: null,
+        resolutionNote: null,
+        lastTriggeredAt: new Date(seededAt.getTime() - 12 * 60_000),
+      },
+      {
+        id: alertId(4),
+        deviceId: deviceId(10),
+        alertRuleId: ruleId(3),
+        dedupeKey: `${deviceId(10)}:${ruleId(3)}`,
+        title: "File server disk threshold recovered",
+        description: "Disk usage previously exceeded the critical threshold.",
+        severity: AlertSeverity.CRITICAL,
+        status: AlertStatus.RESOLVED,
+        source: AlertSource.METRIC_RULE,
+        openedAt: new Date(seededAt.getTime() - 6 * 60 * 60_000),
+        acknowledgedAt: new Date(seededAt.getTime() - 5.75 * 60 * 60_000),
+        acknowledgedById: auditUsers[1].id,
+        acknowledgementNote: null,
+        assigneeUserId: auditUsers[1].id,
+        resolvedAt: new Date(seededAt.getTime() - 5 * 60 * 60_000),
+        resolvedById: auditUsers[1].id,
+        resolutionNote: "Temporary files were safely removed.",
+        lastTriggeredAt: new Date(seededAt.getTime() - 5.5 * 60 * 60_000),
+      },
+    ] as const;
+
+    for (const alert of seededAlerts) {
+      await transaction.alert.upsert({
+        where: { id: alert.id },
+        update: alert,
+        create: alert,
+      });
+    }
+
+    await transaction.event.deleteMany({
+      where: { payload: { equals: DEMO_EVENT_PAYLOAD } },
+    });
+
+    await transaction.event.createMany({
+      data: [
+        {
+          deviceId: deviceId(2),
+          alertId: alertId(1),
+          type: EventType.DEVICE_STATUS_CHANGED,
+          severity: AlertSeverity.CRITICAL,
+          message: "RTR-CORE-01 changed from Online to Offline.",
+          payload: DEMO_EVENT_PAYLOAD,
+          createdAt: new Date(seededAt.getTime() - 47 * 60_000),
+        },
+        {
+          deviceId: deviceId(2),
+          alertId: alertId(1),
+          type: EventType.ALERT_OPENED,
+          severity: AlertSeverity.CRITICAL,
+          message: "Critical offline Alert opened for RTR-CORE-01.",
+          payload: DEMO_EVENT_PAYLOAD,
+          createdAt: new Date(seededAt.getTime() - 46 * 60_000),
+        },
+        {
+          deviceId: deviceId(8),
+          alertId: alertId(2),
+          type: EventType.ALERT_ACKNOWLEDGED,
+          severity: AlertSeverity.INFO,
+          message: "Nasser Al-Balushi acknowledged the CPU Alert.",
+          actorUserId: auditUsers[1].id,
+          payload: DEMO_EVENT_PAYLOAD,
+          createdAt: new Date(seededAt.getTime() - 28 * 60_000),
+        },
+        {
+          deviceId: deviceId(12),
+          alertId: alertId(3),
+          type: EventType.ALERT_INVESTIGATION_STARTED,
+          severity: AlertSeverity.INFO,
+          message: "Investigation started for the packet-loss Alert.",
+          actorUserId: auditUsers[0].id,
+          payload: DEMO_EVENT_PAYLOAD,
+          createdAt: new Date(seededAt.getTime() - 16 * 60_000),
+        },
+        {
+          deviceId: deviceId(10),
+          alertId: alertId(4),
+          type: EventType.ALERT_RESOLVED,
+          severity: AlertSeverity.INFO,
+          message: "File server disk Alert resolved.",
+          actorUserId: auditUsers[1].id,
+          payload: DEMO_EVENT_PAYLOAD,
+          createdAt: new Date(seededAt.getTime() - 5 * 60 * 60_000),
+        },
+      ],
     });
   });
 }
