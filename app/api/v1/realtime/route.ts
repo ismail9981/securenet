@@ -14,6 +14,7 @@ import {
   type RealtimeEnvelope,
 } from "@/modules/realtime/application/realtime-contracts";
 import { realtimeHub } from "@/modules/realtime/infrastructure/in-process-realtime-publisher";
+import { ensurePostgresRealtimeBridge } from "@/modules/realtime/infrastructure/postgres-realtime-bridge";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -38,6 +39,7 @@ export async function GET(request: NextRequest) {
 
   try {
     assertRealtimeOrigin(request);
+    await ensurePostgresRealtimeBridge();
     if (!realtimeHub.canConnect(session.user.id)) {
       return apiError(
         429,
@@ -71,9 +73,13 @@ export async function GET(request: NextRequest) {
           }
         };
 
-        release = realtimeHub.subscribe(session.user.id, (envelope) => {
-          enqueue(encodeEvent(envelope));
-        });
+        release = realtimeHub.subscribe(
+          session.user.id,
+          session.user.role,
+          (envelope) => {
+            enqueue(encodeEvent(envelope));
+          },
+        );
         if (!release) {
           controller.error(new Error("Realtime connection limit reached."));
           cleanup();

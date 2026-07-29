@@ -69,6 +69,34 @@ authenticated user and 50 total Demo streams.
 Named events carry a version-1 envelope with a unique UUID `eventId`, UTC
 timestamp, entity identity, nullable correlation ID, and allow-listed payload.
 Supported types are `device.updated`, `alert.created`, `alert.updated`, and
-`event.created`. Messages are at most 64 KB. Delivery is process-local and
-non-durable; clients suppress duplicates and recover authoritative state through
-REST, using five-second polling only while SSE is unavailable.
+`event.created`. Sprint 5 additionally permits `simulation.status` only for
+Administrator streams. Its payload is limited to run ID, scenario code, status,
+and integer progress. Messages are at most 64 KB. The simulation worker bridges
+committed messages to the web process through PostgreSQL `LISTEN/NOTIFY`; REST
+and PostgreSQL remain authoritative. Clients suppress duplicates and recover
+through REST, using five-second polling only while SSE is unavailable.
+
+## Simulation
+
+All simulation controls require the signed Demo session, `RUN_SIMULATION`,
+same-origin requests, strict validation, and the Administrator role.
+
+`POST /api/v1/simulation/runs` starts one allow-listed scenario. It requires an
+`Idempotency-Key` header and accepts a scenario code, 1–30 unique target Device
+UUIDs, and an optional unsigned 32-bit seed. When omitted, a securely generated
+seed is returned and persisted.
+
+`GET /api/v1/simulation/runs/{id}` returns the public lifecycle, scenario,
+targets, seed/version, duration, progress, timestamps, and safe result.
+
+`POST /api/v1/simulation/runs/{id}/cancel` cancels a `RUNNING` run, restores
+targets from scenario effects, persists a final checkpoint, and retains the last
+committed progress.
+
+Stable domain errors are `SIMULATION_SCENARIO_UNSUPPORTED`,
+`SIMULATION_TARGET_INVALID`, `SIMULATION_TARGET_CONFLICT`,
+`SIMULATION_RUN_NOT_FOUND`, `SIMULATION_RUN_NOT_ACTIVE`,
+`SIMULATION_ACTIVE_CONFLICT`, `SIMULATION_IDEMPOTENCY_CONFLICT`,
+`SIMULATION_WORKER_UNAVAILABLE`, and `SIMULATION_INVALID_STATE`.
+
+There are no reset, pause, resume, speed, arbitrary-incident, or tick endpoints.

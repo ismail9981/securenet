@@ -33,7 +33,7 @@ const RealtimeContext = createContext<RealtimeContextValue>({
   lastEvent: null,
 });
 
-const LIVE_ROUTES = ["/topology", "/alerts", "/events"] as const;
+const LIVE_ROUTES = ["/dashboard", "/topology", "/alerts", "/events"] as const;
 
 export function RealtimeProvider({
   children,

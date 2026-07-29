@@ -69,6 +69,8 @@ function mapMetric(metric: PrismaDeviceMetric): MetricSnapshot {
     uploadMbps: decimalToNumber(metric.uploadMbps),
     uptimeSeconds:
       metric.uptimeSeconds === null ? null : Number(metric.uptimeSeconds),
+    source: metric.source,
+    simulationRunId: metric.simulationRunId,
     sourceTime: metric.sourceTime.toISOString(),
     receivedAt: metric.receivedAt.toISOString(),
     stale: isMetricStale(metric.sourceTime),

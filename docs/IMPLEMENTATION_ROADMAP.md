@@ -10,7 +10,7 @@ scope/priority precedence.
 | 2 — Devices and telemetry                | PostgreSQL device list/details, safe queries, Administrator create/update/archive, audit context, persisted 24-hour metrics, and latest-snapshot UI | FR-003—005, PRD-DEV-001—006, PRD-DD-001—005, SRS-FR-002—005/009/010/012 | Prisma/database/API/device tests; responsive and accessible role-based flows   |
 | 3 — Alerts and events                    | Threshold evaluation, deduplication, lifecycle, audited actions, append-only event log                                                              | FR-007—010, PRD-ALT-001—004, PRD-EVT-001—003, SRS-FR-006/007/010        | TC-ALT and event tests; baseline conflicts resolved before schema/API lock     |
 | 4 — Topology and realtime                | Nodes/connections, state cues, accessible list fallback, compact events, reconnect and snapshot fallback                                            | FR-011, PRD-TOP-001—003, SRS-FR-008                                     | Topology accessibility and 30-node checks; realtime integration tests          |
-| 5 — Simulation engine                    | Deterministic baseline generation and approved incident/recovery scenarios                                                                          | FR-006/007/013 interactions, DOC-011 scenarios                          | Seeded fixture tests; TC-SIM-001 end-to-end evidence                           |
+| 5 — Simulation engine                    | Deterministic baseline generation, approved scenarios, Administrator run/status/cancel controls, and runtime Dashboard effects                      | FR-006/007/012/013, PRD-DASH-005/006, SRS-FR-006/007/008/011/012        | Seeded, worker/concurrency, and TC-SIM-001 end-to-end evidence                 |
 | 6 — Reports, settings, and RBAC polish   | Approved P1 reports, CSV, users, settings, alert-rule controls, role UX polish                                                                      | FR-012/014—016 and DOC-002 P1 requirements                              | Role matrix regression; report/export tests                                    |
 | 7 — QA, security, deployment, portfolio  | Full regression, accessibility, performance, security, CI/CD, managed deployment, truthful portfolio evidence                                       | All AC-01—12 and release gates                                          | 0 blocker/critical defects; release report, live demo, README/video/case study |
 
@@ -63,3 +63,19 @@ unavailability. Publications occur after successful database commits and cannot
 roll back business operations. Consumers are limited to Topology status, the
 shell indicator, Alerts, and Events. Dashboard fixtures remain unchanged,
 bandwidth evaluation remains disabled, and Sprint 5 simulation is not started.
+
+## Sprint 5 resolution
+
+The approved Sprint 5 decisions pull only start, run status, and cancellation
+controls forward with deterministic baseline/scenario execution. A separate
+single-instance Node worker uses PostgreSQL advisory and target locks, versioned
+seeded generation, idempotent batches, restart-to-failed recovery, and a compact
+PostgreSQL bridge to the existing authenticated SSE hub.
+
+The runtime Dashboard selects a PostgreSQL-backed implementation of its existing
+repository port while retaining the fixture adapter. Alert evaluation follows
+committed batches, active deduplication remains, and recovery never
+auto-resolves Alerts. AR-BW-01 stays disabled and FR-007 remains In Progress.
+Reset, pause, resume, speed, incident overlays, Reports, Settings, users, purge
+jobs, production deployment, and every other Sprint 6+ capability remain
+deferred.

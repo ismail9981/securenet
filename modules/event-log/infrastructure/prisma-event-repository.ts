@@ -18,6 +18,9 @@ const eventInclude = {
   },
   alert: { select: { id: true, title: true, status: true } },
   actorUser: { select: { id: true, name: true, email: true } },
+  simulationRun: {
+    select: { id: true, scenarioCode: true, status: true },
+  },
 } satisfies Prisma.EventInclude;
 
 type EventWithReferences = Prisma.EventGetPayload<{
@@ -40,6 +43,7 @@ function mapEvent(event: EventWithReferences): EventRecord {
       : null,
     alert: event.alert,
     actor: event.actorUser,
+    simulationRun: event.simulationRun,
     createdAt: event.createdAt.toISOString(),
   };
 }

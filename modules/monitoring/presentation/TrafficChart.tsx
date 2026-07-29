@@ -105,7 +105,7 @@ export function TrafficChart({
         </ResponsiveContainer>
       </div>
       <p className="text-muted mt-3 text-xs leading-5">
-        Text summary: peak fixture download is {peak.downloadMbps} Mbps at{" "}
+        Text summary: peak Demo download is {peak.downloadMbps} Mbps at{" "}
         {peak.time}; upload at that point is {peak.uploadMbps} Mbps.
       </p>
     </section>

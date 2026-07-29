@@ -7,10 +7,11 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 
+import { prisma } from "@/lib/prisma";
 import { DemoDataBadge } from "@/components/foundation/DemoDataBadge";
 import { requireServerSession } from "@/modules/identity/infrastructure/server-session";
 import { getDashboardSnapshot } from "@/modules/monitoring/application/get-dashboard-snapshot";
-import { DemoDashboardRepository } from "@/modules/monitoring/infrastructure/demo-dashboard-repository";
+import { PrismaDashboardRepository } from "@/modules/monitoring/infrastructure/prisma-dashboard-repository";
 import {
   LatestAlerts,
   RecentEvents,
@@ -19,6 +20,8 @@ import { DeviceDistribution } from "@/modules/monitoring/presentation/DeviceDist
 import { HealthScorePanel } from "@/modules/monitoring/presentation/HealthScorePanel";
 import { KpiCard } from "@/modules/monitoring/presentation/KpiCard";
 import { TrafficChart } from "@/modules/monitoring/presentation/TrafficChart";
+import { SimulationControl } from "@/modules/simulation/presentation/SimulationControl";
+import { simulationRepository } from "@/modules/simulation/infrastructure/simulation-service";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -27,7 +30,7 @@ export const metadata: Metadata = {
 export default async function DashboardPage() {
   const session = await requireServerSession();
   const snapshot = await getDashboardSnapshot(
-    new DemoDashboardRepository(),
+    new PrismaDashboardRepository(),
     session.user.role,
   );
   const { summary } = snapshot;
@@ -43,12 +46,25 @@ export default async function DashboardPage() {
             Dashboard
           </h1>
           <p className="text-muted mt-2 text-sm">
-            Deterministic Sprint 1 fixture · Snapshot 24 Jul 2026, 12:00
-            Asia/Muscat
+            Persisted deterministic Demo simulation ·{" "}
+            {new Date(snapshot.generatedAt).toLocaleString("en-GB", {
+              timeZone: "Asia/Muscat",
+            })}
           </p>
         </div>
         <DemoDataBadge />
       </header>
+
+      {session.user.role === "ADMIN" ? (
+        <SimulationControl
+          initialRun={(await simulationRepository.listRunning()).at(-1) ?? null}
+          targets={await prisma.device.findMany({
+            where: { archivedAt: null, status: { not: "MAINTENANCE" } },
+            select: { id: true, name: true, hostname: true, type: true },
+            orderBy: { name: "asc" },
+          })}
+        />
+      ) : null}
 
       <section
         aria-label="Network summary"
@@ -107,7 +123,10 @@ export default async function DashboardPage() {
 
       <p className="mt-6 border-t pt-4 text-xs leading-5 text-[var(--text-subtle)]">
         No values on this page come from live monitoring. Device counts,
-        traffic, alerts, events, and health inputs are fixed Demo fixtures.
+        traffic, alerts, events, and documented Health Score deductions come
+        from persisted deterministic Demo data, not real Devices. The Health
+        Score formula remains incomplete for packet loss, ping, and
+        degraded-device ratio.
       </p>
     </div>
   );

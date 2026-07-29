@@ -14,6 +14,7 @@ import {
   EventType,
   NetworkConnectionStatus,
   NetworkConnectionType,
+  MetricSource,
   PrismaClient,
   UserRole,
   UserStatus,
@@ -499,6 +500,7 @@ export async function seedDatabase(client: PrismaClient): Promise<void> {
             sourceTime,
             receivedAt: new Date(sourceTime.getTime() + 1_500),
             batchKey: METRIC_BATCH_KEY,
+            source: MetricSource.SEED,
           };
         }),
       ),

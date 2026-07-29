@@ -19,6 +19,11 @@ export interface EventRecord {
   readonly device: AlertDeviceReference | null;
   readonly alert: EventAlertReference | null;
   readonly actor: AlertUserReference | null;
+  readonly simulationRun: {
+    readonly id: string;
+    readonly scenarioCode: string;
+    readonly status: "RUNNING" | "COMPLETED" | "CANCELLED" | "FAILED";
+  } | null;
   readonly createdAt: string;
 }
 

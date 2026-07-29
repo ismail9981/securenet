@@ -6,6 +6,22 @@ use semantic versioning once releases begin.
 
 ## [Unreleased]
 
+### Sprint 5
+
+- Added deterministic 60-second baseline generation and six approved
+  incident/recovery scenarios with five-second execution cycles.
+- Added additive SimulationRun, Metric source, and Metric/Event run traceability
+  without deleting existing history.
+- Added a PostgreSQL advisory-locked Node worker, restart recovery, target locks,
+  idempotent batches, and a compact `LISTEN/NOTIFY` bridge to existing SSE.
+- Added Administrator-only simulation run/status/cancel APIs and accessible,
+  responsive Dashboard controls.
+- Switched the runtime Dashboard to persisted Device, Metric, Alert, and Event
+  data while retaining the fixture adapter and incomplete Health Score
+  disclosure.
+- Kept AR-BW-01 disabled and Alert auto-resolution absent. Reset, pause, resume,
+  speed, overlays, purge jobs, Reports, Settings, and Sprint 6 remain deferred.
+
 ### Fixed
 
 - Corrected same-origin mutation checks for equivalent `localhost` and

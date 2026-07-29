@@ -47,7 +47,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run db:test:reset && npm run start -- --port 3100",
+    command: "npm run db:test:reset && npm run start:test-runtime",
     env: {
       AUTH_SECRET: authSecret,
       DATABASE_URL: testDatabaseUrl,

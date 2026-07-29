@@ -19,6 +19,8 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
+    "simulation:worker": "tsx scripts/simulation-worker.ts",
+    "start:test-runtime": "tsx scripts/start-test-runtime.ts",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "type-check": "next typegen && tsc --noEmit",

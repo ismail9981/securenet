@@ -15,6 +15,8 @@ export interface MetricSnapshot {
   readonly downloadMbps: number | null;
   readonly uploadMbps: number | null;
   readonly uptimeSeconds: number | null;
+  readonly source: "SEED" | "SIMULATION" | "MANUAL";
+  readonly simulationRunId: string | null;
   readonly sourceTime: string;
   readonly receivedAt: string;
   readonly stale: boolean;

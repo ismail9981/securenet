@@ -1,6 +1,6 @@
 # Database boundary
 
-Sprint 4 extends DOC-005's PostgreSQL boundary with Prisma. The schema contains
+Sprint 5 extends DOC-005's PostgreSQL boundary with Prisma. The schema contains
 Demo audit users, locations, devices, a nullable self-referencing parent device,
 append-only metric history, Alert rules, Alerts, immutable Events, and append-only
 audit records, plus preserved network connections.
@@ -16,6 +16,10 @@ audit records, plus preserved network connections.
 - Network connections use canonical endpoint order, reject self-links and
   same-type reverse duplicates, retain rows when Devices are archived, and are
   the only persisted source of rendered Topology links.
+- Simulation runs retain actor, lifecycle, progress, parameters, result, Metrics,
+  and Events. Simulated Device/batch pairs are idempotent.
+- Metric source is `SEED`, `SIMULATION`, or `MANUAL`; prior Metrics retain null
+  run relations and the stable seed batch is safely backfilled to `SEED`.
 - MAC addresses use normalized `VARCHAR(17)` plus a database check because Prisma's
   PostgreSQL connector does not expose `macaddr` as a usable generated-client type.
 
@@ -29,3 +33,6 @@ Migrations are additive and deployed with `npm run db:migrate:deploy`. Productio
 rollback is backup restore or a reviewed forward-fix migration; destructive schema
 reset is not an application rollback strategy. Automated reset is limited to
 `securenet_test` by `scripts/reset-test-database.ts`.
+
+Migration `20260727100000_sprint_5_simulation` is additive and uses restrictive
+foreign keys. Sprint 5 adds no purge or retention job.

@@ -28,6 +28,8 @@ describe("DeviceMetricSnapshot", () => {
           downloadMbps: 120,
           uploadMbps: 30,
           uptimeSeconds: 176_400,
+          source: "SEED",
+          simulationRunId: null,
           sourceTime: "2026-07-26T08:00:00.000Z",
           receivedAt: "2026-07-26T08:00:01.500Z",
           stale: true,

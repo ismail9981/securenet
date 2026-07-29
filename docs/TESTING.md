@@ -28,6 +28,16 @@ history, archive preservation, idempotent seed/migration checks, desktop and
 320-pixel mobile flows, and axe WCAG A/AA checks. Browser tests run serially
 against a freshly reset `securenet_test`.
 
+Sprint 5 adds deterministic PRNG/replay, baseline ranges, bounded walk, scenario
+effects/durations, five-second runtime and 60-second persistence boundaries,
+Metric source/run traceability, lifecycle/cancellation/failure/restart recovery,
+target overlap, idempotent batches, PostgreSQL worker locks, Alert
+deduplication/no-auto-resolution, Event/Audit records, role-filtered
+`simulation.status`, database-backed Dashboard data, API/RBAC/CSRF/rate-limit
+tests, and Administrator control flows on desktop and 320 px. The browser server
+starts the production web process and independent Demo worker against only
+`securenet_test`.
+
 Sprint 4 coverage adds connection validation and database constraints, canonical
 undirected duplicates, cycles, disconnected and orphan nodes, archived
 exclusion/history preservation, deterministic seed idempotence, authorized

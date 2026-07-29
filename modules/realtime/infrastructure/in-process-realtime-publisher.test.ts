@@ -56,6 +56,29 @@ describe("in-process realtime publisher", () => {
     releases.forEach((release) => release?.());
   });
 
+  it("delivers simulation status only to Administrator subscribers", () => {
+    const admin = vi.fn();
+    const engineer = vi.fn();
+    realtimeHub.subscribe("admin", "ADMIN", admin);
+    realtimeHub.subscribe("engineer", "NETWORK_ENGINEER", engineer);
+
+    realtimeHub.publish({
+      eventType: "simulation.status",
+      entityType: "simulation",
+      entityId: "run-1",
+      audienceRoles: ["ADMIN"],
+      payload: {
+        runId: "run-1",
+        scenarioCode: "SIM-CPU-OVERLOAD",
+        status: "RUNNING",
+        progress: 10,
+      },
+    });
+
+    expect(admin).toHaveBeenCalledOnce();
+    expect(engineer).not.toHaveBeenCalled();
+  });
+
   it("logs publication failure without throwing into the business operation", () => {
     const logged = vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() =>

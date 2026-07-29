@@ -15,6 +15,7 @@ type Subscriber = (envelope: RealtimeEnvelope) => void;
 
 interface SubscriberRecord {
   readonly userId: string;
+  readonly role: import("@/modules/shared/domain/network").UserRole;
   readonly subscriber: Subscriber;
 }
 
@@ -30,10 +31,28 @@ class InProcessRealtimeHub implements RealtimePublisher {
     return userConnections < MAX_CONNECTIONS_PER_USER;
   }
 
-  subscribe(userId: string, subscriber: Subscriber): (() => void) | null {
+  subscribe(userId: string, subscriber: Subscriber): (() => void) | null;
+  subscribe(
+    userId: string,
+    role: import("@/modules/shared/domain/network").UserRole,
+    subscriber: Subscriber,
+  ): (() => void) | null;
+  subscribe(
+    userId: string,
+    roleOrSubscriber:
+      import("@/modules/shared/domain/network").UserRole | Subscriber,
+    maybeSubscriber?: Subscriber,
+  ): (() => void) | null {
     if (!this.canConnect(userId)) return null;
+    const role =
+      typeof roleOrSubscriber === "function" ? "VIEWER" : roleOrSubscriber;
+    const subscriber =
+      typeof roleOrSubscriber === "function"
+        ? roleOrSubscriber
+        : maybeSubscriber;
+    if (!subscriber) return null;
     const subscriptionId = randomUUID();
-    this.subscribers.set(subscriptionId, { userId, subscriber });
+    this.subscribers.set(subscriptionId, { userId, role, subscriber });
     return () => {
       this.subscribers.delete(subscriptionId);
     };
@@ -55,7 +74,8 @@ class InProcessRealtimeHub implements RealtimePublisher {
       throw new Error("Realtime message exceeds the 64 KB Demo limit.");
     }
 
-    for (const { subscriber } of this.subscribers.values()) {
+    for (const { subscriber, role } of this.subscribers.values()) {
+      if (input.audienceRoles && !input.audienceRoles.includes(role)) continue;
       try {
         subscriber(envelope);
       } catch (error) {

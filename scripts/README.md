@@ -11,4 +11,11 @@ npm run db:test:reset
 ```
 
 The script must never be repurposed for development or production databases.
-Simulation remains unimplemented.
+
+`npm run simulation:worker` starts the independent single-instance Demo
+simulation worker. It uses a PostgreSQL advisory lock, fails orphaned runs on
+restart, and does not expose credentials. `npm run start:test-runtime` is for
+Playwright only and starts the production web process plus worker against the
+guarded test environment.
+
+There is no reset, purge, pause, resume, speed, cron, queue, or Redis command.

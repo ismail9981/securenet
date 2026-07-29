@@ -96,6 +96,23 @@ enum EventType {
   DEVICE_UPDATED
   DEVICE_ARCHIVED
   DEVICE_STATUS_CHANGED
+  SIMULATION_STARTED
+  SIMULATION_COMPLETED
+  SIMULATION_CANCELLED
+  SIMULATION_FAILED
+}
+
+enum SimulationStatus {
+  RUNNING
+  COMPLETED
+  CANCELLED
+  FAILED
+}
+
+enum MetricSource {
+  SEED
+  SIMULATION
+  MANUAL
 }
 
 model User {
@@ -113,6 +130,7 @@ model User {
   resolvedAlerts     Alert[]    @relation("AlertResolvedBy")
   assignedAlerts     Alert[]    @relation("AlertAssignee")
   events             Event[]
+  simulationRuns     SimulationRun[]
 
   @@map("users")
 }
@@ -191,9 +209,13 @@ model DeviceMetric {
   sourceTime    DateTime @map("source_time") @db.Timestamptz(3)
   receivedAt    DateTime @default(now()) @map("received_at") @db.Timestamptz(3)
   batchKey      String?  @map("batch_key") @db.Uuid
+  source        MetricSource @default(MANUAL)
+  simulationRunId String? @map("simulation_run_id") @db.Uuid
   device        Device   @relation(fields: [deviceId], references: [id], onDelete: Restrict)
+  simulationRun SimulationRun? @relation(fields: [simulationRunId], references: [id], onDelete: Restrict)
 
   @@index([deviceId, sourceTime(sort: Desc)], map: "device_metrics_device_id_source_time_idx")
+  @@index([simulationRunId, sourceTime(sort: Desc)], map: "device_metrics_simulation_run_source_time_idx")
   @@map("device_metrics")
 }
 
@@ -253,6 +275,7 @@ model Event {
   deviceId    String?       @map("device_id") @db.Uuid
   alertId     String?       @map("alert_id") @db.Uuid
   actorUserId String?       @map("actor_user_id") @db.Uuid
+  simulationRunId String?   @map("simulation_run_id") @db.Uuid
   type        EventType
   severity    AlertSeverity
   message     String
@@ -261,12 +284,35 @@ model Event {
   device      Device?       @relation(fields: [deviceId], references: [id], onDelete: Restrict)
   alert       Alert?        @relation(fields: [alertId], references: [id], onDelete: Restrict)
   actorUser   User?         @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
+  simulationRun SimulationRun? @relation(fields: [simulationRunId], references: [id], onDelete: Restrict)
 
   @@index([createdAt(sort: Desc)], map: "events_created_at_idx")
   @@index([deviceId, createdAt(sort: Desc)], map: "events_device_id_created_at_idx")
   @@index([alertId, createdAt(sort: Desc)], map: "events_alert_id_created_at_idx")
   @@index([actorUserId, createdAt(sort: Desc)], map: "events_actor_user_id_created_at_idx")
+  @@index([simulationRunId, createdAt(sort: Desc)], map: "events_simulation_run_created_at_idx")
   @@map("events")
+}
+
+model SimulationRun {
+  id              String           @id @default(uuid()) @db.Uuid
+  scenarioCode    String           @map("scenario_code") @db.VarChar(80)
+  status          SimulationStatus
+  startedById     String           @map("started_by") @db.Uuid
+  startedAt       DateTime         @map("started_at") @db.Timestamptz(3)
+  endedAt         DateTime?        @map("ended_at") @db.Timestamptz(3)
+  progress        Int              @default(0) @db.SmallInt
+  lastTickAt      DateTime?        @map("last_tick_at") @db.Timestamptz(3)
+  idempotencyKey  String           @unique @map("idempotency_key") @db.VarChar(120)
+  parameters      Json             @default("{}") @db.JsonB
+  result          Json?            @db.JsonB
+  startedBy       User             @relation(fields: [startedById], references: [id], onDelete: Restrict)
+  metrics         DeviceMetric[]
+  events          Event[]
+
+  @@index([status, startedAt], map: "simulation_runs_status_started_at_idx")
+  @@index([startedById, startedAt(sort: Desc)], map: "simulation_runs_started_by_started_at_idx")
+  @@map("simulation_runs")
 }
 
 model AuditLog {

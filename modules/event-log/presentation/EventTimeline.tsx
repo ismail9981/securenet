@@ -94,6 +94,9 @@ export function EventTimeline({
             )}
             <span>{event.actor?.name ?? "System"}</span>
             {event.alert ? <span>Alert: {event.alert.title}</span> : null}
+            {event.simulationRun ? (
+              <span>Scenario: {event.simulationRun.scenarioCode}</span>
+            ) : null}
           </div>
         </li>
       ))}

@@ -22,6 +22,7 @@ import {
   AlertNotFoundError,
 } from "@/modules/alerting/application/alert-errors";
 import { AlertLifecycleError } from "@/modules/alerting/domain/alert";
+import { SimulationError } from "@/modules/simulation/application/simulation-errors";
 
 const MAX_JSON_BODY_BYTES = 16_384;
 
@@ -210,6 +211,9 @@ export function handleApiError(error: unknown): NextResponse {
   }
   if (error instanceof AlertActiveConflictError) {
     return apiError(409, error.code, error.message, correlationId);
+  }
+  if (error instanceof SimulationError) {
+    return apiError(error.status, error.code, error.message, correlationId);
   }
 
   logEvent("error", "api.request.failed", {

@@ -21,3 +21,17 @@ production abuse controls.
 Database reset tooling refuses any database name except exactly
 `securenet_test`. Device archive and topology filtering never hard-delete Device,
 Metric, Alert, Event, AuditLog, or NetworkConnection history.
+
+Sprint 5 simulation mutations are Administrator-only and require server-side
+`RUN_SIMULATION`, a signed session, same-origin validation, bounded strict input,
+an allow-listed scenario code, an idempotency key, and a process-local command
+rate limit. Engineer and Viewer sessions cannot access controls or run status.
+
+The single Demo worker uses a PostgreSQL advisory lock. Target-scoped transaction
+locks prevent overlapping status-changing runs. PostgreSQL `LISTEN/NOTIFY`
+bridges only compact allow-listed committed messages to the existing web SSE
+hub; `simulation.status` is delivered only to Administrators and never contains
+seed, target details, failure internals, credentials, or connection data.
+
+This remains local Demo infrastructure. It is not a production job system,
+distributed scheduler, identity system, or real-device monitoring service.

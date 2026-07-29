@@ -10,54 +10,56 @@ Status vocabulary follows DOC-014: `Not Started`, `In Progress`, `Implemented`,
 
 ## DOC-001 P0 functional requirements
 
-| Requirement ID | Requirement title                         | Priority | Source document | Planned phase | Current status | Related files                             | Related tests                        |
-| -------------- | ----------------------------------------- | -------- | --------------- | ------------- | -------------- | ----------------------------------------- | ------------------------------------ |
-| FR-001         | Device/alert totals and network health    | P0       | DOC-001 §11     | Sprint 1      | Verified       | Dashboard plus deterministic repository   | Contract/component/E2E tests         |
-| FR-002         | Traffic and resource charts by time range | P0       | DOC-001 §11     | Sprint 1      | In Progress    | Fixed 24-hour Demo traffic trend          | Component/E2E tests; selector later  |
-| FR-003         | Searchable/filterable/sortable devices    | P0       | DOC-001 §11     | Sprint 2      | Verified       | Device API and responsive inventory UI    | Query/route/component/E2E tests      |
-| FR-004         | Open device details from every reference  | P0       | DOC-001 §11     | Sprint 2      | In Progress    | Inventory references link to details      | Device navigation E2E; later modules |
-| FR-005         | Latest and historical device metrics      | P0       | DOC-001 §11     | Sprint 2      | In Progress    | Persisted history API; latest-snapshot UI | Repository/route/component/E2E tests |
-| FR-006         | Simulation-driven automatic device state  | P0       | DOC-001 §11     | Sprint 5      | Not Started    | Planned Simulation/Monitoring modules     | `TC-MET-001`, `TC-SIM-001` planned   |
-| FR-007         | Threshold-based alert creation            | P0       | DOC-001 §11     | Sprint 3      | In Progress    | Supported rules evaluate; bandwidth off   | Boundary/database/concurrency tests  |
-| FR-008         | Open-alert deduplication                  | P0       | DOC-001 §11     | Sprint 3      | Verified       | Partial unique index plus retrigger path  | Dedupe/concurrency integration tests |
-| FR-009         | Audited acknowledge and resolve           | P0       | DOC-001 §11     | Sprint 3      | Verified       | Transactional lifecycle service and UI    | State/RBAC/rollback/route/E2E tests  |
-| FR-010         | Important changes written to Event Log    | P0       | DOC-001 §11     | Sprint 3      | Verified       | Fixed Event taxonomy and read-only UI     | Repository/route/filter/E2E tests    |
-| FR-011         | Status-aware network topology             | P0       | DOC-001 §11     | Sprint 4      | Verified       | Persisted active graph and accessible UI  | Domain/repository/component/E2E      |
-| FR-013         | Automatic Network Health Score            | P0       | DOC-001 §11     | Sprint 1      | In Progress    | Partial documented formula and disclosure | Health Score unit/component tests    |
+| Requirement ID | Requirement title                         | Priority  | Source document | Planned phase | Current status | Related files                               | Related tests                        |
+| -------------- | ----------------------------------------- | --------- | --------------- | ------------- | -------------- | ------------------------------------------- | ------------------------------------ |
+| FR-001         | Device/alert totals and network health    | P0        | DOC-001 §11     | Sprint 1      | Verified       | Dashboard plus deterministic repository     | Contract/component/E2E tests         |
+| FR-002         | Traffic and resource charts by time range | P0        | DOC-001 §11     | Sprint 1      | In Progress    | Fixed 24-hour Demo traffic trend            | Component/E2E tests; selector later  |
+| FR-003         | Searchable/filterable/sortable devices    | P0        | DOC-001 §11     | Sprint 2      | Verified       | Device API and responsive inventory UI      | Query/route/component/E2E tests      |
+| FR-004         | Open device details from every reference  | P0        | DOC-001 §11     | Sprint 2      | In Progress    | Inventory references link to details        | Device navigation E2E; later modules |
+| FR-005         | Latest and historical device metrics      | P0        | DOC-001 §11     | Sprint 2      | In Progress    | Persisted history API; latest-snapshot UI   | Repository/route/component/E2E tests |
+| FR-006         | Simulation-driven automatic device state  | P0        | DOC-001 §11     | Sprint 5      | Verified       | Deterministic worker, Metrics, state/events | Domain/database/worker/E2E tests     |
+| FR-007         | Threshold-based alert creation            | P0        | DOC-001 §11     | Sprint 3      | In Progress    | Supported rules evaluate; bandwidth off     | Boundary/database/concurrency tests  |
+| FR-008         | Open-alert deduplication                  | P0        | DOC-001 §11     | Sprint 3      | Verified       | Partial unique index plus retrigger path    | Dedupe/concurrency integration tests |
+| FR-009         | Audited acknowledge and resolve           | P0        | DOC-001 §11     | Sprint 3      | Verified       | Transactional lifecycle service and UI      | State/RBAC/rollback/route/E2E tests  |
+| FR-010         | Important changes written to Event Log    | P0        | DOC-001 §11     | Sprint 3      | Verified       | Fixed Event taxonomy and read-only UI       | Repository/route/filter/E2E tests    |
+| FR-011         | Status-aware network topology             | P0        | DOC-001 §11     | Sprint 4      | Verified       | Persisted active graph and accessible UI    | Domain/repository/component/E2E      |
+| FR-012         | Run a manual incident scenario            | P1 pulled | DOC-001 §11     | Sprint 5      | Verified       | Admin Dashboard run/status/cancel control   | API/component/desktop/mobile E2E     |
+| FR-013         | Automatic Network Health Score            | P0        | DOC-001 §11     | Sprint 1      | In Progress    | Partial documented formula and disclosure   | Health Score unit/component tests    |
 
 ## DOC-002 P0 product requirements
 
-| Requirement ID | Requirement title                            | Priority    | Source document | Planned phase | Current status | Related files                             | Related tests                        |
-| -------------- | -------------------------------------------- | ----------- | --------------- | ------------- | -------------- | ----------------------------------------- | ------------------------------------ |
-| PRD-AUTH-001   | Email/password sign in                       | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Identity module and login API             | Auth unit/integration/E2E tests      |
-| PRD-AUTH-002   | Clearly presented Demo account               | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Three deterministic RBAC accounts         | Login component and E2E tests        |
-| PRD-AUTH-003   | Generic failed-login message                 | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Login API and form                        | Auth integration and E2E tests       |
-| PRD-DASH-001   | Device and critical-alert totals             | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Typed deterministic Dashboard             | Contract/component/E2E tests         |
-| PRD-DASH-002   | Health Score and classification              | P0          | DOC-002 §8.2    | Sprint 1      | In Progress    | Boundaries/fixed deductions only          | Health Score unit/component tests    |
-| PRD-DASH-003   | Bandwidth trend                              | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Deterministic Recharts trend              | Dashboard component/E2E tests        |
-| PRD-DASH-004   | Linked latest alerts and events              | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Fixture lists linked to protected routes  | Dashboard E2E test                   |
-| PRD-DASH-005   | Update without page reload                   | P0          | DOC-002 §8.2    | Sprint 4      | In Progress    | Shell indicator; Dashboard fixtures fixed | Realtime component/E2E; values later |
-| PRD-DEV-001    | Device table with status and metrics         | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | PostgreSQL-backed responsive inventory    | Repository/component/E2E tests       |
-| PRD-DEV-002    | Search name/hostname/IP                      | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Validated query DTO and Device List       | Domain/route/E2E tests               |
-| PRD-DEV-003    | Filter type/status/location                  | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Validated API/UI filters                  | Query/route/E2E tests                |
-| PRD-DEV-004    | Sort and paginate devices                    | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Stable sorting and bounded pagination     | Repository/E2E tests                 |
-| PRD-DEV-005    | Administrator device management              | P1 pulled   | DOC-002 §8.3    | Sprint 2      | Verified       | Admin create/update/soft-archive flows    | Service/route/E2E/audit tests        |
-| PRD-DEV-006    | Unique active IP and hostname                | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Partial unique indexes and 409 mapping    | Repository/route conflict tests      |
-| PRD-DD-001     | Device identity/location/OS/status/last seen | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Server-rendered Device Details            | Repository/route/E2E tests           |
-| PRD-DD-002     | Device metric summaries                      | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Current metric snapshot component         | Component/route/E2E tests            |
-| PRD-DD-003     | Metric history by selected range             | P0          | DOC-002 §8.4    | Sprint 2      | In Progress    | 24-hour history persisted/API exposed     | Repository/route tests; UI deferred  |
-| PRD-DD-004     | Device alerts and events                     | P0          | DOC-002 §8.4    | Sprint 2/3    | Verified       | Related persisted Alert/Event sections    | Repository/route/E2E/axe tests       |
-| PRD-DD-005     | Explain unavailable data                     | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Null/stale/unavailable UI states          | Component/E2E/axe tests              |
-| PRD-ALT-001    | Filter alerts by severity/status/device/time | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Validated API and responsive filter UI    | Query/route/E2E tests                |
-| PRD-ALT-002    | Acknowledge with actor and time              | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Transactional lifecycle command           | Actor/note/RBAC/route tests          |
-| PRD-ALT-003    | Resolve with optional note                   | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Condition/role-aware resolve command      | State/rollback/smoke tests           |
-| PRD-ALT-004    | Prevent duplicate open alerts                | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Database active-device/rule constraint    | Concurrent evaluation test           |
-| PRD-EVT-001    | Record state/alert/admin events              | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Prospective Alert/device Event writes     | Transaction/repository tests         |
-| PRD-EVT-002    | Search/filter/browse event timeline          | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Validated cursor API and timeline UI      | Cursor/filter/search/E2E tests       |
-| PRD-EVT-003    | Event records immutable in UI                | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Read-only service/API/UI boundary         | RBAC/route/E2E source review         |
-| PRD-TOP-001    | Display topology nodes/links/types           | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | React Flow plus complete text alternative | Snapshot/component/E2E tests         |
-| PRD-TOP-002    | Node status encoding                         | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | Text, shape, legend, and status styling   | Component/axe/E2E tests              |
-| PRD-TOP-003    | Open device summary from node                | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | Node summary and Device Details link      | Component/desktop/mobile E2E         |
+| Requirement ID | Requirement title                            | Priority    | Source document | Planned phase | Current status | Related files                                  | Related tests                       |
+| -------------- | -------------------------------------------- | ----------- | --------------- | ------------- | -------------- | ---------------------------------------------- | ----------------------------------- |
+| PRD-AUTH-001   | Email/password sign in                       | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Identity module and login API                  | Auth unit/integration/E2E tests     |
+| PRD-AUTH-002   | Clearly presented Demo account               | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Three deterministic RBAC accounts              | Login component and E2E tests       |
+| PRD-AUTH-003   | Generic failed-login message                 | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Login API and form                             | Auth integration and E2E tests      |
+| PRD-DASH-001   | Device and critical-alert totals             | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Typed deterministic Dashboard                  | Contract/component/E2E tests        |
+| PRD-DASH-002   | Health Score and classification              | P0          | DOC-002 §8.2    | Sprint 1      | In Progress    | Boundaries/fixed deductions only               | Health Score unit/component tests   |
+| PRD-DASH-003   | Bandwidth trend                              | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Deterministic Recharts trend                   | Dashboard component/E2E tests       |
+| PRD-DASH-004   | Linked latest alerts and events              | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Fixture lists linked to protected routes       | Dashboard E2E test                  |
+| PRD-DASH-005   | Update without page reload                   | P0          | DOC-002 §8.2    | Sprint 4/5    | Verified       | Persisted Dashboard plus committed SSE refresh | Realtime/worker/E2E tests           |
+| PRD-DASH-006   | Run authorized simulation scenario           | P1 pulled   | DOC-002 §8.2    | Sprint 5      | Verified       | Administrator-only allow-listed controls       | RBAC/API/component/E2E tests        |
+| PRD-DEV-001    | Device table with status and metrics         | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | PostgreSQL-backed responsive inventory         | Repository/component/E2E tests      |
+| PRD-DEV-002    | Search name/hostname/IP                      | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Validated query DTO and Device List            | Domain/route/E2E tests              |
+| PRD-DEV-003    | Filter type/status/location                  | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Validated API/UI filters                       | Query/route/E2E tests               |
+| PRD-DEV-004    | Sort and paginate devices                    | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Stable sorting and bounded pagination          | Repository/E2E tests                |
+| PRD-DEV-005    | Administrator device management              | P1 pulled   | DOC-002 §8.3    | Sprint 2      | Verified       | Admin create/update/soft-archive flows         | Service/route/E2E/audit tests       |
+| PRD-DEV-006    | Unique active IP and hostname                | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Partial unique indexes and 409 mapping         | Repository/route conflict tests     |
+| PRD-DD-001     | Device identity/location/OS/status/last seen | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Server-rendered Device Details                 | Repository/route/E2E tests          |
+| PRD-DD-002     | Device metric summaries                      | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Current metric snapshot component              | Component/route/E2E tests           |
+| PRD-DD-003     | Metric history by selected range             | P0          | DOC-002 §8.4    | Sprint 2      | In Progress    | 24-hour history persisted/API exposed          | Repository/route tests; UI deferred |
+| PRD-DD-004     | Device alerts and events                     | P0          | DOC-002 §8.4    | Sprint 2/3    | Verified       | Related persisted Alert/Event sections         | Repository/route/E2E/axe tests      |
+| PRD-DD-005     | Explain unavailable data                     | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Null/stale/unavailable UI states               | Component/E2E/axe tests             |
+| PRD-ALT-001    | Filter alerts by severity/status/device/time | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Validated API and responsive filter UI         | Query/route/E2E tests               |
+| PRD-ALT-002    | Acknowledge with actor and time              | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Transactional lifecycle command                | Actor/note/RBAC/route tests         |
+| PRD-ALT-003    | Resolve with optional note                   | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Condition/role-aware resolve command           | State/rollback/smoke tests          |
+| PRD-ALT-004    | Prevent duplicate open alerts                | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Database active-device/rule constraint         | Concurrent evaluation test          |
+| PRD-EVT-001    | Record state/alert/admin events              | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Prospective Alert/device Event writes          | Transaction/repository tests        |
+| PRD-EVT-002    | Search/filter/browse event timeline          | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Validated cursor API and timeline UI           | Cursor/filter/search/E2E tests      |
+| PRD-EVT-003    | Event records immutable in UI                | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Read-only service/API/UI boundary              | RBAC/route/E2E source review        |
+| PRD-TOP-001    | Display topology nodes/links/types           | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | React Flow plus complete text alternative      | Snapshot/component/E2E tests        |
+| PRD-TOP-002    | Node status encoding                         | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | Text, shape, legend, and status styling        | Component/axe/E2E tests             |
+| PRD-TOP-003    | Open device summary from node                | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | Node summary and Device Details link           | Component/desktop/mobile E2E        |
 
 ## DOC-003 P0 software requirements
 
@@ -73,6 +75,7 @@ Status vocabulary follows DOC-014: `Not Started`, `In Progress`, `Implemented`,
 | SRS-FR-008     | Realtime client updates                        | P0       | DOC-003 §4      | Sprint 4      | Verified       | SSE signals plus REST recovery/polling           | Route/component/live E2E tests |
 | SRS-FR-009     | Safe pagination and filters                    | P0       | DOC-003 §4      | Sprint 2/3    | Verified       | Bounded Device/Alert/Event query contracts       | Domain/route/E2E tests         |
 | SRS-FR-010     | No permanent operational-record deletion in UI | P0       | DOC-003 §4      | Sprint 3      | Verified       | Soft archive and immutable history boundaries    | Retention/route/E2E tests      |
+| SRS-FR-011     | Start, stop, and safely reset simulation       | P1       | DOC-003 §4      | Sprint 5/6    | In Progress    | Start/status/cancel verified; reset deferred     | Lifecycle/API/E2E; reset later |
 | SRS-FR-012     | Actor identity on administrative actions       | P0       | DOC-003 §4      | Sprint 1/3    | Verified       | Stable actor IDs on lifecycle/Event/Audit rows   | Actor/transaction tests        |
 
 ## Release quality requirements
@@ -80,28 +83,28 @@ Status vocabulary follows DOC-014: `Not Started`, `In Progress`, `Implemented`,
 These baseline NFRs do not carry P0/P1/P2 values in their source tables. They are
 treated as release-wide gates rather than silently assigning a priority.
 
-| Requirement ID | Requirement title                           | Priority     | Source document | Planned phase        | Current status | Related files                   | Related tests                        |
-| -------------- | ------------------------------------------- | ------------ | --------------- | -------------------- | -------------- | ------------------------------- | ------------------------------------ |
-| NFR-001        | Dashboard load under 3 seconds              | Release gate | DOC-001 §12     | Sprint 7             | Not Started    | Planned performance budget      | Lighthouse planned                   |
-| NFR-002        | Simulation changes visible within 5 seconds | Release gate | DOC-001 §12     | Sprint 4/5           | Not Started    | Planned realtime/simulation     | `TC-RT-001`, `TC-SIM-001`            |
-| NFR-003        | Current Chrome/Safari/Edge                  | Release gate | DOC-001 §12     | Sprint 7             | In Progress    | Standards-based foundation      | Browser matrix planned               |
-| NFR-004        | Responsive from 320 px                      | Release gate | DOC-001 §12     | Every sprint         | In Progress    | App shell and CSS               | Foundation Playwright mobile         |
-| NFR-005        | Maintainable modules and names              | Release gate | DOC-001 §12     | Every sprint         | In Progress    | `modules/README.md`, ADR        | Static review                        |
-| NFR-006        | Input, route, and secret protection         | Release gate | DOC-001 §12     | Sprint 1–7           | In Progress    | Auth validation/session/headers | Auth/security checks                 |
-| NFR-007        | Keyboard, contrast, headings, labels        | Release gate | DOC-001 §12     | Every sprint         | In Progress    | Shell/shared states/CSS         | Accessibility E2E planned            |
-| NFR-008        | Survive missing metric/request failure      | Release gate | DOC-001 §12     | Every feature sprint | In Progress    | Empty/error foundations         | `TC-ERR-001` planned                 |
-| NFR-009        | Auditable important operations/errors       | Release gate | DOC-001 §12     | Sprint 1–3           | In Progress    | Redacted structured auth events | Full audit integration Sprint 3      |
-| NFR-010        | Clearly identify simulation                 | Release gate | DOC-001 §12     | Every sprint         | In Progress    | `DemoDataBadge`, metadata       | Foundation E2E                       |
-| SRS-NFR-001    | Typical read P95 under 500 ms               | Release gate | DOC-003 §9      | Sprint 7             | Not Started    | Planned API performance checks  | Load test planned                    |
-| SRS-NFR-002    | Initial load under 3 seconds                | Release gate | DOC-003 §9      | Sprint 7             | Not Started    | Planned performance budget      | Lighthouse planned                   |
-| SRS-NFR-003    | Demo targets 99% monthly availability       | Release gate | DOC-003 §9      | Sprint 7             | Not Started    | Planned deployment/monitoring   | Operations review                    |
-| SRS-NFR-004    | HTTPS and externalized secrets              | Release gate | DOC-003 §9      | Sprint 7             | In Progress    | `.env.example`, `.gitignore`    | Deployment/secret scan planned       |
-| SRS-NFR-005    | Strong password hashing                     | Release gate | DOC-003 §9      | Sprint 1             | Verified       | bcrypt cost-12 Demo adapter     | Auth unit/integration tests          |
-| SRS-NFR-006    | Strict TypeScript and clean lint            | Release gate | DOC-003 §9      | Every sprint         | Verified       | `tsconfig.json`, ESLint config  | `npm run type-check`, `npm run lint` |
-| SRS-NFR-007    | Keyboard and WCAG AA fundamentals           | Release gate | DOC-003 §9      | Every sprint         | In Progress    | Shell/shared states/CSS         | Accessibility E2E planned            |
-| SRS-NFR-008    | Operate from 320 px                         | Release gate | DOC-003 §9      | Every sprint         | In Progress    | Responsive shell                | Foundation Playwright mobile         |
-| SRS-NFR-009    | Structured critical logs                    | Release gate | DOC-003 §9      | Sprint 1/3           | In Progress    | Redacted JSON auth logger       | Source/integration review            |
-| SRS-NFR-010    | No real personal data in Demo               | Release gate | DOC-003 §9      | Every sprint         | In Progress    | Scope/content rules             | Seed review planned                  |
+| Requirement ID | Requirement title                           | Priority     | Source document | Planned phase        | Current status | Related files                                | Related tests                        |
+| -------------- | ------------------------------------------- | ------------ | --------------- | -------------------- | -------------- | -------------------------------------------- | ------------------------------------ |
+| NFR-001        | Dashboard load under 3 seconds              | Release gate | DOC-001 §12     | Sprint 7             | Not Started    | Planned performance budget                   | Lighthouse planned                   |
+| NFR-002        | Simulation changes visible within 5 seconds | Release gate | DOC-001 §12     | Sprint 4/5           | Verified       | Five-second worker plus committed SSE bridge | Worker/realtime/E2E timing           |
+| NFR-003        | Current Chrome/Safari/Edge                  | Release gate | DOC-001 §12     | Sprint 7             | In Progress    | Standards-based foundation                   | Browser matrix planned               |
+| NFR-004        | Responsive from 320 px                      | Release gate | DOC-001 §12     | Every sprint         | In Progress    | App shell and CSS                            | Foundation Playwright mobile         |
+| NFR-005        | Maintainable modules and names              | Release gate | DOC-001 §12     | Every sprint         | In Progress    | `modules/README.md`, ADR                     | Static review                        |
+| NFR-006        | Input, route, and secret protection         | Release gate | DOC-001 §12     | Sprint 1–7           | In Progress    | Auth validation/session/headers              | Auth/security checks                 |
+| NFR-007        | Keyboard, contrast, headings, labels        | Release gate | DOC-001 §12     | Every sprint         | In Progress    | Shell/shared states/CSS                      | Accessibility E2E planned            |
+| NFR-008        | Survive missing metric/request failure      | Release gate | DOC-001 §12     | Every feature sprint | In Progress    | Empty/error foundations                      | `TC-ERR-001` planned                 |
+| NFR-009        | Auditable important operations/errors       | Release gate | DOC-001 §12     | Sprint 1–3           | In Progress    | Redacted structured auth events              | Full audit integration Sprint 3      |
+| NFR-010        | Clearly identify simulation                 | Release gate | DOC-001 §12     | Every sprint         | In Progress    | `DemoDataBadge`, metadata                    | Foundation E2E                       |
+| SRS-NFR-001    | Typical read P95 under 500 ms               | Release gate | DOC-003 §9      | Sprint 7             | Not Started    | Planned API performance checks               | Load test planned                    |
+| SRS-NFR-002    | Initial load under 3 seconds                | Release gate | DOC-003 §9      | Sprint 7             | Not Started    | Planned performance budget                   | Lighthouse planned                   |
+| SRS-NFR-003    | Demo targets 99% monthly availability       | Release gate | DOC-003 §9      | Sprint 7             | Not Started    | Planned deployment/monitoring                | Operations review                    |
+| SRS-NFR-004    | HTTPS and externalized secrets              | Release gate | DOC-003 §9      | Sprint 7             | In Progress    | `.env.example`, `.gitignore`                 | Deployment/secret scan planned       |
+| SRS-NFR-005    | Strong password hashing                     | Release gate | DOC-003 §9      | Sprint 1             | Verified       | bcrypt cost-12 Demo adapter                  | Auth unit/integration tests          |
+| SRS-NFR-006    | Strict TypeScript and clean lint            | Release gate | DOC-003 §9      | Every sprint         | Verified       | `tsconfig.json`, ESLint config               | `npm run type-check`, `npm run lint` |
+| SRS-NFR-007    | Keyboard and WCAG AA fundamentals           | Release gate | DOC-003 §9      | Every sprint         | In Progress    | Shell/shared states/CSS                      | Accessibility E2E planned            |
+| SRS-NFR-008    | Operate from 320 px                         | Release gate | DOC-003 §9      | Every sprint         | In Progress    | Responsive shell                             | Foundation Playwright mobile         |
+| SRS-NFR-009    | Structured critical logs                    | Release gate | DOC-003 §9      | Sprint 1/3           | In Progress    | Redacted JSON auth logger                    | Source/integration review            |
+| SRS-NFR-010    | No real personal data in Demo               | Release gate | DOC-003 §9      | Every sprint         | In Progress    | Scope/content rules                          | Seed review planned                  |
 
 ## Sprint 0 delivery controls
 
@@ -172,3 +175,21 @@ distributed realtime remain `In Progress`, `Not Started`, or deferred.
 | Live Topology, Alert, Event, and shell consumers       | Verified | Desktop/mobile committed-update E2E                       |
 | Performance engineering budgets                        | Verified | 697 ms render; 16.7 ms interaction; 198.6 ms live update  |
 | Static, build, dependency, security, audit, HTTP gates | Verified | 115 Vitest + 50 Playwright; audit/secret/smoke clean      |
+
+## Sprint 5 delivery controls
+
+The complete Sprint 5 gate passed on 2026-07-26. Reset, complete bandwidth
+evaluation, and later operational modules remain `In Progress` or deferred.
+
+| Control                                               | Status   | Evidence                                                    |
+| ----------------------------------------------------- | -------- | ----------------------------------------------------------- |
+| Additive SimulationRun and traceability migration     | Verified | Both DBs current; preservation/migration tests passed       |
+| Deterministic six-scenario domain engine              | Verified | PRNG, replay, range, clamp, scenario, performance tests     |
+| Five-second worker and 60-second Metric cadence       | Verified | Injected-clock runtime, persistence, and live E2E tests     |
+| Advisory lock, overlap, idempotency, restart recovery | Verified | PostgreSQL repository/lock/concurrency tests                |
+| Alert, Event, Audit, and failure boundaries           | Verified | Transaction, actor, dedupe, no-auto-resolve tests           |
+| Administrator run/status/cancel API and controls      | Verified | Route, CSRF, RBAC, idempotency, component, E2E tests        |
+| Persisted Dashboard and committed realtime bridge     | Verified | Dashboard repository, SSE role filter, live browser tests   |
+| Mobile, keyboard, reduced motion, and accessibility   | Verified | 56-case desktop/mobile Playwright and axe suite             |
+| Static, build, dependency, security, audit gates      | Verified | 145 Vitest + 56 Playwright; audit/secret/build checks clean |
+| ADR, operations, API, testing, and completion records | Verified | Sprint 5 documentation and traceability updated             |

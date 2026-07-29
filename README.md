@@ -5,12 +5,13 @@ device state, alerts, operational events, and topology from one interface. Versi
 1.0 is a portfolio/demo product: it does **not** monitor a real network, discover
 devices, or connect through SNMP, WMI, SSH, or agents.
 
-This repository contains the Sprint 0–4 implementation: the application
+This repository contains the Sprint 0–5 implementation: the application
 foundation, Demo identity and Dashboard, PostgreSQL-backed Device Inventory,
 synchronous alert evaluation, immutable operational history, active network
-topology, and single-instance Demo realtime refresh.
-Authentication and every Dashboard value remain deliberately demonstration-only;
-they must not protect or represent a real monitored network.
+topology, authenticated Demo realtime refresh, deterministic simulation worker,
+and PostgreSQL-backed runtime Dashboard. Authentication and generated Dashboard
+values remain deliberately demonstration-only; they must not protect or
+represent a real monitored network.
 
 ## Approved stack
 
@@ -46,6 +47,12 @@ cp .env.example .env.local
 npm run db:migrate:deploy
 npm run db:seed
 npm run dev
+```
+
+Run the independent deterministic Demo simulation worker in another terminal:
+
+```bash
+npm run simulation:worker
 ```
 
 `DATABASE_URL` must target the development database. `TEST_DATABASE_URL` must
@@ -89,28 +96,28 @@ npm run validate
 
 ## Implemented routes
 
-| Route                                  | Status                                                    |
-| -------------------------------------- | --------------------------------------------------------- |
-| `/login`                               | Demo-only deterministic account login                     |
-| `/dashboard`                           | Protected deterministic Sprint 1 Dashboard                |
-| `/devices`, `/devices/[id]`            | Persisted Device List and Device Details                  |
-| `/api/v1/auth/login`, `/logout`, `/me` | Demo identity/session API                                 |
-| `/api/v1/devices`                      | List/search/filter/sort/page and Administrator create     |
-| `/api/v1/devices/{id}`                 | Details, Administrator update, and confirmed soft archive |
-| `/api/v1/devices/{id}/metrics`         | Persisted metric history API; latest snapshot rendered    |
-| `/alerts`                              | Filtered Alert list/details and authorized lifecycle UI   |
-| `/events`                              | Searchable immutable Event timeline with cursor paging    |
-| `/api/v1/alerts`                       | Filtered, bounded Alert pagination                        |
-| `/api/v1/alerts/{id}`                  | Alert details                                             |
-| `/api/v1/alerts/{id}/acknowledge`      | Admin/Engineer acknowledgement                            |
-| `/api/v1/alerts/{id}/investigate`      | Admin/Engineer acknowledged-to-investigating transition   |
-| `/api/v1/alerts/{id}/resolve`          | Role/state/condition-aware resolution                     |
-| `/api/v1/events`                       | Filtered, searchable cursor-paginated Event history       |
-| `/api/v1/devices/{id}/alerts`          | Active-device related Alert history                       |
-| `/api/v1/devices/{id}/events`          | Active-device related Event history                       |
-| `/topology`                            | Interactive active topology and accessible list           |
-| `/api/v1/topology`                     | Authorized active Device/connection snapshot              |
-| `/api/v1/realtime`                     | Authenticated, same-origin read-only SSE stream           |
+| Route                                  | Status                                                        |
+| -------------------------------------- | ------------------------------------------------------------- |
+| `/login`                               | Demo-only deterministic account login                         |
+| `/dashboard`                           | Persisted Demo Dashboard and Administrator simulation control |
+| `/devices`, `/devices/[id]`            | Persisted Device List and Device Details                      |
+| `/api/v1/auth/login`, `/logout`, `/me` | Demo identity/session API                                     |
+| `/api/v1/devices`                      | List/search/filter/sort/page and Administrator create         |
+| `/api/v1/devices/{id}`                 | Details, Administrator update, and confirmed soft archive     |
+| `/api/v1/devices/{id}/metrics`         | Persisted metric history API; latest snapshot rendered        |
+| `/alerts`                              | Filtered Alert list/details and authorized lifecycle UI       |
+| `/events`                              | Searchable immutable Event timeline with cursor paging        |
+| `/api/v1/alerts`                       | Filtered, bounded Alert pagination                            |
+| `/api/v1/alerts/{id}`                  | Alert details                                                 |
+| `/api/v1/alerts/{id}/acknowledge`      | Admin/Engineer acknowledgement                                |
+| `/api/v1/alerts/{id}/investigate`      | Admin/Engineer acknowledged-to-investigating transition       |
+| `/api/v1/alerts/{id}/resolve`          | Role/state/condition-aware resolution                         |
+| `/api/v1/events`                       | Filtered, searchable cursor-paginated Event history           |
+| `/api/v1/devices/{id}/alerts`          | Active-device related Alert history                           |
+| `/api/v1/devices/{id}/events`          | Active-device related Event history                           |
+| `/topology`                            | Interactive active topology and accessible list               |
+| `/api/v1/topology`                     | Authorized active Device/connection snapshot                  |
+| `/api/v1/realtime`                     | Authenticated, same-origin read-only SSE stream               |
 
 `proxy.ts` performs only an optimistic cookie-presence redirect. Every protected
 server render verifies the signature and expiry, and protected application use

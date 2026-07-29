@@ -13,7 +13,7 @@ export const healthLabelSchema = z.enum([
 ]);
 
 export const dashboardSnapshotSchema = z.object({
-  source: z.literal("SIMULATION_FIXTURE"),
+  source: z.enum(["SIMULATION_FIXTURE", "SIMULATION_DATABASE"]),
   generatedAt: z.string().datetime(),
   rangeLabel: z.string(),
   summary: z.object({
