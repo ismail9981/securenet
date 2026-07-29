@@ -12,7 +12,7 @@ Each implemented module follows the approved dependency direction:
 4. `presentation/` — route-facing components, hooks, and handlers.
 5. `tests/` — module integration fixtures where colocated tests are insufficient.
 
-Sprint 5 implements or preserves:
+Sprint 6 implements or preserves:
 
 - `identity`: the unchanged Sprint 1 Demo identity/session adapter and RBAC rules;
 - `inventory`: device schemas, repository port, authorized application service,
@@ -24,13 +24,17 @@ Sprint 5 implements or preserves:
   application boundary, Prisma adapter, and timeline UI;
 - `telemetry`: the pure configurable metric-freshness rule;
 - `monitoring`: the intentionally partial Sprint 1 Health Score rules; and
-- `topology`: connection contracts, authorized snapshot port/service, Prisma
-  adapter, deterministic React Flow layout, and accessible presentation;
+- `topology`: connection contracts, authorized snapshot and saved-position
+  boundaries, Prisma adapter, deterministic React Flow fallback layout, and
+  accessible presentation;
 - `realtime`: versioned message contracts, publisher port, bounded process-local
   adapter, authenticated SSE route, PostgreSQL worker bridge, and client
   recovery/polling state;
 - `simulation`: typed scenarios, deterministic generation, run/application
   boundaries, PostgreSQL worker ownership, APIs, and Administrator presentation;
+- `reporting`: bounded shared filters, Network Health Report/CSV contracts,
+  application service, Prisma aggregate adapter, and responsive presentation;
+- `settings`: global presentation settings and Administrator update boundaries;
   and
 - `shared`: common network enums and schemas.
 
@@ -44,5 +48,7 @@ commits.
 
 Publications are post-commit cache-invalidation signals and cannot
 change committed operation outcomes. REST remains authoritative. Topology never
-derives links from `parentDeviceId`, and no connection CRUD or persisted layout
-boundary exists.
+derives links from `parentDeviceId`, and no connection CRUD boundary exists.
+Historical Metric queries remain in Inventory and use bounded raw/server-side
+aggregate contracts. AlertRule administration remains in Alerting and exposes
+only approved mutable fields.

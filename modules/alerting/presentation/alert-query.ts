@@ -13,8 +13,11 @@ export function parseAlertListQuery(searchParams: URLSearchParams) {
     page: Number(searchParams.get("page") ?? "1"),
     pageSize: Number(searchParams.get("pageSize") ?? "20"),
     severities: arrayValues(searchParams, "severity"),
-    statuses: arrayValues(searchParams, "status"),
+    statuses: arrayValues(searchParams, "alertStatus").length
+      ? arrayValues(searchParams, "alertStatus")
+      : arrayValues(searchParams, "status"),
     deviceId: searchParams.get("deviceId") || undefined,
+    deviceStatus: searchParams.get("deviceStatus") || undefined,
     from: searchParams.get("from") || undefined,
     to: searchParams.get("to") || undefined,
   });

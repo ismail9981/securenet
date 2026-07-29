@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { alertSeveritySchema } from "@/modules/shared/domain/network";
+import {
+  alertSeveritySchema,
+  alertStatusSchema,
+  deviceStatusSchema,
+} from "@/modules/shared/domain/network";
 
 export const EVENT_TYPES = [
   "ALERT_OPENED",
@@ -35,6 +39,8 @@ export const eventListQuerySchema = z
     actorUserId: z.string().uuid().optional(),
     types: z.array(eventTypeSchema).max(EVENT_TYPES.length).default([]),
     severities: z.array(alertSeveritySchema).max(3).default([]),
+    alertStatus: alertStatusSchema.optional(),
+    deviceStatus: deviceStatusSchema.optional(),
     from: optionalDate,
     to: optionalDate,
     search: z.string().trim().max(200).default(""),
@@ -42,7 +48,17 @@ export const eventListQuerySchema = z
   .refine(({ from, to }) => !from || !to || from.getTime() <= to.getTime(), {
     message: "The from date must be before or equal to the to date.",
     path: ["from"],
-  });
+  })
+  .refine(
+    ({ from, to }) =>
+      !from ||
+      !to ||
+      to.getTime() - from.getTime() <= 30 * 24 * 60 * 60 * 1_000,
+    {
+      message: "The selected period cannot exceed 30 days.",
+      path: ["to"],
+    },
+  );
 
 export interface EventCursor {
   readonly createdAt: Date;

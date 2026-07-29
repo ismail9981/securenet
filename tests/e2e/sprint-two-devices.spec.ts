@@ -39,7 +39,7 @@ for (const [role, email] of Object.entries(accounts)) {
       page.getByRole("heading", { name: "Current metrics" }),
     ).toBeVisible();
     await expect(
-      page.getByText(/Historical charts.*In Progress/),
+      page.getByRole("heading", { name: "Metric history" }),
     ).toBeVisible();
     await expect(
       page.getByRole("region", { name: "Overview" }).getByText("Active alerts"),

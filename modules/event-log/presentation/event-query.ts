@@ -22,6 +22,8 @@ export function parseEventListQuery(searchParams: URLSearchParams) {
     actorUserId: searchParams.get("actorUserId") || undefined,
     types: arrayValues(searchParams, "type"),
     severities: arrayValues(searchParams, "severity"),
+    alertStatus: searchParams.get("alertStatus") || undefined,
+    deviceStatus: searchParams.get("deviceStatus") || undefined,
     from: searchParams.get("from") || undefined,
     to: searchParams.get("to") || undefined,
     search: searchParams.get("search") ?? undefined,

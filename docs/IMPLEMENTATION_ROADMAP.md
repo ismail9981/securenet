@@ -3,16 +3,16 @@
 This roadmap follows DOC-000’s approved sprint sequence and preserves DOC-001
 scope/priority precedence.
 
-| Sprint                                   | Approved outcome                                                                                                                                    | Principal requirements                                                  | Exit evidence                                                                  |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| 0 — Foundation                           | Repository, tooling, modular boundaries, design tokens, P0 route placeholders, shared states, core types, docs, test harness                        | SRS-NFR-006, NFR-004/005/007/010 foundations                            | Format, lint, type-check, unit tests, production build, local run              |
-| 1 — Identity, shell, dashboard contracts | Resolve Login priority conflict; implement real sessions/server authorization; dashboard static composition and application contracts               | FR-001/002/013, PRD-AUTH-001—003, PRD-DASH-001—005, SRS-FR-001/002/012  | Auth/RBAC unit and integration tests; dashboard contract/component tests       |
-| 2 — Devices and telemetry                | PostgreSQL device list/details, safe queries, Administrator create/update/archive, audit context, persisted 24-hour metrics, and latest-snapshot UI | FR-003—005, PRD-DEV-001—006, PRD-DD-001—005, SRS-FR-002—005/009/010/012 | Prisma/database/API/device tests; responsive and accessible role-based flows   |
-| 3 — Alerts and events                    | Threshold evaluation, deduplication, lifecycle, audited actions, append-only event log                                                              | FR-007—010, PRD-ALT-001—004, PRD-EVT-001—003, SRS-FR-006/007/010        | TC-ALT and event tests; baseline conflicts resolved before schema/API lock     |
-| 4 — Topology and realtime                | Nodes/connections, state cues, accessible list fallback, compact events, reconnect and snapshot fallback                                            | FR-011, PRD-TOP-001—003, SRS-FR-008                                     | Topology accessibility and 30-node checks; realtime integration tests          |
-| 5 — Simulation engine                    | Deterministic baseline generation, approved scenarios, Administrator run/status/cancel controls, and runtime Dashboard effects                      | FR-006/007/012/013, PRD-DASH-005/006, SRS-FR-006/007/008/011/012        | Seeded, worker/concurrency, and TC-SIM-001 end-to-end evidence                 |
-| 6 — Reports, settings, and RBAC polish   | Approved P1 reports, CSV, users, settings, alert-rule controls, role UX polish                                                                      | FR-012/014—016 and DOC-002 P1 requirements                              | Role matrix regression; report/export tests                                    |
-| 7 — QA, security, deployment, portfolio  | Full regression, accessibility, performance, security, CI/CD, managed deployment, truthful portfolio evidence                                       | All AC-01—12 and release gates                                          | 0 blocker/critical defects; release report, live demo, README/video/case study |
+| Sprint                                   | Approved outcome                                                                                                                                    | Principal requirements                                                  | Exit evidence                                                                    |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| 0 — Foundation                           | Repository, tooling, modular boundaries, design tokens, P0 route placeholders, shared states, core types, docs, test harness                        | SRS-NFR-006, NFR-004/005/007/010 foundations                            | Format, lint, type-check, unit tests, production build, local run                |
+| 1 — Identity, shell, dashboard contracts | Resolve Login priority conflict; implement real sessions/server authorization; dashboard static composition and application contracts               | FR-001/002/013, PRD-AUTH-001—003, PRD-DASH-001—005, SRS-FR-001/002/012  | Auth/RBAC unit and integration tests; dashboard contract/component tests         |
+| 2 — Devices and telemetry                | PostgreSQL device list/details, safe queries, Administrator create/update/archive, audit context, persisted 24-hour metrics, and latest-snapshot UI | FR-003—005, PRD-DEV-001—006, PRD-DD-001—005, SRS-FR-002—005/009/010/012 | Prisma/database/API/device tests; responsive and accessible role-based flows     |
+| 3 — Alerts and events                    | Threshold evaluation, deduplication, lifecycle, audited actions, append-only event log                                                              | FR-007—010, PRD-ALT-001—004, PRD-EVT-001—003, SRS-FR-006/007/010        | TC-ALT and event tests; baseline conflicts resolved before schema/API lock       |
+| 4 — Topology and realtime                | Nodes/connections, state cues, accessible list fallback, compact events, reconnect and snapshot fallback                                            | FR-011, PRD-TOP-001—003, SRS-FR-008                                     | Topology accessibility and 30-node checks; realtime integration tests            |
+| 5 — Simulation engine                    | Deterministic baseline generation, approved scenarios, Administrator run/status/cancel controls, and runtime Dashboard effects                      | FR-006/007/012/013, PRD-DASH-005/006, SRS-FR-006/007/008/011/012        | Seeded, worker/concurrency, and TC-SIM-001 end-to-end evidence                   |
+| 6 — Reports, settings, and RBAC polish   | Approved P1 report/CSV, global settings, alert-rule controls, shared filters, historical Metrics, saved topology positions, and role UX polish      | FR-014/015, PRD-REP-001/002, PRD-SET-001/002, PRD-TOP-005               | Role matrix, report/export, settings, history, topology, and accessibility tests |
+| 7 — QA, security, deployment, portfolio  | Full regression, accessibility, performance, security, CI/CD, managed deployment, truthful portfolio evidence                                       | All AC-01—12 and release gates                                          | 0 blocker/critical defects; release report, live demo, README/video/case study   |
 
 ## Sprint 1 resolution
 
@@ -79,3 +79,16 @@ auto-resolves Alerts. AR-BW-01 stays disabled and FR-007 remains In Progress.
 Reset, pause, resume, speed, incident overlays, Reports, Settings, users, purge
 jobs, production deployment, and every other Sprint 6+ capability remain
 deferred.
+
+## Sprint 6 resolution
+
+Sprint 6 implements the bounded Network Health Report and Alerts CSV export,
+validated URL-backed shared filters, one global presentation-only SystemSetting,
+Administrator-only mutable AlertRule fields, the approved historical Metric
+ranges, and Administrator-saved topology positions. It preserves every prior
+operational record and keeps authoritative authorization in server use cases.
+
+User management, Demo reset, Alert recurrence/reopen, incident overlays,
+printable/PDF output, arbitrary report families, automatic Alert resolution,
+bandwidth utilization, AR-BW-01 activation, deployment, v1.0 release work, and
+all Sprint 7 gates remain deferred.

@@ -74,6 +74,7 @@ const snapshot: TopologySnapshot = {
       status: "DOWN",
     },
   ],
+  positions: [],
 };
 
 describe("TopologyExplorer", () => {

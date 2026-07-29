@@ -4,6 +4,7 @@ import {
   alertSeveritySchema,
   alertStatusSchema,
   userRoleSchema,
+  deviceStatusSchema,
   type AlertSeverity,
   type AlertStatus,
   type DeviceStatus,
@@ -40,13 +41,24 @@ export const alertListQuerySchema = z
     severities: z.array(alertSeveritySchema).max(3).default([]),
     statuses: z.array(alertStatusSchema).max(4).default([]),
     deviceId: z.string().uuid().optional(),
+    deviceStatus: deviceStatusSchema.optional(),
     from: optionalDate,
     to: optionalDate,
   })
   .refine(({ from, to }) => !from || !to || from.getTime() <= to.getTime(), {
     message: "The from date must be before or equal to the to date.",
     path: ["from"],
-  });
+  })
+  .refine(
+    ({ from, to }) =>
+      !from ||
+      !to ||
+      to.getTime() - from.getTime() <= 30 * 24 * 60 * 60 * 1_000,
+    {
+      message: "The selected period cannot exceed 30 days.",
+      path: ["to"],
+    },
+  );
 
 const optionalNote = z
   .string()

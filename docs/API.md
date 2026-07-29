@@ -8,8 +8,9 @@ require a same-origin request and server-side `ACKNOWLEDGE_ALERTS` permission.
 ## Alerts
 
 `GET /api/v1/alerts` accepts `page` (default 1), `pageSize` (default 20, maximum
-100), repeatable or comma-separated `severity` and `status`, `deviceId`, `from`,
-and `to`. Ordering is `openedAt DESC`, then ID.
+100), repeatable or comma-separated `severity` and `alertStatus`, `deviceId`,
+`from`, and `to`. The date range is at most 30 days. Ordering is `openedAt DESC`,
+then ID.
 
 `GET /api/v1/alerts/{id}` returns canonical rule, source, device, actor, assignee,
 note, and lifecycle timestamps.
@@ -33,8 +34,9 @@ Stable domain errors are `ALERT_NOT_FOUND`, `ALERT_INVALID_STATE`,
 
 `GET /api/v1/events` accepts opaque `cursor`, `limit` (default 50, maximum 100),
 `deviceId`, `alertId`, `actorUserId`, repeatable or comma-separated `type` and
-`severity`, `from`, `to`, and `search`. Ordering is `createdAt DESC`, then
-monotonic ID. `meta.nextCursor` is opaque and must be returned unchanged.
+`severity`, `alertStatus`, `deviceStatus`, `from`, `to`, and `search`. The date
+range is at most 30 days. Ordering is `createdAt DESC`, then monotonic ID.
+`meta.nextCursor` is opaque and must be returned unchanged.
 
 Events have no create/update/delete public endpoint.
 
@@ -48,6 +50,10 @@ The internal accepted-metric-batch evaluator is not a public route. Sprint 5 may
 call the application service after telemetry acceptance; Sprint 4 adds no
 scheduler, simulation, WebSocket, or client-published transport.
 
+`GET /api/v1/devices/{id}/metrics` accepts `range` as `1h`, `6h`, `12h`, `24h`,
+or `7d`. It returns raw rows for short ranges and server-side interval aggregates
+for longer ranges, with at most 500 samples and explicit unavailable values.
+
 ## Topology
 
 `GET /api/v1/topology` requires an authenticated Demo session and returns an
@@ -55,8 +61,38 @@ active snapshot containing Device nodes and `NetworkConnection` links. Nodes
 include identity, hostname, type, status, and nullable location metadata. Links
 include canonical endpoints, type, status, nullable label, and nullable
 `bandwidthCapacityMbps`. Archived Devices and links touching them are excluded.
-`parentDeviceId` is not rendered as a link. There are no connection mutation or
-saved-position endpoints.
+`parentDeviceId` is not rendered as a link. Saved positions are included when
+available; deterministic layout remains the fallback.
+
+`PUT /api/v1/topology/positions` requires Administrator permission and a
+same-origin request. It accepts a bounded partial array of active Device UUIDs
+with finite `x` and `y` coordinates and saves the batch transactionally.
+
+## Reports
+
+`GET /api/v1/reports/network-health` requires an authenticated session and
+accepts validated `from`, `to`, optional `deviceId`, repeatable or
+comma-separated `severity`, `alertStatus`, and `deviceStatus`. The range is at
+most 30 days. It returns the documented summary, partial Health Score disclosure,
+device status/type distribution, top ten Devices, and recent Alerts.
+
+`GET /api/v1/reports/alerts.csv` uses the same bounded filters and requires an
+Administrator. It returns at most 10,000 Alerts as UTF-8 CSV with a BOM, CRLF
+rows, stable columns, UTC ISO timestamps, and empty cells for unavailable values.
+Spreadsheet-formula prefixes are neutralized. A successful export appends the
+`report.alerts.exported` AuditLog action.
+
+## Settings and AlertRule administration
+
+`GET /api/v1/settings` returns the global presentation timezone and units.
+`PUT /api/v1/settings` requires an Administrator and same-origin request, accepts
+only allow-listed values, and appends `settings.updated`.
+
+`GET /api/v1/alert-rules` returns existing rules. `PATCH
+/api/v1/alert-rules/{id}` requires an Administrator and same-origin request and
+can change only the bounded mutable rule fields. Rule identity, scope, metric,
+and operator are immutable. AR-BW-01 cannot be enabled. Successful updates append
+`alert_rule.updated`.
 
 ## Realtime
 

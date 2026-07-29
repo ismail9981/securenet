@@ -5,12 +5,13 @@ device state, alerts, operational events, and topology from one interface. Versi
 1.0 is a portfolio/demo product: it does **not** monitor a real network, discover
 devices, or connect through SNMP, WMI, SSH, or agents.
 
-This repository contains the Sprint 0–5 implementation: the application
+This repository contains the Sprint 0–6 implementation: the application
 foundation, Demo identity and Dashboard, PostgreSQL-backed Device Inventory,
 synchronous alert evaluation, immutable operational history, active network
 topology, authenticated Demo realtime refresh, deterministic simulation worker,
-and PostgreSQL-backed runtime Dashboard. Authentication and generated Dashboard
-values remain deliberately demonstration-only; they must not protect or
+PostgreSQL-backed runtime Dashboard, bounded reports/CSV, global presentation
+settings, historical Metrics, and saved topology positions. Authentication and
+generated data remain deliberately demonstration-only; they must not protect or
 represent a real monitored network.
 
 ## Approved stack
@@ -118,21 +119,30 @@ npm run validate
 | `/topology`                            | Interactive active topology and accessible list               |
 | `/api/v1/topology`                     | Authorized active Device/connection snapshot                  |
 | `/api/v1/realtime`                     | Authenticated, same-origin read-only SSE stream               |
+| `/reports`                             | Filtered Network Health Report and Administrator CSV export   |
+| `/api/v1/reports/network-health`       | Bounded authenticated report contract                         |
+| `/api/v1/reports/alerts.csv`           | Administrator-only bounded Alerts CSV                         |
+| `/settings`                            | Global settings and Administrator AlertRule controls          |
+| `/api/v1/settings`                     | Authenticated read; Administrator update                      |
+| `/api/v1/alert-rules`                  | Existing AlertRule list                                       |
+| `/api/v1/alert-rules/{id}`             | Administrator-only bounded AlertRule update                   |
+| `/api/v1/topology/positions`           | Administrator-only saved node positions                       |
 
 `proxy.ts` performs only an optimistic cookie-presence redirect. Every protected
 server render verifies the signature and expiry, and protected application use
 cases assert permissions. The stateless cookie cannot be individually revoked
 server-side before expiry; see ADR-0002.
 
-The Dashboard's counts, Health Score inputs, trend, alerts, events, and timestamp
-are fixed fixtures. The score intentionally omits unresolved packet-loss, ping, and
-degraded-ratio deductions and labels that formula incomplete.
+The runtime Dashboard reads deterministic persisted Demo data while retaining the
+Sprint 1 fixture adapter for isolated tests. The score intentionally omits
+unresolved packet-loss, ping, and degraded-ratio deductions and labels that
+formula incomplete.
 
 The Device module persists deterministic Demo inventory and 24 hourly metric
 fixtures. Administrator can create, update, and confirm a soft archive. Network
 Engineer and Viewer are read-only. Archives never hard-delete devices, metrics, or
-audit history. The UI deliberately shows only the current metric snapshot;
-historical charts, realtime updates, and topology behavior remain deferred.
+audit history. Sprint 6 adds bounded historical ranges and an accessible Metric
+table; it does not interpolate values or add interactive history charts.
 
 Sprint 3 persists Alert rules, Alerts, and Events. Accepted metric batches can be
 evaluated synchronously through an internal application service; no scheduler,
@@ -150,6 +160,12 @@ Alerts, Events, and the shell indicator; REST remains authoritative and
 five-second polling runs only while SSE is unavailable. The process-local
 publisher is Demo-only, non-durable, and not suitable for multi-instance
 production deployment.
+
+Sprint 6 adds one bounded Network Health Report, an Administrator-only Alerts CSV
+export, global presentation settings, bounded updates to existing AlertRules,
+and Administrator-saved topology positions. Shared filters live in validated URL
+parameters. AR-BW-01 remains disabled. PDF output, user management, Demo reset,
+Alert recurrence, automatic resolution, deployment, and Sprint 7 remain absent.
 
 ## Repository structure
 
@@ -175,6 +191,8 @@ scripts/         Documented maintenance and simulation scripts when implemented
 - [PostgreSQL Device persistence decision](docs/adr/0003-postgresql-device-persistence.md)
 - [Alert lifecycle and Event contract decision](docs/adr/0004-alert-lifecycle-and-event-contracts.md)
 - [Topology and realtime decision](docs/adr/0005-topology-and-realtime-architecture.md)
+- [Simulation architecture decision](docs/adr/0006-simulation-runtime-and-scenarios.md)
+- [Reports, settings, filters, and positions decision](docs/adr/0007-reports-settings-filters-and-topology-positions.md)
 - [REST API reference](docs/API.md)
 - [Security and realtime limitations](docs/SECURITY.md)
 - [Testing and database-safety guide](docs/TESTING.md)
@@ -183,6 +201,8 @@ scripts/         Documented maintenance and simulation scripts when implemented
 - [Sprint 2 completion report](docs/SPRINT_2_COMPLETION_REPORT.md)
 - [Sprint 3 completion report](docs/SPRINT_3_COMPLETION_REPORT.md)
 - [Sprint 4 completion report](docs/SPRINT_4_COMPLETION_REPORT.md)
+- [Sprint 5 completion report](docs/SPRINT_5_COMPLETION_REPORT.md)
+- [Sprint 6 completion report](docs/SPRINT_6_COMPLETION_REPORT.md)
 - [Approved baseline package](docs/baseline/README_AR.txt)
 
 The source documents in `docs/baseline/` are authoritative. Changes to scope require

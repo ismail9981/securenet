@@ -35,8 +35,9 @@ function pageHref(
     pageSize: String(query.pageSize),
   });
   query.severities.forEach((value) => result.append("severity", value));
-  query.statuses.forEach((value) => result.append("status", value));
+  query.statuses.forEach((value) => result.append("alertStatus", value));
   if (query.deviceId) result.set("deviceId", query.deviceId);
+  if (query.deviceStatus) result.set("deviceStatus", query.deviceStatus);
   if (query.from) result.set("from", query.from.toISOString());
   if (query.to) result.set("to", query.to.toISOString());
   return `/alerts?${result.toString()}` as Route;
@@ -125,13 +126,28 @@ export default async function AlertsPage({ searchParams }: Props) {
           <select
             className="bg-panel-raised text-foreground mt-1 min-h-11 w-full rounded-lg border px-3"
             defaultValue={query.statuses[0] ?? ""}
-            name="status"
+            name="alertStatus"
           >
             <option value="">All</option>
             <option>OPEN</option>
             <option>ACKNOWLEDGED</option>
             <option>INVESTIGATING</option>
             <option>RESOLVED</option>
+          </select>
+        </label>
+        <label className="text-muted text-xs">
+          Device status
+          <select
+            className="bg-panel-raised text-foreground mt-1 min-h-11 w-full rounded-lg border px-3"
+            defaultValue={query.deviceStatus ?? ""}
+            name="deviceStatus"
+          >
+            <option value="">All</option>
+            <option>ONLINE</option>
+            <option>DEGRADED</option>
+            <option>OFFLINE</option>
+            <option>MAINTENANCE</option>
+            <option>UNKNOWN</option>
           </select>
         </label>
         <button className="bg-brand mt-auto min-h-11 rounded-lg px-4 font-semibold text-slate-950">

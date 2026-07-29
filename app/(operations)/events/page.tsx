@@ -36,6 +36,8 @@ function cursorHref(
   if (query.actorUserId) result.set("actorUserId", query.actorUserId);
   query.types.forEach((value) => result.append("type", value));
   query.severities.forEach((value) => result.append("severity", value));
+  if (query.alertStatus) result.set("alertStatus", query.alertStatus);
+  if (query.deviceStatus) result.set("deviceStatus", query.deviceStatus);
   if (query.from) result.set("from", query.from.toISOString());
   if (query.to) result.set("to", query.to.toISOString());
   if (query.search) result.set("search", query.search);
@@ -150,6 +152,35 @@ export default async function EventsPage({ searchParams }: Props) {
             <option>CRITICAL</option>
             <option>WARNING</option>
             <option>INFO</option>
+          </select>
+        </label>
+        <label className="text-muted text-xs">
+          Alert status
+          <select
+            className="bg-panel-raised text-foreground mt-1 min-h-11 w-full rounded-lg border px-3"
+            defaultValue={query.alertStatus ?? ""}
+            name="alertStatus"
+          >
+            <option value="">All</option>
+            <option>OPEN</option>
+            <option>ACKNOWLEDGED</option>
+            <option>INVESTIGATING</option>
+            <option>RESOLVED</option>
+          </select>
+        </label>
+        <label className="text-muted text-xs">
+          Device status
+          <select
+            className="bg-panel-raised text-foreground mt-1 min-h-11 w-full rounded-lg border px-3"
+            defaultValue={query.deviceStatus ?? ""}
+            name="deviceStatus"
+          >
+            <option value="">All</option>
+            <option>ONLINE</option>
+            <option>DEGRADED</option>
+            <option>OFFLINE</option>
+            <option>MAINTENANCE</option>
+            <option>UNKNOWN</option>
           </select>
         </label>
         <button className="bg-brand mt-auto min-h-11 rounded-lg px-4 font-semibold text-slate-950">

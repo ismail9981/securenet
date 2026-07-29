@@ -75,10 +75,39 @@ export const deviceListQuerySchema = z.object({
   pageSize: z.number().int().min(1).max(100).default(20),
 });
 
-export const metricCursorQuerySchema = z.object({
-  cursor: z.string().regex(/^\d+$/).optional(),
-  limit: z.number().int().min(1).max(100).default(24),
-});
+export const metricRangeSchema = z.enum(["1h", "6h", "24h", "7d", "30d"]);
+export const metricCursorQuerySchema = z
+  .object({
+    cursor: z.string().regex(/^\d+$/).optional(),
+    limit: z.number().int().min(1).max(100).default(24),
+    range: metricRangeSchema.optional(),
+    from: z.string().datetime({ offset: true }).optional(),
+    to: z.string().datetime({ offset: true }).optional(),
+  })
+  .refine(
+    (value) => !(value.cursor && (value.range || value.from || value.to)),
+    {
+      message: "Cursor pagination cannot be combined with a historical range.",
+    },
+  )
+  .refine((value) => Boolean(value.from) === Boolean(value.to), {
+    message: "Both from and to are required for a custom period.",
+  })
+  .refine(
+    (value) =>
+      !value.from ||
+      !value.to ||
+      new Date(value.from).getTime() <= new Date(value.to).getTime(),
+    { message: "The from date must be before or equal to the to date." },
+  )
+  .refine(
+    (value) =>
+      !value.from ||
+      !value.to ||
+      new Date(value.to).getTime() - new Date(value.from).getTime() <=
+        30 * 24 * 60 * 60 * 1_000,
+    { message: "The selected period cannot exceed 30 days." },
+  );
 
 export type CreateDeviceInput = z.infer<typeof createDeviceSchema>;
 export type UpdateDeviceInput = z.infer<typeof updateDeviceSchema>;

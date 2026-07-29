@@ -15,10 +15,13 @@ describe("RBAC permission matrix", () => {
   it("allows network engineers to acknowledge alerts but not manage devices", () => {
     expect(hasPermission("NETWORK_ENGINEER", "ACKNOWLEDGE_ALERTS")).toBe(true);
     expect(hasPermission("NETWORK_ENGINEER", "MANAGE_DEVICES")).toBe(false);
+    expect(hasPermission("NETWORK_ENGINEER", "VIEW_REPORTS")).toBe(true);
+    expect(hasPermission("NETWORK_ENGINEER", "MANAGE_SETTINGS")).toBe(false);
   });
 
   it("keeps viewers read-only", () => {
     expect(hasPermission("VIEWER", "VIEW_DASHBOARD")).toBe(true);
+    expect(hasPermission("VIEWER", "VIEW_SETTINGS")).toBe(true);
     expect(() => assertPermission("VIEWER", "MANAGE_DEVICES")).toThrow(
       AuthorizationError,
     );

@@ -42,8 +42,6 @@ describe("DeviceMetricSnapshot", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("2d 1h")).toBeInTheDocument();
     expect(screen.getByText(/snapshot is stale/)).toBeInTheDocument();
-    expect(
-      screen.getByText(/Historical charts.*In Progress/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Use Metric history below/)).toBeInTheDocument();
   });
 });

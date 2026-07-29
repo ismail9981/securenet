@@ -15,7 +15,7 @@ export interface MetricSnapshot {
   readonly downloadMbps: number | null;
   readonly uploadMbps: number | null;
   readonly uptimeSeconds: number | null;
-  readonly source: "SEED" | "SIMULATION" | "MANUAL";
+  readonly source: "SEED" | "SIMULATION" | "MANUAL" | "AGGREGATED";
   readonly simulationRunId: string | null;
   readonly sourceTime: string;
   readonly receivedAt: string;
@@ -62,5 +62,7 @@ export interface MetricPage {
   readonly data: readonly MetricSnapshot[];
   readonly meta: {
     readonly nextCursor: string | null;
+    readonly range?: "1h" | "6h" | "24h" | "7d" | "30d" | "custom";
+    readonly aggregated?: boolean;
   };
 }

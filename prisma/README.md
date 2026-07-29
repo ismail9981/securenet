@@ -1,6 +1,6 @@
 # Database boundary
 
-Sprint 5 extends DOC-005's PostgreSQL boundary with Prisma. The schema contains
+Sprint 6 extends DOC-005's PostgreSQL boundary with Prisma. The schema contains
 Demo audit users, locations, devices, a nullable self-referencing parent device,
 append-only metric history, Alert rules, Alerts, immutable Events, and append-only
 audit records, plus preserved network connections.
@@ -18,6 +18,10 @@ audit records, plus preserved network connections.
   the only persisted source of rendered Topology links.
 - Simulation runs retain actor, lifecycle, progress, parameters, result, Metrics,
   and Events. Simulated Device/batch pairs are idempotent.
+- `SystemSetting` is a singleton global presentation configuration with an
+  auditable updater; it does not rewrite Metrics.
+- `TopologyPosition` stores at most one saved coordinate per Device with
+  restrictive foreign keys and auditable updater context.
 - Metric source is `SEED`, `SIMULATION`, or `MANUAL`; prior Metrics retain null
   run relations and the stable seed batch is safely backfilled to `SEED`.
 - MAC addresses use normalized `VARCHAR(17)` plus a database check because Prisma's
@@ -36,3 +40,8 @@ reset is not an application rollback strategy. Automated reset is limited to
 
 Migration `20260727100000_sprint_5_simulation` is additive and uses restrictive
 foreign keys. Sprint 5 adds no purge or retention job.
+
+Migration `20260729100000_sprint_6_reports_settings_positions` is additive and
+creates only the global setting and topology-position foundations. The seed
+creates a missing default setting without overwriting an existing configured
+row. Sprint 6 adds no purge or retention job.

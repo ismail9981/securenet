@@ -35,3 +35,19 @@ seed, target details, failure internals, credentials, or connection data.
 
 This remains local Demo infrastructure. It is not a production job system,
 distributed scheduler, identity system, or real-device monitoring service.
+
+Sprint 6 read routes continue to verify the signed session. Settings, AlertRule,
+topology-position, and CSV-export operations additionally require Administrator
+permission and same-origin validation close to the use case. Inputs are strict
+and bounded, writes are transactional, and approved actions append safe AuditLog
+metadata without credentials or connection data.
+
+Alerts CSV is capped at 10,000 rows and prefixes cells that could be interpreted
+as spreadsheet formulas. Null values remain empty. CSV export does not expose
+database errors or internal secrets. The browser bundle and repository are
+scanned for server-only environment names and credential material as part of the
+Sprint 6 gate.
+
+AR-BW-01 remains disabled and cannot be enabled through the settings API. Sprint 6
+adds no automatic Alert resolution, recurrence/reopen, Demo reset, user
+management, retention deletion, PDF generation, or production deployment.

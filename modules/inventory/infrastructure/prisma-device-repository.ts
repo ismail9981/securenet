@@ -352,11 +352,109 @@ export class PrismaDeviceRepository implements DeviceRepository {
     id: string,
     query: MetricCursorQuery,
   ): Promise<MetricPage | null> {
-    const device = await prisma.device.findFirst({
-      where: { id, archivedAt: null },
+    const device = await prisma.device.findUnique({
+      where: { id },
       select: { id: true },
     });
     if (!device) return null;
+
+    if (query.range || (query.from && query.to)) {
+      const duration = {
+        "1h": 60 * 60 * 1_000,
+        "6h": 6 * 60 * 60 * 1_000,
+        "24h": 24 * 60 * 60 * 1_000,
+        "7d": 7 * 24 * 60 * 60 * 1_000,
+        "30d": 30 * 24 * 60 * 60 * 1_000,
+      } as const;
+      const bucketSize = {
+        "1h": 0,
+        "6h": 5 * 60 * 1_000,
+        "24h": 15 * 60 * 1_000,
+        "7d": 60 * 60 * 1_000,
+        "30d": 6 * 60 * 60 * 1_000,
+      } as const;
+      const range = query.range ?? "custom";
+      const to = query.to ? new Date(query.to) : new Date();
+      const from = query.from
+        ? new Date(query.from)
+        : new Date(to.getTime() - duration[query.range ?? "24h"]);
+      const interval =
+        range === "custom"
+          ? Math.max(1, Math.ceil((to.getTime() - from.getTime()) / 500))
+          : bucketSize[range];
+      if (interval === 0) {
+        const source = await prisma.deviceMetric.findMany({
+          where: { deviceId: id, sourceTime: { gte: from, lte: to } },
+          orderBy: [{ sourceTime: "desc" }, { id: "desc" }],
+          take: 500,
+        });
+        return {
+          data: source.reverse().map(mapMetric),
+          meta: { nextCursor: null, range, aggregated: false },
+        };
+      }
+      interface AggregateMetric {
+        id: string;
+        bucketTime: Date;
+        lastSourceTime: Date;
+        receivedAt: Date;
+        cpuPct: Prisma.Decimal | null;
+        ramPct: Prisma.Decimal | null;
+        diskPct: Prisma.Decimal | null;
+        pingMs: Prisma.Decimal | null;
+        packetLossPct: Prisma.Decimal | null;
+        downloadMbps: Prisma.Decimal | null;
+        uploadMbps: Prisma.Decimal | null;
+      }
+      const intervalSeconds = Math.max(1, Math.ceil(interval / 1_000));
+      const aggregated = await prisma.$queryRaw<AggregateMetric[]>(Prisma.sql`
+        SELECT
+          MAX("id")::text AS "id",
+          date_bin(
+            make_interval(secs => ${intervalSeconds}),
+            "source_time",
+            ${from}
+          ) AS "bucketTime",
+          MAX("source_time") AS "lastSourceTime",
+          MAX("received_at") AS "receivedAt",
+          AVG("cpu_pct") AS "cpuPct",
+          AVG("ram_pct") AS "ramPct",
+          AVG("disk_pct") AS "diskPct",
+          AVG("ping_ms") AS "pingMs",
+          AVG("packet_loss_pct") AS "packetLossPct",
+          AVG("download_mbps") AS "downloadMbps",
+          AVG("upload_mbps") AS "uploadMbps"
+        FROM "device_metrics"
+        WHERE "device_id" = ${id}::uuid
+          AND "source_time" >= ${from}
+          AND "source_time" <= ${to}
+        GROUP BY "bucketTime"
+        ORDER BY "bucketTime" ASC
+        LIMIT 500
+      `);
+      const number = (value: Prisma.Decimal | null) =>
+        value === null ? null : value.toNumber();
+      const data: MetricSnapshot[] = aggregated.map((metric) => ({
+        id: metric.id,
+        sourceTime: metric.bucketTime.toISOString(),
+        receivedAt: metric.receivedAt.toISOString(),
+        cpuPct: number(metric.cpuPct),
+        ramPct: number(metric.ramPct),
+        diskPct: number(metric.diskPct),
+        pingMs: number(metric.pingMs),
+        packetLossPct: number(metric.packetLossPct),
+        downloadMbps: number(metric.downloadMbps),
+        uploadMbps: number(metric.uploadMbps),
+        uptimeSeconds: null,
+        source: "AGGREGATED",
+        simulationRunId: null,
+        stale: isMetricStale(metric.lastSourceTime),
+      }));
+      return {
+        data,
+        meta: { nextCursor: null, range, aggregated: true },
+      };
+    }
 
     const metrics = await prisma.deviceMetric.findMany({
       where: {

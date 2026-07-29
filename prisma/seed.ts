@@ -395,6 +395,18 @@ export async function seedDatabase(client: PrismaClient): Promise<void> {
       });
     }
 
+    await transaction.systemSetting.upsert({
+      where: { id: "global" },
+      update: {},
+      create: {
+        id: "global",
+        timezone: "Asia/Muscat",
+        cpuUnit: "percent",
+        memoryUnit: "percent",
+        trafficUnit: "Mbps",
+      },
+    });
+
     for (const location of locations) {
       await transaction.location.upsert({
         where: { id: location.id },

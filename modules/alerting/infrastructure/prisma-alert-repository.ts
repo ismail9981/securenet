@@ -85,6 +85,7 @@ function queryWhere(query: AlertListQuery): Prisma.AlertWhereInput {
     ...(query.severities.length ? { severity: { in: query.severities } } : {}),
     ...(query.statuses.length ? { status: { in: query.statuses } } : {}),
     ...(query.deviceId ? { deviceId: query.deviceId } : {}),
+    ...(query.deviceStatus ? { device: { status: query.deviceStatus } } : {}),
     ...(query.from || query.to
       ? {
           openedAt: {

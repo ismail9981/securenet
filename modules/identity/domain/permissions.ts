@@ -5,10 +5,14 @@ export const PERMISSIONS = [
   "VIEW_DEVICES",
   "VIEW_ALERTS",
   "VIEW_EVENTS",
+  "VIEW_REPORTS",
+  "VIEW_SETTINGS",
   "MANAGE_DEVICES",
   "ACKNOWLEDGE_ALERTS",
   "RUN_SIMULATION",
   "MANAGE_ALERT_RULES",
+  "MANAGE_SETTINGS",
+  "SAVE_TOPOLOGY_POSITIONS",
   "MANAGE_USERS",
   "VIEW_AUDIT_LOG",
 ] as const;
@@ -22,6 +26,8 @@ const ROLE_PERMISSIONS: Readonly<Record<UserRole, ReadonlySet<Permission>>> = {
     "VIEW_DEVICES",
     "VIEW_ALERTS",
     "VIEW_EVENTS",
+    "VIEW_REPORTS",
+    "VIEW_SETTINGS",
     "ACKNOWLEDGE_ALERTS",
     "VIEW_AUDIT_LOG",
   ]),
@@ -30,6 +36,8 @@ const ROLE_PERMISSIONS: Readonly<Record<UserRole, ReadonlySet<Permission>>> = {
     "VIEW_DEVICES",
     "VIEW_ALERTS",
     "VIEW_EVENTS",
+    "VIEW_REPORTS",
+    "VIEW_SETTINGS",
   ]),
 };
 

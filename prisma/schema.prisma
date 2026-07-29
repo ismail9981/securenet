@@ -131,6 +131,8 @@ model User {
   assignedAlerts     Alert[]    @relation("AlertAssignee")
   events             Event[]
   simulationRuns     SimulationRun[]
+  updatedSettings    SystemSetting[]   @relation("SystemSettingUpdatedBy")
+  topologyPositions  TopologyPosition[] @relation("TopologyPositionUpdatedBy")
 
   @@map("users")
 }
@@ -170,6 +172,7 @@ model Device {
   events           Event[]
   sourceConnections NetworkConnection[] @relation("ConnectionSource")
   targetConnections NetworkConnection[] @relation("ConnectionTarget")
+  topologyPosition TopologyPosition?
 
   @@index([status, type, locationId], map: "devices_status_type_location_id_idx")
   @@index([parentDeviceId], map: "devices_parent_device_id_idx")
@@ -330,4 +333,30 @@ model AuditLog {
   @@index([entityType, entityId, createdAt(sort: Desc)], map: "audit_logs_entity_created_at_idx")
   @@index([actorUserId, createdAt(sort: Desc)], map: "audit_logs_actor_created_at_idx")
   @@map("audit_logs")
+}
+
+model SystemSetting {
+  id            String   @id @default("global") @db.VarChar(32)
+  timezone      String   @default("Asia/Muscat") @db.VarChar(64)
+  cpuUnit       String   @default("percent") @map("cpu_unit") @db.VarChar(16)
+  memoryUnit    String   @default("percent") @map("memory_unit") @db.VarChar(16)
+  trafficUnit   String   @default("Mbps") @map("traffic_unit") @db.VarChar(16)
+  updatedById   String?  @map("updated_by") @db.Uuid
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedBy     User?    @relation("SystemSettingUpdatedBy", fields: [updatedById], references: [id], onDelete: Restrict)
+
+  @@map("system_settings")
+}
+
+model TopologyPosition {
+  deviceId    String   @id @map("device_id") @db.Uuid
+  x           Decimal  @db.Decimal(12, 3)
+  y           Decimal  @db.Decimal(12, 3)
+  updatedById String   @map("updated_by") @db.Uuid
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  device      Device   @relation(fields: [deviceId], references: [id], onDelete: Restrict)
+  updatedBy   User     @relation("TopologyPositionUpdatedBy", fields: [updatedById], references: [id], onDelete: Restrict)
+
+  @@index([updatedById, updatedAt(sort: Desc)], map: "topology_positions_updated_by_updated_at_idx")
+  @@map("topology_positions")
 }

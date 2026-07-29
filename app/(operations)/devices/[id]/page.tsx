@@ -20,8 +20,10 @@ import { deviceService } from "@/modules/inventory/infrastructure/device-service
 import { ArchiveDeviceButton } from "@/modules/inventory/presentation/ArchiveDeviceButton";
 import { DeviceForm } from "@/modules/inventory/presentation/DeviceForm";
 import { DeviceMetricSnapshot } from "@/modules/inventory/presentation/DeviceMetricSnapshot";
+import { DeviceMetricHistory } from "@/modules/inventory/presentation/DeviceMetricHistory";
 import { DeviceStatusBadge } from "@/modules/inventory/presentation/DeviceStatusBadge";
 import { formatDateTime } from "@/modules/inventory/presentation/device-format";
+import { settingsService } from "@/modules/settings/infrastructure/settings-service";
 
 export const metadata: Metadata = {
   title: "Device details",
@@ -49,7 +51,7 @@ export default async function DeviceDetailsPage({
   }
 
   const canManage = hasPermission(session.user.role, "MANAGE_DEVICES");
-  const [relatedAlerts, relatedEvents] = await Promise.all([
+  const [relatedAlerts, relatedEvents, settings] = await Promise.all([
     alertService.listForDevice(
       id,
       alertListQuerySchema.parse({ pageSize: 10 }),
@@ -60,6 +62,7 @@ export default async function DeviceDetailsPage({
       eventListQuerySchema.parse({ limit: 10 }),
       actor,
     ),
+    settingsService.get(actor),
   ]);
   const [locations, parentCandidates] = canManage
     ? await Promise.all([
@@ -143,8 +146,16 @@ export default async function DeviceDetailsPage({
       </section>
 
       <div className="mt-8">
-        <DeviceMetricSnapshot snapshot={device.latestMetrics} />
+        <DeviceMetricSnapshot
+          snapshot={device.latestMetrics}
+          trafficUnit={settings.trafficUnit}
+        />
       </div>
+      <DeviceMetricHistory
+        deviceId={device.id}
+        timezone={settings.timezone}
+        trafficUnit={settings.trafficUnit}
+      />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <section aria-labelledby="related-alerts" className="min-w-0">

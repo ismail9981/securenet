@@ -6,6 +6,22 @@ use semantic versioning once releases begin.
 
 ## [Unreleased]
 
+### Sprint 6
+
+- Added the bounded Network Health Report, shared validated URL filters, and
+  Administrator-only Alerts CSV export with spreadsheet-formula neutralization.
+- Added global presentation settings and bounded Administrator AlertRule
+  management while keeping AR-BW-01 disabled.
+- Added five historical Metric ranges with server-side aggregation and an
+  accessible Device Details history table.
+- Added transactional Administrator-saved topology positions with deterministic
+  fallback layout for unsaved nodes.
+- Added additive SystemSetting/TopologyPosition persistence, approved audit
+  actions, responsive role-aware UI, and Sprint 6 unit/integration/browser,
+  accessibility, security, and performance coverage.
+- Kept automatic Alert resolution, recurrence, Demo reset, user management,
+  incident overlays, PDF output, deployment, v1.0 release, and Sprint 7 absent.
+
 ### Sprint 5
 
 - Added deterministic 60-second baseline generation and six approved

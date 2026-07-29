@@ -32,22 +32,32 @@ const edgeColor = {
   DOWN: "var(--status-danger)",
 } as const;
 
+function positionedNodes(snapshot: TopologySnapshot): DeviceFlowNode[] {
+  const saved = new Map(
+    snapshot.positions.map((position) => [position.deviceId, position]),
+  );
+  return deterministicTopologyLayout(snapshot.nodes).map((node) => ({
+    ...node,
+    position: saved.get(node.id) ?? node.position,
+  }));
+}
+
 function TopologyCanvas({
+  canSave,
   initialSnapshot,
 }: {
+  readonly canSave: boolean;
   readonly initialSnapshot: TopologySnapshot;
 }) {
   const [snapshot, setSnapshot] = useState(initialSnapshot);
-  const initialNodes = useMemo(
-    () => [...deterministicTopologyLayout(snapshot.nodes)],
-    [snapshot.nodes],
-  );
+  const initialNodes = useMemo(() => positionedNodes(snapshot), [snapshot]);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [instance, setInstance] = useState<ReactFlowInstance<
     DeviceFlowNode,
     Edge
   > | null>(null);
+  const [saveStatus, setSaveStatus] = useState<string>("");
 
   useEffect(() => {
     let cancelled = false;
@@ -67,7 +77,7 @@ function TopologyCanvas({
         .then((next) => {
           if (!cancelled) {
             setSnapshot(next);
-            setNodes([...deterministicTopologyLayout(next.nodes)]);
+            setNodes(positionedNodes(next));
           }
         })
         .catch(() => {
@@ -123,6 +133,43 @@ function TopologyCanvas({
             </p>
           </div>
           <div className="flex flex-wrap gap-2" aria-label="Topology controls">
+            {canSave ? (
+              <button
+                className="bg-brand min-h-11 rounded-lg px-3 text-sm font-semibold text-slate-950"
+                onClick={() => {
+                  setSaveStatus("Saving positions…");
+                  void fetch("/api/v1/topology/positions", {
+                    method: "PUT",
+                    credentials: "same-origin",
+                    headers: {
+                      Accept: "application/json",
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      positions: nodes.map((node) => ({
+                        deviceId: node.id,
+                        x: node.position.x,
+                        y: node.position.y,
+                      })),
+                    }),
+                  })
+                    .then((response) => {
+                      if (!response.ok) throw new Error("Save failed");
+                      setSaveStatus("Positions saved.");
+                    })
+                    .catch(() =>
+                      setSaveStatus("Positions could not be saved."),
+                    );
+                }}
+                type="button"
+              >
+                Save layout
+              </button>
+            ) : (
+              <span className="text-muted self-center text-xs">
+                Read-only layout
+              </span>
+            )}
             <button
               aria-label="Zoom in"
               className="bg-panel-raised grid min-h-11 min-w-11 place-items-center rounded-lg border"
@@ -160,6 +207,11 @@ function TopologyCanvas({
             </button>
           </div>
         </div>
+        {saveStatus ? (
+          <p aria-live="polite" className="text-muted px-3 text-xs">
+            {saveStatus}
+          </p>
+        ) : null}
         <div className="overflow-x-auto">
           <div className="h-[34rem] min-w-[48rem] sm:min-w-0">
             <ReactFlow
@@ -170,6 +222,7 @@ function TopologyCanvas({
               nodeTypes={nodeTypes}
               nodes={nodes}
               nodesConnectable={false}
+              nodesDraggable={canSave}
               onInit={setInstance}
               onNodeClick={(_, node) => setSelectedId(node.id)}
               onNodesChange={onNodesChange}
@@ -240,13 +293,16 @@ function TopologyCanvas({
 }
 
 export function TopologyExplorer({
+  canSave = false,
   initialSnapshot,
 }: {
+  readonly canSave?: boolean;
   readonly initialSnapshot: TopologySnapshot;
 }) {
   return (
     <ReactFlowProvider>
       <TopologyCanvas
+        canSave={canSave}
         initialSnapshot={initialSnapshot}
         key={initialSnapshot.generatedAt}
       />

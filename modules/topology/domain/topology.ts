@@ -55,11 +55,47 @@ export const topologySnapshotSchema = z.object({
   generatedAt: z.string().datetime(),
   nodes: z.array(topologyNodeSchema),
   links: z.array(topologyLinkSchema).max(60),
+  positions: z
+    .array(
+      z.object({
+        deviceId: z.string().uuid(),
+        x: z.number().min(-10_000).max(10_000),
+        y: z.number().min(-10_000).max(10_000),
+      }),
+    )
+    .max(60)
+    .default([]),
+});
+
+export const saveTopologyPositionsSchema = z.object({
+  positions: z
+    .array(
+      z.object({
+        deviceId: z.string().uuid(),
+        x: z.number().finite().min(-10_000).max(10_000),
+        y: z.number().finite().min(-10_000).max(10_000),
+      }),
+    )
+    .max(60)
+    .superRefine((positions, context) => {
+      const seen = new Set<string>();
+      positions.forEach((position, index) => {
+        if (seen.has(position.deviceId)) {
+          context.addIssue({
+            code: "custom",
+            path: [index, "deviceId"],
+            message: "Each Device may appear only once.",
+          });
+        }
+        seen.add(position.deviceId);
+      });
+    }),
 });
 
 export type TopologyNode = z.infer<typeof topologyNodeSchema>;
 export type TopologyLink = z.infer<typeof topologyLinkSchema>;
 export type TopologySnapshot = z.infer<typeof topologySnapshotSchema>;
+export type SaveTopologyPositions = z.infer<typeof saveTopologyPositionsSchema>;
 
 export function canonicalConnectionEndpoints(
   firstDeviceId: string,

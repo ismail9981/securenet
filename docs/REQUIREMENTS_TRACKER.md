@@ -1,6 +1,6 @@
 # Requirements implementation tracker
 
-Updated: 2026-07-26
+Updated: 2026-07-29
 
 Baseline: SecureNet Full Documentation Baseline v1.0
 
@@ -10,56 +10,67 @@ Status vocabulary follows DOC-014: `Not Started`, `In Progress`, `Implemented`,
 
 ## DOC-001 P0 functional requirements
 
-| Requirement ID | Requirement title                         | Priority  | Source document | Planned phase | Current status | Related files                               | Related tests                        |
-| -------------- | ----------------------------------------- | --------- | --------------- | ------------- | -------------- | ------------------------------------------- | ------------------------------------ |
-| FR-001         | Device/alert totals and network health    | P0        | DOC-001 §11     | Sprint 1      | Verified       | Dashboard plus deterministic repository     | Contract/component/E2E tests         |
-| FR-002         | Traffic and resource charts by time range | P0        | DOC-001 §11     | Sprint 1      | In Progress    | Fixed 24-hour Demo traffic trend            | Component/E2E tests; selector later  |
-| FR-003         | Searchable/filterable/sortable devices    | P0        | DOC-001 §11     | Sprint 2      | Verified       | Device API and responsive inventory UI      | Query/route/component/E2E tests      |
-| FR-004         | Open device details from every reference  | P0        | DOC-001 §11     | Sprint 2      | In Progress    | Inventory references link to details        | Device navigation E2E; later modules |
-| FR-005         | Latest and historical device metrics      | P0        | DOC-001 §11     | Sprint 2      | In Progress    | Persisted history API; latest-snapshot UI   | Repository/route/component/E2E tests |
-| FR-006         | Simulation-driven automatic device state  | P0        | DOC-001 §11     | Sprint 5      | Verified       | Deterministic worker, Metrics, state/events | Domain/database/worker/E2E tests     |
-| FR-007         | Threshold-based alert creation            | P0        | DOC-001 §11     | Sprint 3      | In Progress    | Supported rules evaluate; bandwidth off     | Boundary/database/concurrency tests  |
-| FR-008         | Open-alert deduplication                  | P0        | DOC-001 §11     | Sprint 3      | Verified       | Partial unique index plus retrigger path    | Dedupe/concurrency integration tests |
-| FR-009         | Audited acknowledge and resolve           | P0        | DOC-001 §11     | Sprint 3      | Verified       | Transactional lifecycle service and UI      | State/RBAC/rollback/route/E2E tests  |
-| FR-010         | Important changes written to Event Log    | P0        | DOC-001 §11     | Sprint 3      | Verified       | Fixed Event taxonomy and read-only UI       | Repository/route/filter/E2E tests    |
-| FR-011         | Status-aware network topology             | P0        | DOC-001 §11     | Sprint 4      | Verified       | Persisted active graph and accessible UI    | Domain/repository/component/E2E      |
-| FR-012         | Run a manual incident scenario            | P1 pulled | DOC-001 §11     | Sprint 5      | Verified       | Admin Dashboard run/status/cancel control   | API/component/desktop/mobile E2E     |
-| FR-013         | Automatic Network Health Score            | P0        | DOC-001 §11     | Sprint 1      | In Progress    | Partial documented formula and disclosure   | Health Score unit/component tests    |
+| Requirement ID | Requirement title                          | Priority  | Source document | Planned phase | Current status | Related files                                  | Related tests                                 |
+| -------------- | ------------------------------------------ | --------- | --------------- | ------------- | -------------- | ---------------------------------------------- | --------------------------------------------- |
+| FR-001         | Device/alert totals and network health     | P0        | DOC-001 §11     | Sprint 1      | Verified       | Dashboard plus deterministic repository        | Contract/component/E2E tests                  |
+| FR-002         | Traffic and resource charts by time range  | P0        | DOC-001 §11     | Sprint 1      | In Progress    | Fixed 24-hour Demo traffic trend               | Component/E2E tests; selector later           |
+| FR-003         | Searchable/filterable/sortable devices     | P0        | DOC-001 §11     | Sprint 2      | Verified       | Device API and responsive inventory UI         | Query/route/component/E2E tests               |
+| FR-004         | Open device details from every reference   | P0        | DOC-001 §11     | Sprint 2      | In Progress    | Inventory references link to details           | Device navigation E2E; later modules          |
+| FR-005         | Latest and historical device metrics       | P0        | DOC-001 §11     | Sprint 2/6    | Verified       | Bounded range API and accessible history UI    | Repository/route/component/E2E tests          |
+| FR-006         | Simulation-driven automatic device state   | P0        | DOC-001 §11     | Sprint 5      | Verified       | Deterministic worker, Metrics, state/events    | Domain/database/worker/E2E tests              |
+| FR-007         | Threshold-based alert creation             | P0        | DOC-001 §11     | Sprint 3      | In Progress    | Supported rules evaluate; bandwidth off        | Boundary/database/concurrency tests           |
+| FR-008         | Open-alert deduplication                   | P0        | DOC-001 §11     | Sprint 3      | Verified       | Partial unique index plus retrigger path       | Dedupe/concurrency integration tests          |
+| FR-009         | Audited acknowledge and resolve            | P0        | DOC-001 §11     | Sprint 3      | Verified       | Transactional lifecycle service and UI         | State/RBAC/rollback/route/E2E tests           |
+| FR-010         | Important changes written to Event Log     | P0        | DOC-001 §11     | Sprint 3      | Verified       | Fixed Event taxonomy and read-only UI          | Repository/route/filter/E2E tests             |
+| FR-011         | Status-aware network topology              | P0        | DOC-001 §11     | Sprint 4      | Verified       | Persisted active graph and accessible UI       | Domain/repository/component/E2E               |
+| FR-012         | Run a manual incident scenario             | P1 pulled | DOC-001 §11     | Sprint 5      | Verified       | Admin Dashboard run/status/cancel control      | API/component/desktop/mobile E2E              |
+| FR-013         | Automatic Network Health Score             | P0        | DOC-001 §11     | Sprint 1      | In Progress    | Partial documented formula and disclosure      | Health Score unit/component tests             |
+| FR-014         | Login and role enforcement                 | P1        | DOC-001 §11     | Sprint 1/6    | Verified       | Server RBAC and role-aware operations UX       | Permission/route/desktop/mobile tests         |
+| FR-015         | Shared time/device/severity/status filters | P1        | DOC-001 §11     | Sprint 6      | Verified       | Validated URL-backed report/operations filters | Domain/route/E2E tests                        |
+| FR-016         | Safe Demo data reset                       | P1        | DOC-001 §11     | Deferred      | Deferred       | Product reset intentionally absent             | Test-only reset guard is not product evidence |
+| FR-017         | Printable summary report                   | P2        | DOC-001 §11     | Deferred      | Deferred       | No printable/PDF implementation                | Not implemented                               |
 
 ## DOC-002 P0 product requirements
 
-| Requirement ID | Requirement title                            | Priority    | Source document | Planned phase | Current status | Related files                                  | Related tests                       |
-| -------------- | -------------------------------------------- | ----------- | --------------- | ------------- | -------------- | ---------------------------------------------- | ----------------------------------- |
-| PRD-AUTH-001   | Email/password sign in                       | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Identity module and login API                  | Auth unit/integration/E2E tests     |
-| PRD-AUTH-002   | Clearly presented Demo account               | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Three deterministic RBAC accounts              | Login component and E2E tests       |
-| PRD-AUTH-003   | Generic failed-login message                 | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Login API and form                             | Auth integration and E2E tests      |
-| PRD-DASH-001   | Device and critical-alert totals             | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Typed deterministic Dashboard                  | Contract/component/E2E tests        |
-| PRD-DASH-002   | Health Score and classification              | P0          | DOC-002 §8.2    | Sprint 1      | In Progress    | Boundaries/fixed deductions only               | Health Score unit/component tests   |
-| PRD-DASH-003   | Bandwidth trend                              | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Deterministic Recharts trend                   | Dashboard component/E2E tests       |
-| PRD-DASH-004   | Linked latest alerts and events              | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Fixture lists linked to protected routes       | Dashboard E2E test                  |
-| PRD-DASH-005   | Update without page reload                   | P0          | DOC-002 §8.2    | Sprint 4/5    | Verified       | Persisted Dashboard plus committed SSE refresh | Realtime/worker/E2E tests           |
-| PRD-DASH-006   | Run authorized simulation scenario           | P1 pulled   | DOC-002 §8.2    | Sprint 5      | Verified       | Administrator-only allow-listed controls       | RBAC/API/component/E2E tests        |
-| PRD-DEV-001    | Device table with status and metrics         | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | PostgreSQL-backed responsive inventory         | Repository/component/E2E tests      |
-| PRD-DEV-002    | Search name/hostname/IP                      | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Validated query DTO and Device List            | Domain/route/E2E tests              |
-| PRD-DEV-003    | Filter type/status/location                  | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Validated API/UI filters                       | Query/route/E2E tests               |
-| PRD-DEV-004    | Sort and paginate devices                    | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Stable sorting and bounded pagination          | Repository/E2E tests                |
-| PRD-DEV-005    | Administrator device management              | P1 pulled   | DOC-002 §8.3    | Sprint 2      | Verified       | Admin create/update/soft-archive flows         | Service/route/E2E/audit tests       |
-| PRD-DEV-006    | Unique active IP and hostname                | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Partial unique indexes and 409 mapping         | Repository/route conflict tests     |
-| PRD-DD-001     | Device identity/location/OS/status/last seen | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Server-rendered Device Details                 | Repository/route/E2E tests          |
-| PRD-DD-002     | Device metric summaries                      | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Current metric snapshot component              | Component/route/E2E tests           |
-| PRD-DD-003     | Metric history by selected range             | P0          | DOC-002 §8.4    | Sprint 2      | In Progress    | 24-hour history persisted/API exposed          | Repository/route tests; UI deferred |
-| PRD-DD-004     | Device alerts and events                     | P0          | DOC-002 §8.4    | Sprint 2/3    | Verified       | Related persisted Alert/Event sections         | Repository/route/E2E/axe tests      |
-| PRD-DD-005     | Explain unavailable data                     | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Null/stale/unavailable UI states               | Component/E2E/axe tests             |
-| PRD-ALT-001    | Filter alerts by severity/status/device/time | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Validated API and responsive filter UI         | Query/route/E2E tests               |
-| PRD-ALT-002    | Acknowledge with actor and time              | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Transactional lifecycle command                | Actor/note/RBAC/route tests         |
-| PRD-ALT-003    | Resolve with optional note                   | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Condition/role-aware resolve command           | State/rollback/smoke tests          |
-| PRD-ALT-004    | Prevent duplicate open alerts                | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Database active-device/rule constraint         | Concurrent evaluation test          |
-| PRD-EVT-001    | Record state/alert/admin events              | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Prospective Alert/device Event writes          | Transaction/repository tests        |
-| PRD-EVT-002    | Search/filter/browse event timeline          | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Validated cursor API and timeline UI           | Cursor/filter/search/E2E tests      |
-| PRD-EVT-003    | Event records immutable in UI                | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Read-only service/API/UI boundary              | RBAC/route/E2E source review        |
-| PRD-TOP-001    | Display topology nodes/links/types           | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | React Flow plus complete text alternative      | Snapshot/component/E2E tests        |
-| PRD-TOP-002    | Node status encoding                         | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | Text, shape, legend, and status styling        | Component/axe/E2E tests             |
-| PRD-TOP-003    | Open device summary from node                | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | Node summary and Device Details link           | Component/desktop/mobile E2E        |
+| Requirement ID | Requirement title                            | Priority    | Source document | Planned phase | Current status | Related files                                  | Related tests                        |
+| -------------- | -------------------------------------------- | ----------- | --------------- | ------------- | -------------- | ---------------------------------------------- | ------------------------------------ |
+| PRD-AUTH-001   | Email/password sign in                       | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Identity module and login API                  | Auth unit/integration/E2E tests      |
+| PRD-AUTH-002   | Clearly presented Demo account               | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Three deterministic RBAC accounts              | Login component and E2E tests        |
+| PRD-AUTH-003   | Generic failed-login message                 | P0 conflict | DOC-002 §8.1    | Sprint 1      | Verified       | Login API and form                             | Auth integration and E2E tests       |
+| PRD-DASH-001   | Device and critical-alert totals             | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Typed deterministic Dashboard                  | Contract/component/E2E tests         |
+| PRD-DASH-002   | Health Score and classification              | P0          | DOC-002 §8.2    | Sprint 1      | In Progress    | Boundaries/fixed deductions only               | Health Score unit/component tests    |
+| PRD-DASH-003   | Bandwidth trend                              | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Deterministic Recharts trend                   | Dashboard component/E2E tests        |
+| PRD-DASH-004   | Linked latest alerts and events              | P0          | DOC-002 §8.2    | Sprint 1      | Verified       | Fixture lists linked to protected routes       | Dashboard E2E test                   |
+| PRD-DASH-005   | Update without page reload                   | P0          | DOC-002 §8.2    | Sprint 4/5    | Verified       | Persisted Dashboard plus committed SSE refresh | Realtime/worker/E2E tests            |
+| PRD-DASH-006   | Run authorized simulation scenario           | P1 pulled   | DOC-002 §8.2    | Sprint 5      | Verified       | Administrator-only allow-listed controls       | RBAC/API/component/E2E tests         |
+| PRD-DEV-001    | Device table with status and metrics         | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | PostgreSQL-backed responsive inventory         | Repository/component/E2E tests       |
+| PRD-DEV-002    | Search name/hostname/IP                      | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Validated query DTO and Device List            | Domain/route/E2E tests               |
+| PRD-DEV-003    | Filter type/status/location                  | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Validated API/UI filters                       | Query/route/E2E tests                |
+| PRD-DEV-004    | Sort and paginate devices                    | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Stable sorting and bounded pagination          | Repository/E2E tests                 |
+| PRD-DEV-005    | Administrator device management              | P1 pulled   | DOC-002 §8.3    | Sprint 2      | Verified       | Admin create/update/soft-archive flows         | Service/route/E2E/audit tests        |
+| PRD-DEV-006    | Unique active IP and hostname                | P0          | DOC-002 §8.3    | Sprint 2      | Verified       | Partial unique indexes and 409 mapping         | Repository/route conflict tests      |
+| PRD-DD-001     | Device identity/location/OS/status/last seen | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Server-rendered Device Details                 | Repository/route/E2E tests           |
+| PRD-DD-002     | Device metric summaries                      | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Current metric snapshot component              | Component/route/E2E tests            |
+| PRD-DD-003     | Metric history by selected range             | P0          | DOC-002 §8.4    | Sprint 2/6    | Verified       | Five bounded ranges and accessible table       | Repository/route/component/E2E tests |
+| PRD-DD-004     | Device alerts and events                     | P0          | DOC-002 §8.4    | Sprint 2/3    | Verified       | Related persisted Alert/Event sections         | Repository/route/E2E/axe tests       |
+| PRD-DD-005     | Explain unavailable data                     | P0          | DOC-002 §8.4    | Sprint 2      | Verified       | Null/stale/unavailable UI states               | Component/E2E/axe tests              |
+| PRD-ALT-001    | Filter alerts by severity/status/device/time | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Validated API and responsive filter UI         | Query/route/E2E tests                |
+| PRD-ALT-002    | Acknowledge with actor and time              | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Transactional lifecycle command                | Actor/note/RBAC/route tests          |
+| PRD-ALT-003    | Resolve with optional note                   | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Condition/role-aware resolve command           | State/rollback/smoke tests           |
+| PRD-ALT-004    | Prevent duplicate open alerts                | P0          | DOC-002 §8.5    | Sprint 3      | Verified       | Database active-device/rule constraint         | Concurrent evaluation test           |
+| PRD-ALT-005    | Reopen resolved alert on recurrence          | P1          | DOC-002 §8.5    | Deferred      | Deferred       | Existing deduplication only                    | No recurrence implementation         |
+| PRD-EVT-001    | Record state/alert/admin events              | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Prospective Alert/device Event writes          | Transaction/repository tests         |
+| PRD-EVT-002    | Search/filter/browse event timeline          | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Validated cursor API and timeline UI           | Cursor/filter/search/E2E tests       |
+| PRD-EVT-003    | Event records immutable in UI                | P0          | DOC-002 §8.6    | Sprint 3      | Verified       | Read-only service/API/UI boundary              | RBAC/route/E2E source review         |
+| PRD-TOP-001    | Display topology nodes/links/types           | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | React Flow plus complete text alternative      | Snapshot/component/E2E tests         |
+| PRD-TOP-002    | Node status encoding                         | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | Text, shape, legend, and status styling        | Component/axe/E2E tests              |
+| PRD-TOP-003    | Open device summary from node                | P0          | DOC-002 §8.7    | Sprint 4      | Verified       | Node summary and Device Details link           | Component/desktop/mobile E2E         |
+| PRD-TOP-004    | Incident impact on related nodes             | P1          | DOC-002 §8.7    | Deferred      | Deferred       | Incident overlay intentionally absent          | Not implemented                      |
+| PRD-TOP-005    | Save Administrator node positions            | P1          | DOC-002 §8.7    | Sprint 6      | Verified       | Partial transactional saved positions          | Repository/route/component/E2E tests |
+| PRD-REP-001    | Health/devices/alerts report by period       | P1          | DOC-002 §8.8    | Sprint 6      | Verified       | Bounded Network Health Report                  | Domain/repository/route/E2E tests    |
+| PRD-REP-002    | Export tabular data as CSV                   | P1          | DOC-002 §8.8    | Sprint 6      | Verified       | Bounded Alerts CSV with formula neutralization | Route/security/E2E tests             |
+| PRD-SET-001    | Administrator alert threshold management     | P1          | DOC-002 §8.8    | Sprint 6      | Verified       | Bounded updates to existing AlertRules         | Domain/repository/route/E2E tests    |
+| PRD-SET-002    | Display timezone and measurement units       | P1          | DOC-002 §8.8    | Sprint 6      | Verified       | Global presentation-only SystemSetting         | Domain/repository/route/E2E tests    |
 
 ## DOC-003 P0 software requirements
 
@@ -193,3 +204,19 @@ evaluation, and later operational modules remain `In Progress` or deferred.
 | Mobile, keyboard, reduced motion, and accessibility   | Verified | 56-case desktop/mobile Playwright and axe suite             |
 | Static, build, dependency, security, audit gates      | Verified | 145 Vitest + 56 Playwright; audit/secret/build checks clean |
 | ADR, operations, API, testing, and completion records | Verified | Sprint 5 documentation and traceability updated             |
+
+## Sprint 6 delivery controls
+
+Sprint 6 completes only the approved P1 report, settings, filter, historical
+Metric, topology-position, and RBAC-polish scope. Later release work remains
+deferred.
+
+| Control                                               | Status   | Evidence                                              |
+| ----------------------------------------------------- | -------- | ----------------------------------------------------- |
+| Additive settings and topology-position migration     | Verified | Both databases current; migration/schema tests passed |
+| Network Health Report and bounded Alerts CSV          | Verified | Repository/route/security/browser tests               |
+| Shared URL-backed filter contracts                    | Verified | Domain/route/desktop/mobile tests                     |
+| Global presentation settings and AlertRule controls   | Verified | Administrator RBAC, validation, audit, and E2E tests  |
+| Historical Metric ranges and accessible presentation  | Verified | Repository/route/component/axe tests                  |
+| Administrator-saved topology positions                | Verified | Transaction/RBAC/component/reload tests               |
+| Regression, responsive, keyboard, reduced motion, axe | Verified | 62-case desktop/mobile Playwright suite               |

@@ -1,6 +1,7 @@
 import {
   Activity,
   Bell,
+  BarChart3,
   CircleHelp,
   ListTree,
   Menu,
@@ -8,6 +9,7 @@ import {
   Radio,
   Search,
   Server,
+  Settings,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -25,6 +27,8 @@ const navigation = [
   { href: "/alerts", label: "Alerts", icon: Bell },
   { href: "/events", label: "Events", icon: ListTree },
   { href: "/topology", label: "Topology", icon: Network },
+  { href: "/reports", label: "Reports", icon: BarChart3 },
+  { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 function ProductMark() {

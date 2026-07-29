@@ -2,6 +2,7 @@ import { Network } from "lucide-react";
 import type { Metadata } from "next";
 
 import { requireServerSession } from "@/modules/identity/infrastructure/server-session";
+import { hasPermission } from "@/modules/identity/domain/permissions";
 import { topologyService } from "@/modules/topology/infrastructure/topology-service";
 import { TopologyExplorer } from "@/modules/topology/presentation/TopologyExplorer";
 
@@ -45,7 +46,10 @@ export default async function TopologyPage() {
           </span>
         ))}
       </div>
-      <TopologyExplorer initialSnapshot={snapshot} />
+      <TopologyExplorer
+        canSave={hasPermission(session.user.role, "SAVE_TOPOLOGY_POSITIONS")}
+        initialSnapshot={snapshot}
+      />
     </div>
   );
 }

@@ -19,8 +19,10 @@ const metrics = [
 
 export function DeviceMetricSnapshot({
   snapshot,
+  trafficUnit = "Mbps",
 }: {
   readonly snapshot: MetricSnapshot | null;
+  readonly trafficUnit?: "Mbps" | "Gbps";
 }) {
   if (!snapshot) {
     return (
@@ -71,7 +73,16 @@ export function DeviceMetricSnapshot({
           <div className="bg-panel rounded-xl border p-4" key={field}>
             <dt className="text-muted text-xs font-medium">{label}</dt>
             <dd className="mt-2 text-lg font-semibold">
-              {formatMetric(snapshot[field], unit)}
+              {formatMetric(
+                (field === "downloadMbps" || field === "uploadMbps") &&
+                  trafficUnit === "Gbps" &&
+                  snapshot[field] !== null
+                  ? snapshot[field] / 1000
+                  : snapshot[field],
+                field === "downloadMbps" || field === "uploadMbps"
+                  ? trafficUnit
+                  : unit,
+              )}
             </dd>
           </div>
         ))}
@@ -84,8 +95,8 @@ export function DeviceMetricSnapshot({
       </dl>
 
       <p className="text-muted mt-3 text-xs">
-        Received: {formatDateTime(snapshot.receivedAt)} · Historical charts and
-        range selection remain In Progress.
+        Received: {formatDateTime(snapshot.receivedAt)} · Use Metric history
+        below for approved ranges.
       </p>
     </section>
   );

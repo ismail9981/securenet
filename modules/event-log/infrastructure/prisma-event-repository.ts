@@ -56,6 +56,8 @@ function queryWhere(query: EventListQuery): Prisma.EventWhereInput {
     ...(query.actorUserId ? { actorUserId: query.actorUserId } : {}),
     ...(query.types.length ? { type: { in: query.types } } : {}),
     ...(query.severities.length ? { severity: { in: query.severities } } : {}),
+    ...(query.alertStatus ? { alert: { status: query.alertStatus } } : {}),
+    ...(query.deviceStatus ? { device: { status: query.deviceStatus } } : {}),
     ...(query.search
       ? { message: { contains: query.search, mode: "insensitive" } }
       : {}),

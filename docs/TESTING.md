@@ -28,6 +28,20 @@ history, archive preservation, idempotent seed/migration checks, desktop and
 320-pixel mobile flows, and axe WCAG A/AA checks. Browser tests run serially
 against a freshly reset `securenet_test`.
 
+Sprint 6 coverage adds report aggregates and filters, bounded CSV output and
+formula neutralization, global settings, bounded AlertRule administration,
+historical Metric ranges/aggregation, saved topology positions, server RBAC and
+role-aware UX, additive migration preservation, and performance budgets. The
+desktop and 320-pixel browser matrix includes keyboard operation, reduced motion,
+axe WCAG A/AA scans, reload persistence, empty/error/unauthorized behavior, and
+regression coverage.
+
+Performance evidence is produced by
+`tests/integration/sprint-six-performance.test.ts`: initial report generation,
+20 filter samples with P95 calculation, a 10,000-row CSV export, 30-day Metric
+history, and a 30-node position save. These are local test-database budgets, not
+production capacity claims.
+
 Sprint 5 adds deterministic PRNG/replay, baseline ranges, bounded walk, scenario
 effects/durations, five-second runtime and 60-second persistence boundaries,
 Metric source/run traceability, lifecycle/cancellation/failure/restart recovery,

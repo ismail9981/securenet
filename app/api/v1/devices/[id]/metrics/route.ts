@@ -28,6 +28,9 @@ export async function GET(
     const query = metricCursorQuerySchema.parse({
       cursor: request.nextUrl.searchParams.get("cursor") ?? undefined,
       limit: Number(request.nextUrl.searchParams.get("limit") ?? "24"),
+      range: request.nextUrl.searchParams.get("range") || undefined,
+      from: request.nextUrl.searchParams.get("from") || undefined,
+      to: request.nextUrl.searchParams.get("to") || undefined,
     });
     const result = await deviceService.getMetrics(id, query, {
       actor: session.user,
