@@ -167,31 +167,62 @@ test("Alert and Event consumers refresh from committed realtime signals", async 
 
   await page.goto("/events");
   await expect(page.getByText(fixture.eventText).first()).toBeVisible();
+  await expect(page.getByTitle(/Realtime connection: Connected/)).toBeVisible();
 
-  const eventProbe = await page.evaluate(async () => {
-    const response = await fetch("/api/v1/devices", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        name: "Event Realtime Probe",
-        hostname: "RT-EVENT-01",
-        ipAddress: "10.99.91.1",
-        type: "SERVER",
-        status: "UNKNOWN",
-        locationId: "10000000-0000-4000-8000-000000000001",
-        importanceWeight: 1,
-      }),
-    });
-    return (await response.json()).data as { id: string };
+  const eventRefresh = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return (
+      response.request().method() === "GET" && url.pathname === "/api/v1/events"
+    );
   });
-  await expect(
-    page.getByText(/created Event Realtime Probe/).first(),
-  ).toBeVisible({ timeout: 5_000 });
-  await page.evaluate(async (id) => {
-    await fetch(`/api/v1/devices/${id}`, {
-      method: "DELETE",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ confirmed: true }),
-    });
-  }, eventProbe.id);
+  const [creationResponse, eventProbe] = await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.request().method() === "POST" &&
+        new URL(response.url()).pathname === "/api/v1/devices",
+    ),
+    page.evaluate(async () => {
+      const response = await fetch("/api/v1/devices", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: "Event Realtime Probe",
+          hostname: "RT-EVENT-01",
+          ipAddress: "10.99.91.1",
+          type: "SERVER",
+          status: "UNKNOWN",
+          locationId: "10000000-0000-4000-8000-000000000001",
+          importanceWeight: 1,
+        }),
+      });
+      return (await response.json()).data as { id: string };
+    }),
+  ]);
+  expect(creationResponse.status()).toBe(201);
+
+  try {
+    const committedEvents = await page.request.get(
+      "/api/v1/events?search=created%20Event%20Realtime%20Probe",
+    );
+    expect(committedEvents.status()).toBe(200);
+    const committedBody = (await committedEvents.json()) as {
+      data: Array<{ message: string }>;
+    };
+    expect(
+      committedBody.data.some(({ message }) =>
+        message.includes("created Event Realtime Probe"),
+      ),
+    ).toBe(true);
+
+    expect((await eventRefresh).status()).toBe(200);
+    await expect(
+      page.getByText(/created Event Realtime Probe/).first(),
+    ).toBeVisible();
+  } finally {
+    const archiveResponse = await page.request.delete(
+      `/api/v1/devices/${eventProbe.id}`,
+      { data: { confirmed: true } },
+    );
+    expect(archiveResponse.status()).toBe(200);
+  }
 });

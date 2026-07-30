@@ -14,7 +14,7 @@ async function signIn(page: Page, email: string) {
 
 test("Administrator starts, observes, and cancels a deterministic scenario", async ({
   page,
-}, testInfo) => {
+}) => {
   await signIn(page, "admin@securenet.demo");
   await expect(
     page.getByRole("heading", { name: "Simulate incident" }),
@@ -25,35 +25,63 @@ test("Administrator starts, observes, and cancels a deterministic scenario", asy
     page.getByRole("dialog", { name: /Start Server CPU Overload/ }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Go back" })).toBeFocused();
+  const startResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      new URL(response.url()).pathname === "/api/v1/simulation/runs",
+  );
   await page.getByRole("button", { name: "Start scenario" }).click();
+  const started = await startResponse;
+  expect(started.status()).toBe(201);
+  const startedBody = (await started.json()) as { data: { id: string } };
+  const runId = startedBody.data.id;
   await expect(page.getByText(/Server CPU Overload started/)).toBeVisible();
   await expect(page.getByRole("progressbar")).toBeVisible();
 
-  await expect
-    .poll(
-      async () =>
-        page.evaluate(async (id) => {
-          const response = await fetch(`/api/v1/devices/${id}`);
-          const result = (await response.json()) as {
-            data?: {
-              status: string;
-              latestMetrics: { cpuPct: number | null; source: string } | null;
+  let cancelled = false;
+  try {
+    await expect
+      .poll(
+        async () =>
+          page.evaluate(async (id) => {
+            const response = await fetch(`/api/v1/devices/${id}`);
+            const result = (await response.json()) as {
+              data?: {
+                status: string;
+                latestMetrics: {
+                  simulationRunId: string | null;
+                  source: string;
+                } | null;
+              };
             };
-          };
-          return result.data;
-        }, webServerId),
-      {
-        timeout: testInfo.project.name === "mobile-chromium" ? 10_000 : 5_000,
-      },
-    )
-    .toMatchObject({
-      status: "DEGRADED",
-      latestMetrics: { source: "SIMULATION" },
-    });
+            return result.data;
+          }, webServerId),
+        { timeout: 15_000 },
+      )
+      .toMatchObject({
+        status: "DEGRADED",
+        latestMetrics: { simulationRunId: runId, source: "SIMULATION" },
+      });
 
-  await page.getByRole("button", { name: "Cancel scenario" }).click();
-  await expect(page.getByText("Scenario cancelled.")).toBeVisible();
-  await expect(page.getByText(/CANCELLED/)).toBeVisible();
+    const cancelResponse = page.waitForResponse(
+      (response) =>
+        response.request().method() === "POST" &&
+        new URL(response.url()).pathname ===
+          `/api/v1/simulation/runs/${runId}/cancel`,
+    );
+    await page.getByRole("button", { name: "Cancel scenario" }).click();
+    expect((await cancelResponse).status()).toBe(200);
+    cancelled = true;
+    await expect(page.getByText("Scenario cancelled.")).toBeVisible();
+    await expect(page.getByText(/^CANCELLED · \d+%$/)).toBeVisible();
+  } finally {
+    if (!cancelled) {
+      const cleanup = await page.request.post(
+        `/api/v1/simulation/runs/${runId}/cancel`,
+      );
+      expect(cleanup.status()).toBe(200);
+    }
+  }
 });
 
 test("Network Engineer and Viewer cannot see or invoke simulation controls", async ({

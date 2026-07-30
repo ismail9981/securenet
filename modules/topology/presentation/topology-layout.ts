@@ -37,6 +37,7 @@ export function deterministicTopologyLayout(
             left.id.localeCompare(right.id),
         )
         .map((node, index) => ({
+          ariaLabel: `${node.name}, ${node.type}, ${node.status}`,
           id: node.id,
           type: "device",
           position: {

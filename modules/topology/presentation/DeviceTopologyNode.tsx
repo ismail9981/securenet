@@ -19,7 +19,6 @@ export function DeviceTopologyNode({
 }: NodeProps<Node<TopologyNode>>) {
   return (
     <div
-      aria-label={`${data.name}, ${data.type}, ${data.status}`}
       className={`bg-panel-raised min-w-40 rounded-xl border-2 px-3 py-2 shadow-lg ${statusClass[data.status]} ${selected ? "ring-brand ring-2" : ""}`}
     >
       <Handle
