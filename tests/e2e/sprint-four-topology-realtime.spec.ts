@@ -24,9 +24,7 @@ test("Viewer can inspect the active topology and navigate by node", async ({
   await expect(
     topology.getByRole("heading", { name: "Accessible topology list" }),
   ).toBeVisible();
-  await expect(
-    topology.getByText(/Connected Devices:/).first(),
-  ).toBeVisible();
+  await expect(topology.getByText(/Connected Devices:/).first()).toBeVisible();
 
   await topology
     .locator(".react-flow__node")
