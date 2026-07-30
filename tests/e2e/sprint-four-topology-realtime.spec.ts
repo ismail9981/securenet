@@ -16,23 +16,26 @@ test("Viewer can inspect the active topology and navigate by node", async ({
 }) => {
   await signIn(page, "viewer@securenet.demo");
   await page.goto("/topology");
+  const topology = page.getByRole("main");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Topology" }),
+    topology.getByRole("heading", { level: 1, name: "Topology" }),
   ).toBeVisible();
-  await expect(page.getByText("30 Devices · 29 links")).toBeVisible();
+  await expect(topology.getByText("30 Devices · 29 links")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Accessible topology list" }),
+    topology.getByRole("heading", { name: "Accessible topology list" }),
   ).toBeVisible();
-  await expect(page.getByText(/Connected Devices:/).first()).toBeVisible();
+  await expect(
+    topology.getByText(/Connected Devices:/).first(),
+  ).toBeVisible();
 
-  await page
+  await topology
     .locator(".react-flow__node")
     .filter({ hasText: "Core Router" })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Core Router" }),
+    topology.getByRole("heading", { name: "Core Router" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Open Device Details" }).click();
+  await topology.getByRole("link", { name: "Open Device Details" }).click();
   await expect(page).toHaveURL(
     /\/devices\/30000000-0000-4000-8000-000000000002$/,
   );

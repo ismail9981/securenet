@@ -16,11 +16,14 @@ test("all roles can use the report, shared filters, CSV, and read-only settings"
 }) => {
   await signIn(page, "viewer@securenet.demo");
   await page.goto("/reports");
+  const report = page.getByRole("main");
   await expect(
-    page.getByRole("heading", { name: "Network Health Report" }),
+    report.getByRole("heading", { name: "Network Health Report" }),
   ).toBeVisible();
-  await page.getByLabel("Severity").selectOption("CRITICAL");
-  await page.getByRole("button", { name: "Apply filters" }).click();
+  const severity = report.getByLabel("Severity");
+  await expect(severity).toBeVisible();
+  await severity.selectOption("CRITICAL");
+  await report.getByRole("button", { name: "Apply filters" }).click();
   await expect(page).toHaveURL(/severity=CRITICAL/);
   const csv = await page.evaluate(async () => {
     const response = await fetch(
@@ -35,9 +38,10 @@ test("all roles can use the report, shared filters, CSV, and read-only settings"
   expect(csv).toMatchObject({ status: 200, type: "text/csv; charset=utf-8" });
   expect(csv.disposition).toContain("securenet-alerts-");
   await page.goto("/settings");
-  await expect(page.getByText(/Read-only settings access/)).toBeVisible();
+  const settings = page.getByRole("main");
+  await expect(settings.getByText(/Read-only settings access/)).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Save global settings" }),
+    settings.getByRole("button", { name: "Save global settings" }),
   ).toHaveCount(0);
 });
 

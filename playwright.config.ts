@@ -30,7 +30,8 @@ export default defineConfig({
     timeout: 15_000,
   },
   use: {
-    baseURL: "http://127.0.0.1:3100",
+    baseURL: "https://127.0.0.1:3100",
+    ignoreHTTPSErrors: true,
     trace: "on-first-retry",
   },
   projects: [
@@ -58,7 +59,8 @@ export default defineConfig({
       SEED_DEMO_PASSWORD: "SecureNetDemo123",
       SECURENET_DEPLOYMENT_ENV: "test",
     },
-    url: "http://127.0.0.1:3100",
+    ignoreHTTPSErrors: true,
+    url: "https://127.0.0.1:3100",
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },
