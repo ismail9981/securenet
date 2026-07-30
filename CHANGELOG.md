@@ -6,6 +6,24 @@ use semantic versioning once releases begin.
 
 ## [Unreleased]
 
+### Sprint 7
+
+- Added a manual single-instance Render Blueprint for one Web Service, one
+  Background Worker, and paid PostgreSQL 17 with private connectivity, a single
+  pre-deploy migration command, readiness checks, and automatic deploys off.
+- Added fail-closed environment validation, server-enforced Viewer-only public
+  production login, minimal health routes, structured redacted logging,
+  correlation IDs, mutation throttling, and graceful lifecycle handling.
+- Added guarded empty-only production bootstrap, isolated restore verification,
+  smoke tooling, GitHub Actions/manual eligibility, core coverage thresholds,
+  and Chromium/mobile/WebKit validation.
+- Corrected mutable documentation to preserve Alerts CSV access for every
+  authenticated role.
+- Fixed Device PATCH validation so an empty object cannot acquire create-time
+  defaults and produce an unintended update.
+- Kept AR-BW-01 disabled, Health Score partial, automatic resolution absent, and
+  deployment, `v0.7.0`, and `v1.0.0` unperformed.
+
 ### Sprint 6
 
 - Added the bounded Network Health Report, shared validated URL filters, and

@@ -24,8 +24,9 @@ signals to the web SSE hub through PostgreSQL `LISTEN/NOTIFY`.
 
 The Settings page changes one global presentation-only configuration row and
 bounded fields on existing AlertRules. Only Administrators may save settings,
-rules, topology positions, or export Alerts CSV. These operations append
-AuditLog actions; they do not create operational Events.
+rules, or topology positions. Alerts CSV is available to every authenticated
+role. These operations append AuditLog actions; they do not create operational
+Events.
 
 Migration `20260729100000_sprint_6_reports_settings_positions` is additive. It
 adds the global setting and saved-position tables without deleting or rewriting
@@ -42,7 +43,19 @@ identifying the selected database.
 - Recovery is a scenario, not Alert auto-resolution.
 - AR-BW-01 remains disabled.
 - No product Demo reset, user-management, pause, resume, speed, purge, queue,
-  Redis, PDF-generation, or production monitoring facility exists in Sprint 6.
+  Redis, or PDF-generation facility exists.
 
 If the worker exits unexpectedly, restart it once. The new owner records
 orphaned runs as failed and exposes the result through the run-status API.
+
+## Sprint 7 release operations
+
+Use `DEPLOYMENT.md` and `BACKUP_RESTORE.md`. Render runs exactly one Web and one
+Worker, with automatic deploys off. The Web pre-deploy phase alone runs
+`prisma migrate deploy`; `/api/health/ready` is the health path.
+
+`npm run db:production:bootstrap` is a separately authorized empty-only operator
+action. It refuses non-production Demo environments, missing flags, mismatched or
+reserved database names, and any operational row. It is not a reset or deploy
+hook. `LOG_LEVEL` accepts `debug`, `info`, `warn`, or `error`; unknown values fall
+back to `info`.

@@ -45,6 +45,10 @@ export default defineConfig({
         viewport: { width: 320, height: 800 },
       },
     },
+    {
+      name: "desktop-webkit",
+      use: { ...devices["Desktop Safari"] },
+    },
   ],
   webServer: {
     command: "npm run db:test:reset && npm run start:test-runtime",
@@ -52,6 +56,7 @@ export default defineConfig({
       AUTH_SECRET: authSecret,
       DATABASE_URL: testDatabaseUrl,
       SEED_DEMO_PASSWORD: "SecureNetDemo123",
+      SECURENET_DEPLOYMENT_ENV: "test",
     },
     url: "http://127.0.0.1:3100",
     reuseExistingServer: !process.env.CI,

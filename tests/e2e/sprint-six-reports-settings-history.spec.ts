@@ -48,7 +48,12 @@ test("Administrator manages bounded settings and persists Topology positions", a
   await page.goto("/settings");
   await page.getByRole("button", { name: "Save global settings" }).click();
   await expect(page.getByText("Settings saved.")).toBeVisible();
-  await expect(page.getByText(/AR-BW-01 remains disabled/)).toBeVisible();
+  await expect(
+    page
+      .getByText(/AR-BW-01 remains disabled/)
+      .filter({ visible: true })
+      .first(),
+  ).toBeVisible();
   await expect(
     page.getByRole("checkbox", { name: "Enabled" }).first(),
   ).toBeDisabled();

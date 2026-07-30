@@ -11,7 +11,7 @@ import {
 import {
   createSessionToken,
   SESSION_COOKIE_NAME,
-  sessionCookieOptions,
+  getSessionCookieOptions,
 } from "@/modules/identity/infrastructure/session";
 import { loginRequestSchema } from "@/modules/identity/presentation/login-schema";
 
@@ -29,14 +29,19 @@ function errorResponse(
   message: string,
   correlationId: string,
 ) {
-  return NextResponse.json(
+  const response = NextResponse.json(
     { error: { code, message, correlationId } },
     { status },
   );
+  response.headers.set("x-correlation-id", correlationId);
+  return response;
 }
 
 export async function POST(request: NextRequest) {
-  const correlationId = randomUUID();
+  const correlationId =
+    request.headers
+      .get("x-correlation-id")
+      ?.match(/^[a-zA-Z0-9._-]{1,128}$/)?.[0] ?? randomUUID();
   const contentLength = Number(request.headers.get("content-length") ?? "0");
 
   if (contentLength > MAX_BODY_BYTES) {
@@ -117,7 +122,8 @@ export async function POST(request: NextRequest) {
   clearLoginRateLimit(clientKey);
   const token = await createSessionToken(result.user);
   const response = NextResponse.json({ data: { user: result.user } });
-  response.cookies.set(SESSION_COOKIE_NAME, token, sessionCookieOptions);
+  response.headers.set("x-correlation-id", correlationId);
+  response.cookies.set(SESSION_COOKIE_NAME, token, getSessionCookieOptions());
 
   logEvent("info", "auth.login.succeeded", {
     correlationId,

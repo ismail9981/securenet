@@ -55,8 +55,19 @@ export const createDeviceSchema = z.object({
   importanceWeight: z.number().int().min(1).max(5).default(1),
 });
 
-export const updateDeviceSchema = createDeviceSchema
-  .partial()
+export const updateDeviceSchema = z
+  .object({
+    name: deviceNameSchema.optional(),
+    hostname: hostnameSchema.optional(),
+    ipAddress: ipAddressSchema.optional(),
+    macAddress: macAddressSchema.optional(),
+    type: deviceTypeSchema.optional(),
+    status: deviceStatusSchema.optional(),
+    osName: nullableText(120).optional(),
+    locationId: deviceIdSchema.optional(),
+    parentDeviceId: deviceIdSchema.nullable().optional(),
+    importanceWeight: z.number().int().min(1).max(5).optional(),
+  })
   .refine((value) => Object.keys(value).length > 0, {
     message: "Provide at least one field to update.",
   });

@@ -21,3 +21,15 @@ guarded test environment.
 
 There is no product Demo reset, purge, pause, resume, speed, cron, queue, or Redis
 command.
+
+`npm run db:production:bootstrap` is an explicit one-time, empty-only production
+Demo bootstrap. It requires positive environment/database identity and an
+authorization flag, refuses any operational data, and never calls the test reset.
+
+`npm run backup:verify-restore` performs read-only counts and migration inspection
+against a positively identified isolated restore. It refuses development, test,
+default, template, or live-equal targets and does not restore or delete.
+
+`npm run smoke:production` requires an HTTPS or loopback target and a private
+operator password. It checks health, Viewer authentication, private-role
+rejection, protected modules, CSV, and simulation reads without printing secrets.

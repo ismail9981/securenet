@@ -23,6 +23,10 @@ import {
 } from "@/modules/alerting/application/alert-errors";
 import { AlertLifecycleError } from "@/modules/alerting/domain/alert";
 import { SimulationError } from "@/modules/simulation/application/simulation-errors";
+import {
+  checkMutationRateLimit,
+  MutationRateLimitError,
+} from "@/modules/identity/infrastructure/mutation-rate-limit";
 
 const MAX_JSON_BODY_BYTES = 16_384;
 
@@ -113,6 +117,15 @@ export function assertSameOrigin(
   request: NextRequest,
   permission: Permission = "MANAGE_DEVICES",
 ): void {
+  if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+    const rateLimit = checkMutationRateLimit(
+      `${getRequestIp(request) ?? "local"}:${permission}`,
+    );
+    if (!rateLimit.allowed) {
+      throw new MutationRateLimitError(rateLimit.retryAfterSeconds);
+    }
+  }
+
   const origin = request.headers.get("origin");
   if (!origin) return;
 
@@ -184,6 +197,16 @@ export function handleApiError(error: unknown): NextResponse {
       "You do not have permission to perform this action.",
       correlationId,
     );
+  }
+  if (error instanceof MutationRateLimitError) {
+    const response = apiError(
+      429,
+      "RATE_LIMITED",
+      "Too many mutation requests. Try again later.",
+      correlationId,
+    );
+    response.headers.set("Retry-After", String(error.retryAfterSeconds));
+    return response;
   }
   if (error instanceof DeviceNotFoundError) {
     return apiError(404, error.code, error.message, correlationId);

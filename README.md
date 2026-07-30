@@ -5,12 +5,13 @@ device state, alerts, operational events, and topology from one interface. Versi
 1.0 is a portfolio/demo product: it does **not** monitor a real network, discover
 devices, or connect through SNMP, WMI, SSH, or agents.
 
-This repository contains the Sprint 0–6 implementation: the application
+This repository contains the Sprint 0–7 implementation: the application
 foundation, Demo identity and Dashboard, PostgreSQL-backed Device Inventory,
 synchronous alert evaluation, immutable operational history, active network
 topology, authenticated Demo realtime refresh, deterministic simulation worker,
 PostgreSQL-backed runtime Dashboard, bounded reports/CSV, global presentation
-settings, historical Metrics, and saved topology positions. Authentication and
+settings, historical Metrics, saved topology positions, and Render release
+readiness. Authentication and
 generated data remain deliberately demonstration-only; they must not protect or
 represent a real monitored network.
 
@@ -66,11 +67,15 @@ npm run db:test:reset
 Open [http://localhost:3000](http://localhost:3000). The root route resolves through
 the protected Dashboard flow and redirects unauthenticated users to `/login`.
 
-The login screen presents deterministic fictional accounts for Administrator,
-Network Engineer, and Viewer. Their credentials are public by design so the RBAC
-matrix is repeatable. All three accounts use the local Demo password
+The local login screen presents deterministic fictional accounts for
+Administrator, Network Engineer, and Viewer so the RBAC matrix is repeatable.
+All three accounts use the local Demo password
 `SecureNetDemo123`, configured through `SEED_DEMO_PASSWORD`. Do not reuse that
 password or this adapter for real data.
+
+Production Demo policy exposes only Viewer. Administrator and Network Engineer
+credentials and login remain private unless explicitly enabled by server-only
+configuration. They must not appear in public documentation or client bundles.
 
 | Role             | Email                     |
 | ---------------- | ------------------------- |
@@ -119,14 +124,15 @@ npm run validate
 | `/topology`                            | Interactive active topology and accessible list               |
 | `/api/v1/topology`                     | Authorized active Device/connection snapshot                  |
 | `/api/v1/realtime`                     | Authenticated, same-origin read-only SSE stream               |
-| `/reports`                             | Filtered Network Health Report and Administrator CSV export   |
+| `/reports`                             | Filtered Network Health Report and authenticated CSV export   |
 | `/api/v1/reports/network-health`       | Bounded authenticated report contract                         |
-| `/api/v1/reports/alerts.csv`           | Administrator-only bounded Alerts CSV                         |
+| `/api/v1/reports/alerts.csv`           | Authenticated bounded Alerts CSV                              |
 | `/settings`                            | Global settings and Administrator AlertRule controls          |
 | `/api/v1/settings`                     | Authenticated read; Administrator update                      |
 | `/api/v1/alert-rules`                  | Existing AlertRule list                                       |
 | `/api/v1/alert-rules/{id}`             | Administrator-only bounded AlertRule update                   |
 | `/api/v1/topology/positions`           | Administrator-only saved node positions                       |
+| `/api/health/live`, `/ready`           | Minimal public liveness and database-backed readiness         |
 
 `proxy.ts` performs only an optimistic cookie-presence redirect. Every protected
 server render verifies the signature and expiry, and protected application use
@@ -161,11 +167,17 @@ five-second polling runs only while SSE is unavailable. The process-local
 publisher is Demo-only, non-durable, and not suitable for multi-instance
 production deployment.
 
-Sprint 6 adds one bounded Network Health Report, an Administrator-only Alerts CSV
-export, global presentation settings, bounded updates to existing AlertRules,
+Sprint 6 adds one bounded Network Health Report and an Alerts CSV for all
+authenticated roles, global presentation settings, bounded updates to existing AlertRules,
 and Administrator-saved topology positions. Shared filters live in validated URL
 parameters. AR-BW-01 remains disabled. PDF output, user management, Demo reset,
-Alert recurrence, automatic resolution, deployment, and Sprint 7 remain absent.
+Alert recurrence, and automatic resolution remain absent.
+
+Sprint 7 adds a one-Web/one-Worker Render Blueprint, paid PostgreSQL definition,
+environment validation, Viewer-only public production identity policy, health
+checks, redacted structured logs, guarded empty-only bootstrap, CI validation,
+restore verification, and release runbooks. Automatic deployment is disabled.
+No live deployment or release tag is created here.
 
 ## Repository structure
 
@@ -193,6 +205,9 @@ scripts/         Documented maintenance and simulation scripts when implemented
 - [Topology and realtime decision](docs/adr/0005-topology-and-realtime-architecture.md)
 - [Simulation architecture decision](docs/adr/0006-simulation-runtime-and-scenarios.md)
 - [Reports, settings, filters, and positions decision](docs/adr/0007-reports-settings-filters-and-topology-positions.md)
+- [Render release-readiness decision](docs/adr/0008-render-deployment-release-readiness-and-v1-boundary.md)
+- [Deployment runbook](docs/DEPLOYMENT.md)
+- [Backup and restore runbook](docs/BACKUP_RESTORE.md)
 - [REST API reference](docs/API.md)
 - [Security and realtime limitations](docs/SECURITY.md)
 - [Testing and database-safety guide](docs/TESTING.md)
@@ -203,6 +218,7 @@ scripts/         Documented maintenance and simulation scripts when implemented
 - [Sprint 4 completion report](docs/SPRINT_4_COMPLETION_REPORT.md)
 - [Sprint 5 completion report](docs/SPRINT_5_COMPLETION_REPORT.md)
 - [Sprint 6 completion report](docs/SPRINT_6_COMPLETION_REPORT.md)
+- [Sprint 7 completion report](docs/SPRINT_7_COMPLETION_REPORT.md)
 - [Approved baseline package](docs/baseline/README_AR.txt)
 
 The source documents in `docs/baseline/` are authoritative. Changes to scope require

@@ -1,0 +1,69 @@
+name: SecureNet validation
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: securenet
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: securenet_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U securenet -d securenet_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      AUTH_SECRET: ci-only-auth-secret-at-least-32-characters
+      DATABASE_URL: postgresql://securenet:ci-only-password@localhost:5432/securenet_test
+      TEST_DATABASE_URL: postgresql://securenet:ci-only-password@localhost:5432/securenet_test
+      SEED_DEMO_PASSWORD: SecureNetDemo123
+      SECURENET_DEPLOYMENT_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm ls --depth=0
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run type-check
+      - run: npm run prisma:validate
+      - run: npm run prisma:generate
+      - run: npm run db:migrate:deploy
+      - run: npm test
+      - run: npm run test:coverage
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:e2e
+      - run: npm audit --audit-level=high
+
+  production-eligibility:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - run: echo "Validation passed; production remains a separate manual Render action."

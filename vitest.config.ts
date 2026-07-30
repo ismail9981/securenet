@@ -4,8 +4,10 @@ export default defineConfig({
   test: {
     environment: "node",
     fileParallelism: false,
+    hookTimeout: 30_000,
     include: ["**/*.test.{ts,tsx}"],
     setupFiles: ["./vitest.setup.ts"],
+    testTimeout: 30_000,
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],

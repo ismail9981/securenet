@@ -10,7 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-import { DEMO_ACCOUNTS } from "@/modules/identity/infrastructure/demo-accounts";
+import type { DemoAccount } from "@/modules/identity/infrastructure/demo-accounts";
 
 const ROLE_LABELS = {
   ADMIN: "Administrator",
@@ -23,22 +23,21 @@ interface LoginError {
   readonly correlationId?: string;
 }
 
-const DEFAULT_DEMO_ACCOUNT = DEMO_ACCOUNTS[1];
-
 interface LoginFormProps {
+  readonly demoAccounts: readonly DemoAccount[];
   readonly demoPassword: string;
 }
 
-export function LoginForm({ demoPassword }: LoginFormProps) {
+export function LoginForm({ demoAccounts, demoPassword }: LoginFormProps) {
   const router = useRouter();
-  const [email, setEmail] = useState<string>(DEFAULT_DEMO_ACCOUNT.email);
+  const [email, setEmail] = useState<string>(demoAccounts[0]?.email ?? "");
   const [password, setPassword] = useState<string>(demoPassword);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedRole, setCopiedRole] = useState<string | null>(null);
   const [error, setError] = useState<LoginError | null>(null);
 
   async function selectAccount(index: number) {
-    const account = DEMO_ACCOUNTS[index];
+    const account = demoAccounts[index];
     if (!account) return;
 
     setEmail(account.email);
@@ -182,11 +181,14 @@ export function LoginForm({ demoPassword }: LoginFormProps) {
           Choose an account to fill and copy its public Demo credentials.
         </p>
         <p className="bg-background text-muted mt-3 rounded-lg border px-3 py-2 text-xs leading-5">
-          All three accounts use the public Demo password{" "}
+          {demoAccounts.length === 1
+            ? "This account uses"
+            : "These accounts use"}{" "}
+          the public Demo password{" "}
           <code className="text-foreground font-mono">{demoPassword}</code>.
         </p>
         <ul className="mt-4 space-y-3">
-          {DEMO_ACCOUNTS.map((account, index) => (
+          {demoAccounts.map((account, index) => (
             <li
               className="bg-background rounded-lg border p-3"
               key={account.role}

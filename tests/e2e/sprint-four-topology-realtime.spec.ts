@@ -112,12 +112,32 @@ test("Device commits update Topology without reload and preserve archive semanti
 
 test("Alert and Event consumers refresh from committed realtime signals", async ({
   page,
-}) => {
+}, testInfo) => {
   await signIn(page, "admin@securenet.demo");
   await page.goto("/alerts");
   await expect(page.getByTitle(/Realtime connection: Connected/)).toBeVisible();
 
-  const alertId = "50000000-0000-4000-8000-000000000002";
+  const fixtureByProject = {
+    "desktop-chromium": {
+      id: "50000000-0000-4000-8000-000000000002",
+      title: "Application server CPU threshold exceeded",
+      eventText: /Application server CPU threshold exceeded|CPU Alert/,
+    },
+    "mobile-chromium": {
+      id: "50000000-0000-4000-8000-000000000003",
+      title: "Access point packet loss was critical",
+      eventText: /packet.loss Alert|wireless interference/i,
+    },
+    "desktop-webkit": {
+      id: "50000000-0000-4000-8000-000000000002",
+      title: "Application server CPU threshold exceeded",
+      eventText: /Application server CPU threshold exceeded|CPU Alert/,
+    },
+  } as const;
+  const fixture =
+    fixtureByProject[testInfo.project.name as keyof typeof fixtureByProject] ??
+    fixtureByProject["desktop-chromium"];
+  const alertId = fixture.id;
   const result = await page.evaluate(async (id) => {
     const current = await fetch(`/api/v1/alerts/${id}`).then(
       async (response) => (await response.json()).data as { status: string },
@@ -140,16 +160,12 @@ test("Alert and Event consumers refresh from committed realtime signals", async 
   }, alertId);
 
   const cpuAlert = page.locator("details:visible").filter({
-    hasText: "Application server CPU threshold exceeded",
+    hasText: fixture.title,
   });
   await expect(cpuAlert).toContainText(result.alert.status, { timeout: 5_000 });
 
   await page.goto("/events");
-  await expect(
-    page
-      .getByText(/Application server CPU threshold exceeded|CPU Alert/)
-      .first(),
-  ).toBeVisible();
+  await expect(page.getByText(fixture.eventText).first()).toBeVisible();
 
   const eventProbe = await page.evaluate(async () => {
     const response = await fetch("/api/v1/devices", {

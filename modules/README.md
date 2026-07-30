@@ -12,6 +12,10 @@ Each implemented module follows the approved dependency direction:
 4. `presentation/` — route-facing components, hooks, and handlers.
 5. `tests/` — module integration fixtures where colocated tests are insufficient.
 
+Sprint 7 preserves these product boundaries and adds only cross-cutting release
+readiness in `lib/`, `scripts/`, health routes, and deployment configuration.
+No product module or persistence model is added.
+
 Sprint 6 implements or preserves:
 
 - `identity`: the unchanged Sprint 1 Demo identity/session adapter and RBAC rules;

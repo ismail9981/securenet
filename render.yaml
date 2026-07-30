@@ -1,0 +1,81 @@
+services:
+  - type: web
+    name: securenet-web
+    runtime: node
+    plan: starter
+    branch: main
+    autoDeployTrigger: off
+    numInstances: 1
+    buildCommand: npm ci && npm run build
+    preDeployCommand: npm run db:migrate:deploy
+    startCommand: npm run start
+    healthCheckPath: /api/health/ready
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_APP_NAME
+        value: SecureNet
+      - key: NEXT_PUBLIC_DEMO_MODE
+        value: "true"
+      - key: SECURENET_DEPLOYMENT_ENV
+        value: production-demo
+      - key: DEMO_PRIVATE_ROLE_LOGIN_ENABLED
+        value: "false"
+      - key: ALLOW_PRODUCTION_DEMO_BOOTSTRAP
+        value: "false"
+      - key: LOG_LEVEL
+        value: info
+      - key: DATABASE_URL
+        fromDatabase:
+          name: securenet-postgres
+          property: connectionString
+      - key: SECURENET_PRODUCTION_DATABASE_NAME
+        fromDatabase:
+          name: securenet-postgres
+          property: database
+      - key: AUTH_SECRET
+        sync: false
+      - key: SEED_DEMO_PASSWORD
+        sync: false
+
+  - type: worker
+    name: securenet-worker
+    runtime: node
+    plan: starter
+    branch: main
+    autoDeployTrigger: off
+    numInstances: 1
+    buildCommand: npm ci && npm run prisma:generate
+    startCommand: npm run simulation:worker
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SECURENET_DEPLOYMENT_ENV
+        value: production-demo
+      - key: DEMO_PRIVATE_ROLE_LOGIN_ENABLED
+        value: "false"
+      - key: LOG_LEVEL
+        value: info
+      - key: DATABASE_URL
+        fromDatabase:
+          name: securenet-postgres
+          property: connectionString
+      - key: SECURENET_PRODUCTION_DATABASE_NAME
+        fromDatabase:
+          name: securenet-postgres
+          property: database
+      - key: AUTH_SECRET
+        sync: false
+      - key: SEED_DEMO_PASSWORD
+        sync: false
+
+databases:
+  - name: securenet-postgres
+    plan: basic-256mb
+    postgresMajorVersion: "17"
+    databaseName: securenet_prod_demo
+    user: securenet
+    ipAllowList: []
+    storageAutoscalingEnabled: true

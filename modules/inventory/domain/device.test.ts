@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   createDeviceSchema,
   deviceListQuerySchema,
+  metricCursorQuerySchema,
+  updateDeviceSchema,
 } from "@/modules/inventory/domain/device";
 
 const validDevice = {
@@ -44,5 +46,35 @@ describe("device boundary schemas", () => {
         sort: "createdAt",
       }),
     ).toThrow();
+  });
+
+  it("requires at least one update field", () => {
+    expect(() => updateDeviceSchema.parse({})).toThrow();
+    expect(updateDeviceSchema.parse({ name: "Updated Router" })).toEqual({
+      name: "Updated Router",
+    });
+  });
+
+  it("enforces historical cursor and period combinations", () => {
+    expect(() =>
+      metricCursorQuerySchema.parse({ cursor: "10", range: "24h" }),
+    ).toThrow();
+    expect(() =>
+      metricCursorQuerySchema.parse({
+        from: "2026-07-01T00:00:00Z",
+      }),
+    ).toThrow();
+    expect(() =>
+      metricCursorQuerySchema.parse({
+        from: "2026-07-02T00:00:00Z",
+        to: "2026-07-01T00:00:00Z",
+      }),
+    ).toThrow();
+    expect(
+      metricCursorQuerySchema.parse({
+        from: "2026-07-01T00:00:00Z",
+        to: "2026-07-02T00:00:00Z",
+      }).limit,
+    ).toBe(24);
   });
 });

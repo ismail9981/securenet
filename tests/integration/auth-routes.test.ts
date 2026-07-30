@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { POST as login } from "@/app/api/v1/auth/login/route";
 import { POST as logout } from "@/app/api/v1/auth/logout/route";
@@ -11,6 +11,8 @@ import { SESSION_COOKIE_NAME } from "@/modules/identity/infrastructure/session";
 const TEST_SECRET =
   "route-test-secret-that-is-longer-than-thirty-two-characters";
 const DOCUMENTED_DEMO_PASSWORD = "SecureNetDemo123";
+const ORIGINAL_DATABASE_URL = process.env.DATABASE_URL;
+const ORIGINAL_TEST_DATABASE_URL = process.env.TEST_DATABASE_URL;
 
 function loginRequest(payload: unknown, client = "198.51.100.10"): NextRequest {
   return new NextRequest("http://localhost/api/v1/auth/login", {
@@ -33,6 +35,20 @@ describe("Demo authentication routes", () => {
   afterEach(() => {
     delete process.env.AUTH_SECRET;
     delete process.env.SEED_DEMO_PASSWORD;
+    delete process.env.SECURENET_DEPLOYMENT_ENV;
+    delete process.env.DEMO_PRIVATE_ROLE_LOGIN_ENABLED;
+    delete process.env.SECURENET_PRODUCTION_DATABASE_NAME;
+    vi.unstubAllEnvs();
+    if (ORIGINAL_DATABASE_URL) {
+      process.env.DATABASE_URL = ORIGINAL_DATABASE_URL;
+    } else {
+      delete process.env.DATABASE_URL;
+    }
+    if (ORIGINAL_TEST_DATABASE_URL) {
+      process.env.TEST_DATABASE_URL = ORIGINAL_TEST_DATABASE_URL;
+    } else {
+      delete process.env.TEST_DATABASE_URL;
+    }
   });
 
   it.each(DEMO_ACCOUNTS)(
@@ -76,6 +92,28 @@ describe("Demo authentication routes", () => {
     expect(response.status).toBe(401);
     expect(body.error.message).toBe("The email or password is incorrect.");
     expect(body.error.correlationId).toEqual(expect.any(String));
+    expect(response.headers.get("x-correlation-id")).toBe(
+      body.error.correlationId,
+    );
+  });
+
+  it("allows only Viewer by default in the production Demo environment", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    process.env.SECURENET_DEPLOYMENT_ENV = "production-demo";
+    process.env.DATABASE_URL =
+      "postgresql://safe-placeholder@localhost/securenet_prod_demo";
+    process.env.SECURENET_PRODUCTION_DATABASE_NAME = "securenet_prod_demo";
+    delete process.env.TEST_DATABASE_URL;
+
+    for (const account of DEMO_ACCOUNTS) {
+      const response = await login(
+        loginRequest(
+          { email: account.email, password: DOCUMENTED_DEMO_PASSWORD },
+          `production-${account.role}`,
+        ),
+      );
+      expect(response.status).toBe(account.role === "VIEWER" ? 200 : 401);
+    }
   });
 
   it("rejects an oversized request even without a content-length header", async () => {

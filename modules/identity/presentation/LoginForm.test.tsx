@@ -4,6 +4,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { LoginForm } from "@/modules/identity/presentation/LoginForm";
+import { DEMO_ACCOUNTS } from "@/modules/identity/infrastructure/demo-accounts";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -14,7 +15,12 @@ vi.mock("next/navigation", () => ({
 
 describe("LoginForm", () => {
   it("provides labeled credentials fields and all three Demo roles", () => {
-    render(<LoginForm demoPassword="SecureNetDemo123" />);
+    render(
+      <LoginForm
+        demoAccounts={DEMO_ACCOUNTS}
+        demoPassword="SecureNetDemo123"
+      />,
+    );
 
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();

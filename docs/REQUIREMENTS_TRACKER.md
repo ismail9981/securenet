@@ -220,3 +220,25 @@ deferred.
 | Historical Metric ranges and accessible presentation  | Verified | Repository/route/component/axe tests                  |
 | Administrator-saved topology positions                | Verified | Transaction/RBAC/component/reload tests               |
 | Regression, responsive, keyboard, reduced motion, axe | Verified | 62-case desktop/mobile Playwright suite               |
+
+## Sprint 7 delivery controls
+
+Sprint 7 implements release-readiness controls locally. Hosted evidence and
+release artifacts remain pending separate approval.
+
+| Control                                                    | Status      | Evidence                                        |
+| ---------------------------------------------------------- | ----------- | ----------------------------------------------- |
+| Render one-Web/one-Worker/paid-PostgreSQL Blueprint        | Verified    | `render.yaml`; config tests; auto-deploy off    |
+| Central production environment validation                  | Verified    | fail-closed unit tests and startup integration  |
+| Viewer-only public production identity exposure            | Verified    | server policy, login, route, and bundle tests   |
+| Minimal liveness/readiness contract                        | Verified    | failure tests and HTTP smoke                    |
+| Structured logs, redaction, correlation, graceful shutdown | Verified    | logger/runtime tests and process smoke evidence |
+| Empty-only guarded production bootstrap                    | Verified    | authorization and non-destructive refusal tests |
+| CI, coverage, restore, smoke, and release tooling          | Verified    | workflow/config/helper validation               |
+| SRS-FR-002 complete page/route/use-case authorization      | Verified    | permission, proxy, route, and 93-case E2E audit |
+| FR-004 visible Device-reference navigation                 | Verified    | component/source/E2E navigation audit           |
+| FR-002 Dashboard range                                     | In Progress | accepted v1 exception: fixed 24-hour Dashboard  |
+| FR-007 alert processing                                    | In Progress | supported rules verified; bandwidth disabled    |
+| FR-013 / PRD-DASH-002 Health Score                         | In Progress | accepted v1 exception: formula visibly partial  |
+| Hosted deployment, restore proof, portfolio media          | Deferred    | requires separate deployment approval           |
+| `v0.7.0`, Product Owner Go/No-Go, and `v1.0.0`             | Deferred    | required post-validation release sequence       |

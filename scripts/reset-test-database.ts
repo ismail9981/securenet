@@ -16,20 +16,20 @@ export async function resetTestDatabase(): Promise<void> {
   const client = new PrismaClient({ adapter });
 
   try {
-    await client.$transaction([
-      client.topologyPosition.deleteMany(),
-      client.systemSetting.deleteMany(),
-      client.event.deleteMany(),
-      client.auditLog.deleteMany(),
-      client.alert.deleteMany(),
-      client.alertRule.deleteMany(),
-      client.deviceMetric.deleteMany(),
-      client.simulationRun.deleteMany(),
-      client.networkConnection.deleteMany(),
-      client.device.deleteMany(),
-      client.location.deleteMany(),
-      client.user.deleteMany(),
-    ]);
+    await client.$transaction(async (transaction) => {
+      await transaction.topologyPosition.deleteMany();
+      await transaction.systemSetting.deleteMany();
+      await transaction.event.deleteMany();
+      await transaction.auditLog.deleteMany();
+      await transaction.alert.deleteMany();
+      await transaction.alertRule.deleteMany();
+      await transaction.deviceMetric.deleteMany();
+      await transaction.simulationRun.deleteMany();
+      await transaction.networkConnection.deleteMany();
+      await transaction.device.deleteMany();
+      await transaction.location.deleteMany();
+      await transaction.user.deleteMany();
+    });
     await seedDatabase(client);
   } finally {
     await client.$disconnect();

@@ -4,8 +4,10 @@ import { redirect } from "next/navigation";
 
 import { DemoDataBadge } from "@/components/foundation/DemoDataBadge";
 import { getDemoPassword } from "@/modules/identity/infrastructure/demo-password";
+import { DEMO_ACCOUNTS } from "@/modules/identity/infrastructure/demo-accounts";
 import { getServerSession } from "@/modules/identity/infrastructure/server-session";
 import { LoginForm } from "@/modules/identity/presentation/LoginForm";
+import { isPublicDemoRoleAllowed } from "@/lib/runtime-environment";
 
 export const metadata: Metadata = {
   title: "Demo sign in",
@@ -16,6 +18,9 @@ export default async function LoginPage() {
   if (session) redirect("/dashboard");
 
   const demoPassword = getDemoPassword();
+  const demoAccounts = DEMO_ACCOUNTS.filter((account) =>
+    isPublicDemoRoleAllowed(account.role),
+  );
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:grid lg:place-items-center">
@@ -47,7 +52,7 @@ export default async function LoginPage() {
             not a production account system.
           </p>
         </header>
-        <LoginForm demoPassword={demoPassword} />
+        <LoginForm demoAccounts={demoAccounts} demoPassword={demoPassword} />
       </div>
     </main>
   );

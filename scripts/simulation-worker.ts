@@ -3,6 +3,7 @@ import pg from "pg";
 
 import { requireDatabaseUrl } from "../lib/database-url";
 import { logEvent } from "../lib/logger";
+import { validateRuntimeEnvironment } from "../lib/runtime-environment";
 import { SimulationRuntime } from "../modules/simulation/application/simulation-runtime";
 import {
   acquireSimulationWorkerLock,
@@ -11,6 +12,7 @@ import {
 import { simulationRepository } from "../modules/simulation/infrastructure/simulation-service";
 
 config({ path: ".env.local", quiet: true });
+validateRuntimeEnvironment();
 
 const client = new pg.Client({ connectionString: requireDatabaseUrl() });
 await client.connect();
@@ -21,10 +23,13 @@ if (!(await acquireSimulationWorkerLock(client))) {
   process.exitCode = 1;
 } else {
   const runtime = new SimulationRuntime(simulationRepository);
-  const shutdown = () => runtime.stop();
-  process.once("SIGINT", shutdown);
-  process.once("SIGTERM", shutdown);
-  logEvent("info", "simulation.worker.started");
+  const shutdown = (signal: NodeJS.Signals) => {
+    logEvent("info", "simulation.worker.stopping", { signal });
+    runtime.stop();
+  };
+  process.once("SIGINT", () => shutdown("SIGINT"));
+  process.once("SIGTERM", () => shutdown("SIGTERM"));
+  logEvent("info", "simulation.worker.started", { instanceCount: 1 });
   try {
     await runtime.run();
   } finally {

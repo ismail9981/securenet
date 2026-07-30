@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { logEvent } from "@/lib/logger";
 import {
+  getSessionCookieOptions,
   SESSION_COOKIE_NAME,
   verifySessionToken,
 } from "@/modules/identity/infrastructure/session";
@@ -16,10 +17,7 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.json({ data: { signedOut: true } });
 
   response.cookies.set(SESSION_COOKIE_NAME, "", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
+    ...getSessionCookieOptions(),
     maxAge: 0,
   });
 

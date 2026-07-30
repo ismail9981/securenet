@@ -12,6 +12,7 @@ npm run db:migrate:deploy
 npm test
 npm run build
 npm run test:e2e
+npm run test:coverage
 npm audit
 ```
 
@@ -61,3 +62,22 @@ and message limits, malformed/duplicate suppression, reconnect snapshot recovery
 polling fallback, after-commit publication, non-rollback publication failures,
 and live Topology/Alert/Event refresh. Browser tests continue to run serially
 against a freshly reset `securenet_test`.
+
+## Sprint 7 release-readiness coverage
+
+Playwright runs desktop Chromium, 320 px Chromium, and desktop WebKit.
+Edge-equivalent validation uses the Chromium engine plus a manual hosted Edge
+checklist when available. VoiceOver is manual and is never reported as passed
+unless performed.
+
+`vitest.coverage.config.ts` enforces 80% lines, functions, statements, and
+branches for core domain/application logic. Generated files, contracts,
+repository ports, error/type declarations, configuration, thin framework
+routes, process-integration orchestration, and declarative UI wrappers are
+excluded. Pure simulation rules remain included.
+
+Release tests cover production environment refusal, Viewer-only exposure, local
+three-role behavior, minimal health information, log redaction, correlation,
+proxy coverage, security headers, abuse limits, empty-only bootstrap,
+restore-target isolation, authorization, Device links, and worker/realtime
+recovery. Hosted evidence remains pending separately approved deployment.

@@ -92,3 +92,16 @@ User management, Demo reset, Alert recurrence/reopen, incident overlays,
 printable/PDF output, arbitrary report families, automatic Alert resolution,
 bandwidth utilization, AR-BW-01 activation, deployment, v1.0 release work, and
 all Sprint 7 gates remain deferred.
+
+## Sprint 7 resolution
+
+Sprint 7 prepares a manually deployed Render Demo using one Web, one Worker, and
+one paid PostgreSQL 17 database. It adds fail-closed environment policy,
+Viewer-only public production login, health endpoints, structured redacted logs,
+correlation IDs, graceful shutdown, guarded empty-only bootstrap, CI validation,
+restore safety tooling, and release/portfolio checklists.
+
+The accepted v1 scope keeps a fixed 24-hour Dashboard trend, Device Details
+history from 1 hour through 30 days, CPU/RAM/Ping/Packet Loss/status alert rules,
+disabled AR-BW-01, and a visibly partial Health Score. Deployment, hosted proof,
+`v0.7.0`, Product Owner Go/No-Go, and `v1.0.0` require separate approvals.

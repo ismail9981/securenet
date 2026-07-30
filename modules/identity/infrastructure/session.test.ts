@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   createSessionToken,
+  getSessionCookieOptions,
   verifySessionToken,
 } from "@/modules/identity/infrastructure/session";
 
@@ -15,6 +16,7 @@ describe("signed Demo session", () => {
 
   afterEach(() => {
     delete process.env.AUTH_SECRET;
+    vi.unstubAllEnvs();
   });
 
   it("round-trips allow-listed user data", async () => {
@@ -42,5 +44,20 @@ describe("signed Demo session", () => {
     const modified = `${header}.${modifiedPayload}.${signature}`;
 
     await expect(verifySessionToken(modified)).resolves.toBeNull();
+  });
+
+  it("uses HttpOnly, SameSite=Lax, and Secure in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    expect(getSessionCookieOptions()).toMatchObject({
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+    });
+  });
+
+  it("allows local HTTP only for the explicit test deployment mode", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("SECURENET_DEPLOYMENT_ENV", "test");
+    expect(getSessionCookieOptions().secure).toBe(false);
   });
 });

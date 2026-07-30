@@ -76,8 +76,9 @@ comma-separated `severity`, `alertStatus`, and `deviceStatus`. The range is at
 most 30 days. It returns the documented summary, partial Health Score disclosure,
 device status/type distribution, top ten Devices, and recent Alerts.
 
-`GET /api/v1/reports/alerts.csv` uses the same bounded filters and requires an
-Administrator. It returns at most 10,000 Alerts as UTF-8 CSV with a BOM, CRLF
+`GET /api/v1/reports/alerts.csv` uses the same bounded filters and requires any
+authenticated Demo role with `VIEW_REPORTS`. It returns at most 10,000 Alerts as
+UTF-8 CSV with a BOM, CRLF
 rows, stable columns, UTC ISO timestamps, and empty cells for unavailable values.
 Spreadsheet-formula prefixes are neutralized. A successful export appends the
 `report.alerts.exported` AuditLog action.
@@ -136,3 +137,12 @@ Stable domain errors are `SIMULATION_SCENARIO_UNSUPPORTED`,
 `SIMULATION_WORKER_UNAVAILABLE`, and `SIMULATION_INVALID_STATE`.
 
 There are no reset, pause, resume, speed, arbitrary-incident, or tick endpoints.
+
+## Health
+
+`GET /api/health/live` is public and returns only `{"status":"live"}`. It performs
+no database or environment check.
+
+`GET /api/health/ready` returns only `{"status":"ready"}` with 200 after required
+runtime validation and PostgreSQL connectivity, or `{"status":"unavailable"}`
+with 503. It exposes no host, database, migration, worker, or environment details.
