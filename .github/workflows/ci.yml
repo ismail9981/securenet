@@ -45,12 +45,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npx prisma validate
+      - run: npx prisma generate
       - run: npm ls --depth=0
       - run: npm run format:check
       - run: npm run lint
       - run: npm run type-check
-      - run: npm run prisma:validate
-      - run: npm run prisma:generate
       - run: npm run db:migrate:deploy
       - run: npm test
       - run: npm run test:coverage
