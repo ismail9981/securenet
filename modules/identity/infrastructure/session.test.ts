@@ -11,11 +11,10 @@ const TEST_SECRET =
 
 describe("signed Demo session", () => {
   beforeEach(() => {
-    process.env.AUTH_SECRET = TEST_SECRET;
+    vi.stubEnv("AUTH_SECRET", TEST_SECRET);
   });
 
   afterEach(() => {
-    delete process.env.AUTH_SECRET;
     vi.unstubAllEnvs();
   });
 
@@ -55,9 +54,8 @@ describe("signed Demo session", () => {
     });
   });
 
-  it("allows local HTTP only for the explicit test deployment mode", () => {
-    vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("SECURENET_DEPLOYMENT_ENV", "test");
+  it("does not mark the cookie Secure outside production", () => {
+    vi.stubEnv("NODE_ENV", "development");
     expect(getSessionCookieOptions().secure).toBe(false);
   });
 });

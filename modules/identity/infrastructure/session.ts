@@ -77,9 +77,7 @@ export async function verifySessionToken(
 export function getSessionCookieOptions() {
   return {
     httpOnly: true,
-    secure:
-      process.env.NODE_ENV === "production" &&
-      process.env.SECURENET_DEPLOYMENT_ENV !== "test",
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
     path: "/",
     maxAge: SESSION_DURATION_SECONDS,
