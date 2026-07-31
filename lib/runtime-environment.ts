@@ -11,6 +11,7 @@ const runtimeEnvironmentSchema = z.object({
   DATABASE_URL: z.string().url().refine(isPostgresUrl),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
   SECURENET_DEPLOYMENT_ENV: deploymentEnvironmentSchema.default("local"),
+  SECURENET_PORTFOLIO_MODE: z.enum(["true", "false"]).default("false"),
   DEMO_PRIVATE_ROLE_LOGIN_ENABLED: z.enum(["true", "false"]).default("false"),
   SEED_DEMO_PASSWORD: z.string().min(12).max(200).optional(),
 });
@@ -19,6 +20,7 @@ export type DeploymentEnvironment = z.infer<typeof deploymentEnvironmentSchema>;
 
 export interface RuntimeEnvironment {
   readonly deploymentEnvironment: DeploymentEnvironment;
+  readonly portfolioMode: boolean;
   readonly privateRoleLoginEnabled: boolean;
   readonly logLevel: "debug" | "info" | "warn" | "error";
 }
@@ -53,6 +55,7 @@ export function validateRuntimeEnvironment(
   }
 
   const deploymentEnvironment = parsed.data.SECURENET_DEPLOYMENT_ENV;
+  const portfolioMode = parsed.data.SECURENET_PORTFOLIO_MODE === "true";
   if (deploymentEnvironment === "production-demo") {
     const actualDatabaseName = databaseName(parsed.data.DATABASE_URL);
     if (
@@ -66,13 +69,54 @@ export function validateRuntimeEnvironment(
       throw new Error("Production Demo environment configuration is unsafe.");
     }
   }
+  if (
+    portfolioMode &&
+    (deploymentEnvironment !== "production-demo" ||
+      source.NODE_ENV !== "production" ||
+      parsed.data.DEMO_PRIVATE_ROLE_LOGIN_ENABLED !== "false")
+  ) {
+    throw new Error("Portfolio Demo environment configuration is unsafe.");
+  }
 
   return {
     deploymentEnvironment,
+    portfolioMode,
     privateRoleLoginEnabled:
       parsed.data.DEMO_PRIVATE_ROLE_LOGIN_ENABLED === "true",
     logLevel: parsed.data.LOG_LEVEL,
   };
+}
+
+export function validatePortfolioBootstrapEnvironment(
+  source: Readonly<Record<string, string | undefined>> = process.env,
+): { readonly databaseName: string } {
+  const runtime = validateRuntimeEnvironment(source);
+  const databaseUrl = new URL(source.DATABASE_URL ?? "");
+  const expectedName = source.SECURENET_PORTFOLIO_DATABASE_NAME?.trim();
+  const actualName = databaseName(databaseUrl.toString());
+
+  if (
+    !runtime.portfolioMode ||
+    source.ALLOW_PORTFOLIO_BOOTSTRAP !== "true" ||
+    !expectedName ||
+    expectedName !== actualName ||
+    source.SECURENET_PRODUCTION_DATABASE_NAME !== expectedName ||
+    !databaseUrl.hostname.toLowerCase().endsWith(".neon.tech") ||
+    isReservedDatabaseName(actualName)
+  ) {
+    throw new Error(
+      "Portfolio bootstrap environment is not safely authorized.",
+    );
+  }
+
+  return { databaseName: actualName };
+}
+
+export function isPortfolioMode(
+  source: Readonly<Record<string, string | undefined>> = process.env,
+): boolean {
+  if (source.SECURENET_PORTFOLIO_MODE !== "true") return false;
+  return validateRuntimeEnvironment(source).portfolioMode;
 }
 
 export function validateProductionBootstrapEnvironment(
@@ -103,7 +147,10 @@ export function isPublicDemoRoleAllowed(
   role: "ADMIN" | "NETWORK_ENGINEER" | "VIEWER",
   source: Readonly<Record<string, string | undefined>> = process.env,
 ): boolean {
-  if (source.SECURENET_DEPLOYMENT_ENV !== "production-demo") {
+  if (
+    source.SECURENET_DEPLOYMENT_ENV !== "production-demo" &&
+    source.SECURENET_PORTFOLIO_MODE !== "true"
+  ) {
     return true;
   }
   const runtime = validateRuntimeEnvironment(source);

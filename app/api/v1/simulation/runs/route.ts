@@ -10,6 +10,7 @@ import {
   handleApiError,
   readJsonBody,
 } from "@/lib/api";
+import { isPortfolioMode } from "@/lib/runtime-environment";
 import { authorizeActor } from "@/modules/identity/application/authorize";
 import { SimulationError } from "@/modules/simulation/application/simulation-errors";
 import {
@@ -24,6 +25,13 @@ import { SCENARIO_CODES } from "@/modules/simulation/domain/scenarios";
 export async function POST(request: NextRequest) {
   const session = await getApiSession(request);
   if (!session) return authenticationRequired();
+  if (isPortfolioMode()) {
+    return apiError(
+      503,
+      "SIMULATION_WORKER_UNAVAILABLE",
+      "Simulation is unavailable in the Portfolio Demo deployment.",
+    );
+  }
   try {
     authorizeActor({ actor: session.user }, "RUN_SIMULATION");
     assertSameOrigin(request, "RUN_SIMULATION");

@@ -8,6 +8,7 @@ import {
 import type { Metadata } from "next";
 
 import { prisma } from "@/lib/prisma";
+import { isPortfolioMode } from "@/lib/runtime-environment";
 import { DemoDataBadge } from "@/components/foundation/DemoDataBadge";
 import { requireServerSession } from "@/modules/identity/infrastructure/server-session";
 import { getDashboardSnapshot } from "@/modules/monitoring/application/get-dashboard-snapshot";
@@ -34,6 +35,7 @@ export default async function DashboardPage() {
     session.user.role,
   );
   const { summary } = snapshot;
+  const portfolioMode = isPortfolioMode();
 
   return (
     <div className="mx-auto w-full max-w-7xl">
@@ -55,7 +57,7 @@ export default async function DashboardPage() {
         <DemoDataBadge />
       </header>
 
-      {session.user.role === "ADMIN" ? (
+      {session.user.role === "ADMIN" && !portfolioMode ? (
         <SimulationControl
           initialRun={(await simulationRepository.listRunning()).at(-1) ?? null}
           targets={await prisma.device.findMany({

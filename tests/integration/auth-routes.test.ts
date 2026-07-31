@@ -36,8 +36,10 @@ describe("Demo authentication routes", () => {
     delete process.env.AUTH_SECRET;
     delete process.env.SEED_DEMO_PASSWORD;
     delete process.env.SECURENET_DEPLOYMENT_ENV;
+    delete process.env.SECURENET_PORTFOLIO_MODE;
     delete process.env.DEMO_PRIVATE_ROLE_LOGIN_ENABLED;
     delete process.env.SECURENET_PRODUCTION_DATABASE_NAME;
+    delete process.env.SECURENET_PORTFOLIO_DATABASE_NAME;
     vi.unstubAllEnvs();
     if (ORIGINAL_DATABASE_URL) {
       process.env.DATABASE_URL = ORIGINAL_DATABASE_URL;
@@ -110,6 +112,26 @@ describe("Demo authentication routes", () => {
         loginRequest(
           { email: account.email, password: DOCUMENTED_DEMO_PASSWORD },
           `production-${account.role}`,
+        ),
+      );
+      expect(response.status).toBe(account.role === "VIEWER" ? 200 : 401);
+    }
+  });
+
+  it("allows Viewer and rejects private roles in Portfolio Demo mode", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    process.env.SECURENET_DEPLOYMENT_ENV = "production-demo";
+    process.env.SECURENET_PORTFOLIO_MODE = "true";
+    process.env.DATABASE_URL =
+      "postgresql://safe-placeholder@ep-example.us-east-2.aws.neon.tech/securenet_portfolio";
+    process.env.SECURENET_PRODUCTION_DATABASE_NAME = "securenet_portfolio";
+    delete process.env.TEST_DATABASE_URL;
+
+    for (const account of DEMO_ACCOUNTS) {
+      const response = await login(
+        loginRequest(
+          { email: account.email, password: DOCUMENTED_DEMO_PASSWORD },
+          `portfolio-${account.role}`,
         ),
       );
       expect(response.status).toBe(account.role === "VIEWER" ? 200 : 401);

@@ -3,11 +3,15 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { DemoDataBadge } from "@/components/foundation/DemoDataBadge";
+import { PortfolioDemoDisclosure } from "@/components/foundation/PortfolioDemoDisclosure";
 import { getDemoPassword } from "@/modules/identity/infrastructure/demo-password";
 import { DEMO_ACCOUNTS } from "@/modules/identity/infrastructure/demo-accounts";
 import { getServerSession } from "@/modules/identity/infrastructure/server-session";
 import { LoginForm } from "@/modules/identity/presentation/LoginForm";
-import { isPublicDemoRoleAllowed } from "@/lib/runtime-environment";
+import {
+  isPortfolioMode,
+  isPublicDemoRoleAllowed,
+} from "@/lib/runtime-environment";
 
 export const metadata: Metadata = {
   title: "Demo sign in",
@@ -18,6 +22,7 @@ export default async function LoginPage() {
   if (session) redirect("/dashboard");
 
   const demoPassword = getDemoPassword();
+  const portfolioMode = isPortfolioMode();
   const demoAccounts = DEMO_ACCOUNTS.filter((account) =>
     isPublicDemoRoleAllowed(account.role),
   );
@@ -52,6 +57,11 @@ export default async function LoginPage() {
             not a production account system.
           </p>
         </header>
+        {portfolioMode ? (
+          <div className="mb-6">
+            <PortfolioDemoDisclosure />
+          </div>
+        ) : null}
         <LoginForm demoAccounts={demoAccounts} demoPassword={demoPassword} />
       </div>
     </main>

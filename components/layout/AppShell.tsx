@@ -16,8 +16,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { DemoDataBadge } from "@/components/foundation/DemoDataBadge";
+import { PortfolioDemoDisclosure } from "@/components/foundation/PortfolioDemoDisclosure";
 import { RealtimeIndicator } from "@/components/realtime/RealtimeIndicator";
 import { RealtimeProvider } from "@/components/realtime/RealtimeProvider";
+import { isPortfolioMode } from "@/lib/runtime-environment";
 import type { PublicUser } from "@/modules/identity/domain/user";
 import { UserMenu } from "@/modules/identity/presentation/UserMenu";
 
@@ -73,6 +75,8 @@ export function AppShell({
   children,
   user,
 }: Readonly<{ children: ReactNode; user: PublicUser }>) {
+  const portfolioMode = isPortfolioMode();
+
   return (
     <RealtimeProvider>
       <div className="min-h-screen lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
@@ -146,7 +150,14 @@ export function AppShell({
             </div>
           </header>
 
-          <main className="px-4 py-6 md:px-6 md:py-8">{children}</main>
+          <main className="px-4 py-6 md:px-6 md:py-8">
+            {portfolioMode ? (
+              <div className="mx-auto mb-6 w-full max-w-7xl">
+                <PortfolioDemoDisclosure />
+              </div>
+            ) : null}
+            {children}
+          </main>
         </div>
       </div>
     </RealtimeProvider>

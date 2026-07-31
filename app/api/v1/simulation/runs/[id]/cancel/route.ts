@@ -10,6 +10,7 @@ import {
   getRequestIp,
   handleApiError,
 } from "@/lib/api";
+import { isPortfolioMode } from "@/lib/runtime-environment";
 import { authorizeActor } from "@/modules/identity/application/authorize";
 import { acceptSimulationCommand } from "@/modules/simulation/infrastructure/simulation-rate-limit";
 import { publishSimulationStatus } from "@/modules/simulation/infrastructure/simulation-realtime";
@@ -24,6 +25,13 @@ interface Context {
 export async function POST(request: NextRequest, context: Context) {
   const session = await getApiSession(request);
   if (!session) return authenticationRequired();
+  if (isPortfolioMode()) {
+    return apiError(
+      503,
+      "SIMULATION_WORKER_UNAVAILABLE",
+      "Simulation is unavailable in the Portfolio Demo deployment.",
+    );
+  }
   try {
     authorizeActor({ actor: session.user }, "RUN_SIMULATION");
     assertSameOrigin(request, "RUN_SIMULATION");

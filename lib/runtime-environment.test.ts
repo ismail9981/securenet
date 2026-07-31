@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  isPortfolioMode,
   isPublicDemoRoleAllowed,
+  validatePortfolioBootstrapEnvironment,
   validateProductionBootstrapEnvironment,
   validateRuntimeEnvironment,
 } from "@/lib/runtime-environment";
@@ -92,5 +94,60 @@ describe("runtime environment validation", () => {
         ALLOW_PRODUCTION_DEMO_BOOTSTRAP: "true",
       }),
     ).toEqual({ databaseName: "securenet_prod_demo" });
+  });
+
+  it("accepts only a production Viewer-only Portfolio Demo configuration", () => {
+    const portfolio = {
+      ...base,
+      NODE_ENV: "production",
+      DATABASE_URL:
+        "postgresql://user:password@ep-example.us-east-2.aws.neon.tech/securenet_portfolio",
+      SECURENET_DEPLOYMENT_ENV: "production-demo",
+      SECURENET_PORTFOLIO_MODE: "true",
+      SECURENET_PRODUCTION_DATABASE_NAME: "securenet_portfolio",
+      SEED_DEMO_PASSWORD: "portfolio-demo-password",
+    };
+
+    expect(validateRuntimeEnvironment(portfolio).portfolioMode).toBe(true);
+    expect(isPortfolioMode(portfolio)).toBe(true);
+    expect(isPublicDemoRoleAllowed("VIEWER", portfolio)).toBe(true);
+    expect(isPublicDemoRoleAllowed("ADMIN", portfolio)).toBe(false);
+    expect(isPublicDemoRoleAllowed("NETWORK_ENGINEER", portfolio)).toBe(false);
+    expect(() =>
+      validateRuntimeEnvironment({
+        ...portfolio,
+        DEMO_PRIVATE_ROLE_LOGIN_ENABLED: "true",
+      }),
+    ).toThrow(/Portfolio Demo environment configuration is unsafe/);
+  });
+
+  it("guards Portfolio bootstrap by mode, Neon host, authorization, and exact name", () => {
+    const portfolio = {
+      ...base,
+      NODE_ENV: "production",
+      DATABASE_URL:
+        "postgresql://user:password@ep-example.us-east-2.aws.neon.tech/securenet_portfolio",
+      SECURENET_DEPLOYMENT_ENV: "production-demo",
+      SECURENET_PORTFOLIO_MODE: "true",
+      SECURENET_PRODUCTION_DATABASE_NAME: "securenet_portfolio",
+      SECURENET_PORTFOLIO_DATABASE_NAME: "securenet_portfolio",
+      SEED_DEMO_PASSWORD: "portfolio-demo-password",
+    };
+
+    expect(() => validatePortfolioBootstrapEnvironment(portfolio)).toThrow();
+    expect(
+      validatePortfolioBootstrapEnvironment({
+        ...portfolio,
+        ALLOW_PORTFOLIO_BOOTSTRAP: "true",
+      }),
+    ).toEqual({ databaseName: "securenet_portfolio" });
+    expect(() =>
+      validatePortfolioBootstrapEnvironment({
+        ...portfolio,
+        ALLOW_PORTFOLIO_BOOTSTRAP: "true",
+        DATABASE_URL:
+          "postgresql://user:password@database.example/securenet_portfolio",
+      }),
+    ).toThrow();
   });
 });

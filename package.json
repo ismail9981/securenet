@@ -36,6 +36,7 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:production:bootstrap": "tsx scripts/production-bootstrap.ts",
+    "db:portfolio:bootstrap": "tsx scripts/portfolio-bootstrap.ts",
     "smoke:production": "tsx scripts/production-smoke.ts",
     "backup:verify-restore": "tsx scripts/verify-restored-database.ts",
     "db:test:reset": "tsx scripts/reset-test-database.ts",

@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -31,6 +32,35 @@ describe("release configuration audit", () => {
     expect(workflow).toContain("workflow_dispatch:");
     expect(workflow).toContain("environment:");
     expect(workflow).not.toMatch(/render\.com|deploy hook|curl\s+.*deploy/i);
+  });
+
+  it("defines a separate free portfolio Web Service without paid resources or secrets", () => {
+    const blueprint = source("render.portfolio.yaml");
+    expect(blueprint.match(/type: web/g)).toHaveLength(1);
+    expect(blueprint).toContain("plan: free");
+    expect(blueprint).toContain("branch: main");
+    expect(blueprint).toContain("healthCheckPath: /api/health/ready");
+    expect(blueprint).toContain("SECURENET_PORTFOLIO_MODE");
+    expect(blueprint).toContain("DATABASE_URL");
+    expect(blueprint).not.toMatch(
+      /type:\s+(?:worker|pserv|cron)|^databases:|redis|disk:|plan:\s+(?:starter|standard|pro)|postgres(?:ql)?:\/\/|SecureNetDemo123/im,
+    );
+    expect(blueprint).not.toContain("db:portfolio:bootstrap");
+    expect(blueprint).not.toContain("db:migrate:deploy");
+  });
+
+  it("preserves the approved paid production Render Blueprint byte-for-byte", () => {
+    expect(
+      createHash("sha256").update(source("render.yaml")).digest("hex"),
+    ).toBe("dcb7fc369952364f77b090ec8f5563e9456d8ae8c66d04a46ce637ab889baef8");
+  });
+
+  it("keeps Portfolio simulation controls unavailable without removing production controls", () => {
+    expect(source("app/(operations)/dashboard/page.tsx")).toContain(
+      'session.user.role === "ADMIN" && !portfolioMode',
+    );
+    expect(source("render.yaml")).toContain("type: worker");
+    expect(source("render.portfolio.yaml")).not.toContain("type: worker");
   });
 
   it("keeps private Demo identities out of the client LoginForm module", () => {

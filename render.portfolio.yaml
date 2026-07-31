@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: securenet-portfolio
+    runtime: node
+    plan: free
+    branch: main
+    autoDeployTrigger: off
+    renderSubdomainPolicy: enabled
+    buildCommand: npm ci && npm run prisma:generate && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health/ready
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_APP_NAME
+        value: SecureNet
+      - key: NEXT_PUBLIC_DEMO_MODE
+        value: "true"
+      - key: SECURENET_DEPLOYMENT_ENV
+        value: production-demo
+      - key: SECURENET_PORTFOLIO_MODE
+        value: "true"
+      - key: DEMO_PRIVATE_ROLE_LOGIN_ENABLED
+        value: "false"
+      - key: ALLOW_PRODUCTION_DEMO_BOOTSTRAP
+        value: "false"
+      - key: ALLOW_PORTFOLIO_BOOTSTRAP
+        value: "false"
+      - key: LOG_LEVEL
+        value: info
+      - key: DATABASE_URL
+        sync: false
+      - key: SECURENET_PRODUCTION_DATABASE_NAME
+        sync: false
+      - key: SECURENET_PORTFOLIO_DATABASE_NAME
+        sync: false
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: SEED_DEMO_PASSWORD
+        sync: false

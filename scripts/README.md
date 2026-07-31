@@ -26,6 +26,11 @@ command.
 Demo bootstrap. It requires positive environment/database identity and an
 authorization flag, refuses any operational data, and never calls the test reset.
 
+`npm run db:portfolio:bootstrap` is the separate manual Neon portfolio
+bootstrap. It requires portfolio mode, an explicitly authorized database name,
+and a Neon host; it refuses any existing application data and is never part of a
+build or start command.
+
 `npm run backup:verify-restore` performs read-only counts and migration inspection
 against a positively identified isolated restore. It refuses development, test,
 default, template, or live-equal targets and does not restore or delete.

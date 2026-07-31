@@ -179,6 +179,13 @@ checks, redacted structured logs, guarded empty-only bootstrap, CI validation,
 restore verification, and release runbooks. Automatic deployment is disabled.
 No live deployment or release tag is created here.
 
+For a separate public portfolio preview with no paid Render resource, use
+`render.portfolio.yaml` and
+[`docs/PORTFOLIO_DEPLOYMENT.md`](docs/PORTFOLIO_DEPLOYMENT.md). That mode uses
+one Render Free Web Service plus an external Neon Free database, exposes only
+Viewer login, and has no persistent simulation Worker. It is explicitly not the
+production-grade architecture.
+
 ## Repository structure
 
 ```text
@@ -207,6 +214,7 @@ scripts/         Documented maintenance and simulation scripts when implemented
 - [Reports, settings, filters, and positions decision](docs/adr/0007-reports-settings-filters-and-topology-positions.md)
 - [Render release-readiness decision](docs/adr/0008-render-deployment-release-readiness-and-v1-boundary.md)
 - [Deployment runbook](docs/DEPLOYMENT.md)
+- [Free portfolio deployment](docs/PORTFOLIO_DEPLOYMENT.md)
 - [Backup and restore runbook](docs/BACKUP_RESTORE.md)
 - [REST API reference](docs/API.md)
 - [Security and realtime limitations](docs/SECURITY.md)
