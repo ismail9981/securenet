@@ -13,7 +13,10 @@ export async function resetTestDatabase(): Promise<void> {
   process.env.DATABASE_URL = testDatabaseUrl;
 
   const adapter = new PrismaPg({ connectionString: testDatabaseUrl });
-  const client = new PrismaClient({ adapter });
+  const client = new PrismaClient({
+    adapter,
+    transactionOptions: { timeout: 120_000 },
+  });
 
   try {
     await client.$transaction(async (transaction) => {

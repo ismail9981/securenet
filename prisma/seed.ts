@@ -688,7 +688,10 @@ async function main(): Promise<void> {
   const adapter = new PrismaPg({
     connectionString: requireDatabaseUrl(),
   });
-  const client = new PrismaClient({ adapter });
+  const client = new PrismaClient({
+    adapter,
+    transactionOptions: { timeout: 120_000 },
+  });
 
   try {
     await seedDatabase(client);

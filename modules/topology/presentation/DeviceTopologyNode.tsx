@@ -18,8 +18,10 @@ export function DeviceTopologyNode({
   selected,
 }: NodeProps<Node<TopologyNode>>) {
   return (
-    <div
-      className={`bg-panel-raised min-w-40 rounded-xl border-2 px-3 py-2 shadow-lg ${statusClass[data.status]} ${selected ? "ring-brand ring-2" : ""}`}
+    <button
+      aria-label={`${data.name}, ${data.type}, ${data.status}`}
+      className={`bg-panel-raised focus-visible:ring-brand min-w-40 rounded-xl border-2 px-3 py-2 text-left shadow-lg focus-visible:ring-2 focus-visible:outline-none ${statusClass[data.status]} ${selected ? "ring-brand ring-2" : ""}`}
+      type="button"
     >
       <Handle
         className="!border-0 !bg-transparent"
@@ -45,6 +47,6 @@ export function DeviceTopologyNode({
         position={Position.Bottom}
         type="source"
       />
-    </div>
+    </button>
   );
 }

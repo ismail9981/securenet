@@ -223,6 +223,7 @@ function TopologyCanvas({
               nodes={nodes}
               nodesConnectable={false}
               nodesDraggable={canSave}
+              nodesFocusable={false}
               onInit={setInstance}
               onNodeClick={(_, node) => setSelectedId(node.id)}
               onNodesChange={onNodesChange}

@@ -26,18 +26,24 @@ function csvCell(value: string | null): string {
   return `"${safe.replaceAll('"', '""')}"`;
 }
 
+const zonedFormatters = new Map<string, Intl.DateTimeFormat>();
+
 function zonedIso(date: Date | null, timezone: string): string | null {
   if (!date) return null;
-  const formatter = new Intl.DateTimeFormat("en-CA", {
-    timeZone: timezone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23",
-  });
+  let formatter = zonedFormatters.get(timezone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    });
+    zonedFormatters.set(timezone, formatter);
+  }
   const parts = Object.fromEntries(
     formatter
       .formatToParts(date)

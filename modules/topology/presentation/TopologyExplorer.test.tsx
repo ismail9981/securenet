@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 
 import React from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@xyflow/react", () => ({
@@ -22,16 +23,16 @@ vi.mock("@xyflow/react", () => ({
   }) => (
     <div data-testid="react-flow">
       {nodes.map((node) => (
-        <button
+        <div
+          data-node-id={node.id}
           key={node.id}
           onClick={() => onNodeClick({}, node)}
-          type="button"
         >
           {React.createElement(nodeTypes[node.type]!, {
             data: node.data,
             selected: false,
           })}
-        </button>
+        </div>
       ))}
       {children}
     </div>
@@ -91,11 +92,14 @@ describe("TopologyExplorer", () => {
     expect(screen.getByText(/Connected Devices: SEC-FW-01/)).toBeVisible();
   });
 
-  it("opens a node summary with Device Details navigation", () => {
+  it("opens a node summary by mouse with Device Details navigation", async () => {
+    const user = userEvent.setup();
     render(<TopologyExplorer initialSnapshot={snapshot} />);
-    fireEvent.click(
-      screen.getByRole("button", { name: /Core Router, ROUTER, OFFLINE/ }),
-    );
+    const node = screen.getByRole("button", {
+      name: /Core Router, ROUTER, OFFLINE/i,
+    });
+    expect(node).toHaveAccessibleName("Core Router, ROUTER, OFFLINE");
+    await user.click(node);
     expect(
       screen.getByRole("heading", { name: "Core Router" }),
     ).toBeInTheDocument();
@@ -103,4 +107,26 @@ describe("TopologyExplorer", () => {
       screen.getByRole("link", { name: "Open Device Details" }),
     ).toHaveAttribute("href", "/devices/30000000-0000-4000-8000-000000000002");
   });
+
+  it.each(["{Enter}", " "])(
+    "opens a node summary with the %s key",
+    async (key) => {
+      const user = userEvent.setup();
+      render(<TopologyExplorer initialSnapshot={snapshot} />);
+      const node = screen.getByRole("button", {
+        name: /Core Router, ROUTER, OFFLINE/i,
+      });
+
+      node.focus();
+      expect(node).toHaveFocus();
+      await user.keyboard(key);
+
+      expect(
+        screen.getByRole("heading", { name: "Core Router" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: "Open Device Details" }),
+      ).toBeVisible();
+    },
+  );
 });
