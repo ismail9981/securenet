@@ -34,3 +34,6 @@ generated/prisma/
 
 # Original extracted handoff package (versioned copy lives in docs/baseline)
 /SecureNet_Full_Documentation_Baseline_v1.0/
+
+# macOS
+.DS_Store

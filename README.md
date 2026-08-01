@@ -15,6 +15,59 @@ readiness. Authentication and
 generated data remain deliberately demonstration-only; they must not protect or
 represent a real monitored network.
 
+## 📸 Project Preview
+
+### Login
+
+![Login](public/screenshots/login.png)
+
+### Dashboard
+
+Main monitoring dashboard showing network health, device status, alerts, and key metrics.
+
+![Dashboard](public/screenshots/dashboard.png)
+
+### Devices
+
+Manage network devices with real-time status and detailed information.
+
+![Devices](public/screenshots/devices.png)
+
+### Alerts
+
+![Alerts](public/screenshots/alerts.png)
+
+### Events
+
+![Events](public/screenshots/events.png)
+
+### Network Topology
+
+![Topology](public/screenshots/topology.png)
+
+## ✨ Key Features
+
+- Real-time Dashboard
+- Device Monitoring
+- Network Topology
+- Alert Management
+- Event Logs
+- Historical Metrics
+- Role-Based Access Control
+- Reports & Analytics
+
+## 🛠 Tech Stack
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- PostgreSQL
+- Prisma
+- Zod
+- Vitest
+- Playwright
+
 ## Approved stack
 
 - Next.js App Router and React with strict TypeScript
@@ -67,21 +120,25 @@ npm run db:test:reset
 Open [http://localhost:3000](http://localhost:3000). The root route resolves through
 the protected Dashboard flow and redirects unauthenticated users to `/login`.
 
-The local login screen presents deterministic fictional accounts for
+The local development environment includes deterministic fictional accounts for
+testing the role-based access control matrix.
+
+Demo credentials are configured through environment variables and are not
+published in this repository. For the public portfolio deployment, only a
+restricted Viewer account may be exposed through server-side configuration.
+Administrator and Network Engineer credentials must remain private.The local login screen presents deterministic fictional accounts for
 Administrator, Network Engineer, and Viewer so the RBAC matrix is repeatable.
-All three accounts use the local Demo password
-`SecureNetDemo123`, configured through `SEED_DEMO_PASSWORD`. Do not reuse that
-password or this adapter for real data.
+The local development environment includes deterministic fictional accounts for
+testing the role-based access control matrix.
+
+Demo credentials are configured through environment variables and are not
+published in this repository. For the public portfolio deployment, only a
+restricted Viewer account may be exposed through server-side configuration.
+Administrator and Network Engineer credentials remain private.
 
 Production Demo policy exposes only Viewer. Administrator and Network Engineer
 credentials and login remain private unless explicitly enabled by server-only
 configuration. They must not appear in public documentation or client bundles.
-
-| Role             | Email                     |
-| ---------------- | ------------------------- |
-| Administrator    | `admin@securenet.demo`    |
-| Network Engineer | `engineer@securenet.demo` |
-| Viewer           | `viewer@securenet.demo`   |
 
 ## Quality commands
 
