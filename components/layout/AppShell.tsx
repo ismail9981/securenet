@@ -1,73 +1,31 @@
-import {
-  Activity,
-  Bell,
-  BarChart3,
-  CircleHelp,
-  ListTree,
-  Menu,
-  Network,
-  Radio,
-  Search,
-  Server,
-  Settings,
-  X,
-} from "lucide-react";
-import Link from "next/link";
+import { CircleHelp, Menu, Radio, Search, X } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { DemoDataBadge } from "@/components/foundation/DemoDataBadge";
 import { PortfolioDemoDisclosure } from "@/components/foundation/PortfolioDemoDisclosure";
 import { RealtimeIndicator } from "@/components/realtime/RealtimeIndicator";
 import { RealtimeProvider } from "@/components/realtime/RealtimeProvider";
+import { OperationalNavigation } from "@/components/layout/OperationalNavigation";
 import { isPortfolioMode } from "@/lib/runtime-environment";
 import type { PublicUser } from "@/modules/identity/domain/user";
 import { UserMenu } from "@/modules/identity/presentation/UserMenu";
 
-const navigation = [
-  { href: "/dashboard", label: "Dashboard", icon: Activity },
-  { href: "/devices", label: "Devices", icon: Server },
-  { href: "/alerts", label: "Alerts", icon: Bell },
-  { href: "/events", label: "Events", icon: ListTree },
-  { href: "/topology", label: "Topology", icon: Network },
-  { href: "/reports", label: "Reports", icon: BarChart3 },
-  { href: "/settings", label: "Settings", icon: Settings },
-] as const;
-
 function ProductMark() {
   return (
     <div className="flex items-center gap-3">
-      <div className="border-brand/30 bg-brand/10 text-brand grid size-9 place-items-center rounded-lg border">
+      <div className="text-brand relative grid size-9 place-items-center border">
         <Radio aria-hidden="true" className="size-5" />
+        <span className="bg-brand absolute -top-px -right-px size-1.5" />
       </div>
       <div>
-        <p className="text-sm font-semibold tracking-wide">SecureNet</p>
-        <p className="text-muted text-[0.68rem] tracking-[0.12em] uppercase">
-          Monitoring center
+        <p className="text-sm font-semibold tracking-[0.08em] uppercase">
+          SecureNet
+        </p>
+        <p className="text-muted font-mono text-[0.58rem] tracking-[0.1em] uppercase">
+          NOC / System 01
         </p>
       </div>
     </div>
-  );
-}
-
-function NavigationLinks({ onMobile = false }: { onMobile?: boolean }) {
-  return (
-    <nav
-      aria-label={onMobile ? "Mobile primary navigation" : "Primary navigation"}
-    >
-      <ul className="space-y-1">
-        {navigation.map(({ href, icon: Icon, label }) => (
-          <li key={href}>
-            <Link
-              className="text-muted hover:bg-panel-raised hover:text-foreground flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-              href={href}
-            >
-              <Icon aria-hidden="true" className="size-4.5" />
-              {label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
   );
 }
 
@@ -79,35 +37,56 @@ export function AppShell({
 
   return (
     <RealtimeProvider>
-      <div className="min-h-screen lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
-        <aside className="hidden border-r bg-[var(--surface-sidebar)] lg:flex lg:min-h-screen lg:flex-col lg:p-4">
-          <div className="px-2 py-2">
+      <div className="min-h-screen lg:grid lg:grid-cols-[13.5rem_minmax(0,1fr)]">
+        <aside className="hidden border-r bg-[var(--surface-sidebar)] lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:px-5 lg:py-6">
+          <div>
             <ProductMark />
           </div>
-          <div className="mt-8">
-            <NavigationLinks />
+          <p className="text-muted mt-10 mb-3 font-mono text-[0.58rem] tracking-[0.12em] uppercase">
+            Operations index
+          </p>
+          <div>
+            <OperationalNavigation />
           </div>
-          <div className="bg-panel mt-auto rounded-xl border p-3">
+          <div className="mt-auto border-t pt-4">
+            <dl className="mb-4 grid grid-cols-2 gap-y-3 font-mono text-[0.58rem] uppercase">
+              <div>
+                <dt className="text-muted">Mode</dt>
+                <dd className="text-success mt-1">Demo</dd>
+              </div>
+              <div>
+                <dt className="text-muted">Region</dt>
+                <dd className="mt-1">OM-01</dd>
+              </div>
+              <div>
+                <dt className="text-muted">Runtime</dt>
+                <dd className="mt-1">Single</dd>
+              </div>
+              <div>
+                <dt className="text-muted">Data</dt>
+                <dd className="mt-1">Fixture</dd>
+              </div>
+            </dl>
             <div className="flex items-start gap-2.5">
               <CircleHelp
                 aria-hidden="true"
                 className="text-info mt-0.5 size-4 shrink-0"
               />
-              <p className="text-muted text-xs leading-5">
-                Demo environment. Device inventory, Alerts, and Events are
-                persisted; realtime delivery is single-instance and non-durable.
+              <p className="text-muted text-[0.66rem] leading-5">
+                Persisted demonstration data. Single-instance, non-durable
+                realtime delivery.
               </p>
             </div>
           </div>
         </aside>
 
         <div className="min-w-0">
-          <header className="sticky top-0 z-20 border-b bg-[rgb(7_16_24/92%)] backdrop-blur">
-            <div className="flex min-h-16 items-center gap-3 px-4 md:px-6">
+          <header className="sticky top-0 z-20 border-b bg-[rgb(10_11_13/92%)] backdrop-blur-xl">
+            <div className="flex min-h-14 items-center gap-3 px-4 md:px-7">
               <details className="group relative lg:hidden">
                 <summary
                   aria-label="Toggle navigation"
-                  className="bg-panel text-muted hover:text-foreground grid min-h-11 min-w-11 cursor-pointer list-none place-items-center rounded-lg border [&::-webkit-details-marker]:hidden"
+                  className="bg-panel text-muted hover:text-foreground grid min-h-11 min-w-11 cursor-pointer list-none place-items-center border [&::-webkit-details-marker]:hidden"
                 >
                   <Menu
                     aria-hidden="true"
@@ -119,15 +98,15 @@ export function AppShell({
                   />
                   <span className="sr-only">Toggle navigation</span>
                 </summary>
-                <div className="absolute top-13 left-0 w-[min(19rem,calc(100vw-2rem))] rounded-xl border bg-[var(--surface-sidebar)] p-4 shadow-2xl">
+                <div className="absolute top-13 left-0 w-[min(19rem,calc(100vw-2rem))] border bg-[var(--surface-sidebar)] p-5 shadow-2xl">
                   <div className="mb-5">
                     <ProductMark />
                   </div>
-                  <NavigationLinks onMobile />
+                  <OperationalNavigation onMobile />
                 </div>
               </details>
 
-              <label className="bg-panel text-muted hidden max-w-md flex-1 items-center gap-2 rounded-lg border px-3 sm:flex">
+              <label className="text-muted hidden max-w-sm flex-1 items-center gap-2 border-b px-1 sm:flex">
                 <Search aria-hidden="true" className="size-4" />
                 <span className="sr-only">Global search</span>
                 <input
@@ -150,7 +129,7 @@ export function AppShell({
             </div>
           </header>
 
-          <main className="px-4 py-6 md:px-6 md:py-8">
+          <main className="px-4 py-7 md:px-8 md:py-10">
             {portfolioMode ? (
               <div className="mx-auto mb-6 w-full max-w-7xl">
                 <PortfolioDemoDisclosure />

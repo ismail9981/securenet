@@ -26,7 +26,7 @@ export function DeviceMetricSnapshot({
 }) {
   if (!snapshot) {
     return (
-      <div className="bg-panel rounded-xl border p-5">
+      <div className="bg-panel border p-5">
         <div className="flex gap-3">
           <AlertTriangle
             aria-hidden="true"
@@ -68,9 +68,9 @@ export function DeviceMetricSnapshot({
         </div>
       ) : null}
 
-      <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <dl className="metric-strip sm:grid-cols-2 xl:grid-cols-4">
         {metrics.map(([label, field, unit]) => (
-          <div className="bg-panel rounded-xl border p-4" key={field}>
+          <div className="bg-panel p-4" key={field}>
             <dt className="text-muted text-xs font-medium">{label}</dt>
             <dd className="mt-2 text-lg font-semibold">
               {formatMetric(
@@ -86,7 +86,7 @@ export function DeviceMetricSnapshot({
             </dd>
           </div>
         ))}
-        <div className="bg-panel rounded-xl border p-4">
+        <div className="bg-panel p-4">
           <dt className="text-muted text-xs font-medium">Uptime</dt>
           <dd className="mt-2 text-lg font-semibold">
             {formatUptime(snapshot.uptimeSeconds)}

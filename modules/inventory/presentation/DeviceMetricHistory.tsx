@@ -74,7 +74,7 @@ export function DeviceMetricHistory({
             {ranges.map((value) => (
               <button
                 aria-pressed={range === value}
-                className={`min-h-11 rounded-lg border px-3 text-sm ${
+                className={`min-h-11 border px-3 font-mono text-xs ${
                   range === value ? "bg-brand text-slate-950" : "bg-panel"
                 }`}
                 key={value}
@@ -97,7 +97,7 @@ export function DeviceMetricHistory({
         <>
           <div
             aria-label="Historical CPU, RAM, latency, packet loss, download, and upload chart"
-            className="bg-panel h-80 rounded-xl border p-3"
+            className="bg-panel h-80 border p-3"
             role="img"
           >
             <ResponsiveContainer height="100%" width="100%">
@@ -146,7 +146,7 @@ export function DeviceMetricHistory({
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <details className="bg-panel mt-4 rounded-xl border p-4">
+          <details className="bg-panel mt-4 border p-4">
             <summary className="min-h-11 cursor-pointer font-semibold">
               Accessible metric table
             </summary>

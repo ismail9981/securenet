@@ -65,7 +65,7 @@ export function SettingsConsole({
   return (
     <div className="space-y-8">
       {!canManage ? (
-        <p className="bg-panel text-muted rounded-xl border p-4">
+        <p className="bg-panel text-muted border-l-2 border-l-[var(--accent-primary)] p-4">
           Read-only settings access. Administrator permission is required for
           changes.
         </p>
@@ -74,7 +74,7 @@ export function SettingsConsole({
         {message}
       </p>
 
-      <form className="bg-panel rounded-xl border p-5" onSubmit={saveSettings}>
+      <form className="bg-panel border p-5" onSubmit={saveSettings}>
         <h2 className="text-xl font-semibold">Global display settings</h2>
         <p className="text-muted mt-1 text-sm">
           Presentation only. Stored historical values and timestamps are never
@@ -84,7 +84,7 @@ export function SettingsConsole({
           <label className="text-sm">
             <span className="text-muted mb-1 block">Timezone</span>
             <select
-              className="bg-panel-raised min-h-11 w-full rounded-lg border px-3"
+              className="bg-panel-raised min-h-11 w-full border px-3"
               disabled={!canManage}
               onChange={(event) =>
                 setSettings({
@@ -101,7 +101,7 @@ export function SettingsConsole({
           <label className="text-sm">
             <span className="text-muted mb-1 block">Traffic unit</span>
             <select
-              className="bg-panel-raised min-h-11 w-full rounded-lg border px-3"
+              className="bg-panel-raised min-h-11 w-full border px-3"
               disabled={!canManage}
               onChange={(event) =>
                 setSettings({
@@ -119,7 +119,7 @@ export function SettingsConsole({
           <label className="text-sm">
             <span className="text-muted mb-1 block">CPU unit</span>
             <input
-              className="bg-panel-raised min-h-11 w-full rounded-lg border px-3"
+              className="bg-panel-raised min-h-11 w-full border px-3"
               disabled
               value={settings.cpuUnit}
             />
@@ -127,7 +127,7 @@ export function SettingsConsole({
           <label className="text-sm">
             <span className="text-muted mb-1 block">Memory unit</span>
             <input
-              className="bg-panel-raised min-h-11 w-full rounded-lg border px-3"
+              className="bg-panel-raised min-h-11 w-full border px-3"
               disabled
               value={settings.memoryUnit}
             />
@@ -135,7 +135,7 @@ export function SettingsConsole({
         </div>
         {canManage ? (
           <button
-            className="bg-brand mt-5 min-h-11 rounded-lg px-4 font-semibold text-slate-950"
+            className="bg-brand mt-5 min-h-11 px-4 font-semibold text-slate-950"
             type="submit"
           >
             Save global settings
@@ -150,9 +150,9 @@ export function SettingsConsole({
             Rule identity, metric, operator, and scope are immutable. AR-BW-01
             remains disabled.
           </p>
-          <div className="mt-4 grid gap-4">
+          <div className="mt-4 border-t">
             {rules.map((rule, index) => (
-              <div className="bg-panel rounded-xl border p-5" key={rule.id}>
+              <div className="bg-panel border-x border-b p-5" key={rule.id}>
                 <div className="flex flex-wrap justify-between gap-3">
                   <div>
                     <h3 className="font-semibold">{rule.name}</h3>
@@ -190,7 +190,7 @@ export function SettingsConsole({
                     <label className="text-sm" key={field}>
                       <span className="text-muted mb-1 block">{label}</span>
                       <input
-                        className="bg-panel-raised min-h-11 w-full rounded-lg border px-3"
+                        className="bg-panel-raised min-h-11 w-full border px-3"
                         min="0"
                         onChange={(event) => {
                           const value =
@@ -212,7 +212,7 @@ export function SettingsConsole({
                   ))}
                 </div>
                 <button
-                  className="bg-brand mt-4 min-h-11 rounded-lg px-4 font-semibold text-slate-950"
+                  className="bg-brand mt-4 min-h-11 px-4 font-semibold text-slate-950"
                   onClick={() => void saveRule(rule)}
                   type="button"
                 >

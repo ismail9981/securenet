@@ -8,25 +8,28 @@ interface KpiCardProps {
 }
 
 const toneClasses = {
-  brand: "border-brand/25 bg-brand/10 text-brand",
-  success: "border-success/25 bg-success/10 text-success",
-  warning: "border-warning/25 bg-warning/10 text-warning",
-  danger: "border-danger/25 bg-danger/10 text-danger",
-  muted: "border-border bg-panel-raised text-muted",
+  brand: "text-brand",
+  success: "text-success",
+  warning: "text-warning",
+  danger: "text-danger",
+  muted: "text-muted",
 } as const;
 
 export function KpiCard({ icon: Icon, label, tone, value }: KpiCardProps) {
   return (
-    <article className="bg-panel rounded-xl border p-4 sm:p-5">
-      <div
-        className={`mb-5 grid size-9 place-items-center rounded-lg border ${toneClasses[tone]}`}
-      >
+    <article className="group bg-panel relative min-h-32 p-4 sm:p-5">
+      <div className={`absolute top-4 right-4 ${toneClasses[tone]}`}>
         <Icon aria-hidden="true" className="size-4" />
       </div>
-      <p className="text-2xl font-semibold tracking-tight tabular-nums">
+      <p className="text-4xl font-medium tracking-[-0.06em] tabular-nums">
         {value}
       </p>
-      <p className="text-muted mt-1 text-sm">{label}</p>
+      <p className="text-muted mt-5 font-mono text-[0.62rem] tracking-[0.08em] uppercase">
+        {label}
+      </p>
+      <span
+        className={`absolute bottom-0 left-0 h-px w-0 transition-[width] duration-300 group-hover:w-full ${toneClasses[tone]} bg-current`}
+      />
     </article>
   );
 }

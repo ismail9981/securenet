@@ -1,5 +1,7 @@
-import { BarChart3, Download } from "lucide-react";
+import { Download } from "lucide-react";
 import type { Metadata } from "next";
+
+import { OperationalPageHeader } from "@/components/foundation/OperationalPageHeader";
 
 import { requireServerSession } from "@/modules/identity/infrastructure/server-session";
 import { parseReportFilters } from "@/modules/reporting/domain/report-filters";
@@ -38,18 +40,22 @@ export default async function ReportsPage({
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6">
-      <header>
-        <div className="border-brand/25 bg-brand/10 text-brand mb-4 flex size-11 items-center justify-center rounded-xl border">
-          <BarChart3 aria-hidden="true" className="size-5" />
-        </div>
-        <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
-          Persisted Demo reporting
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold sm:text-3xl">
-          Network Health Report
-        </h1>
-        <p className="text-muted mt-2">{report.demoDisclosure}</p>
-      </header>
+      <OperationalPageHeader
+        description={report.demoDisclosure}
+        eyebrow="Analysis workspace"
+        index="06"
+        metadata={[
+          { label: "Traffic", value: report.trafficUnit },
+          { label: "Health", value: report.health.score },
+          {
+            label: "Status",
+            value: report.health.label,
+            tone: report.health.label === "CRITICAL" ? "critical" : "warning",
+          },
+          { label: "Export", value: "CSV" },
+        ]}
+        title="Network Health Report"
+      />
 
       <ReportFilters
         values={{
@@ -63,7 +69,7 @@ export default async function ReportsPage({
 
       <div>
         <a
-          className="bg-brand inline-flex min-h-11 items-center gap-2 rounded-lg px-4 font-semibold text-slate-950"
+          className="bg-brand inline-flex min-h-11 items-center gap-2 px-4 font-semibold text-slate-950"
           href={`/api/v1/reports/alerts.csv?${exportParams.toString()}`}
         >
           <Download aria-hidden="true" className="size-4" />
@@ -77,7 +83,7 @@ export default async function ReportsPage({
         </h2>
         <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
           {Object.entries(report.deviceCounts).map(([label, value]) => (
-            <div className="bg-panel rounded-xl border p-4" key={label}>
+            <div className="bg-panel border-t p-4" key={label}>
               <dt className="text-muted text-xs">{label}</dt>
               <dd className="mt-2 text-2xl font-semibold">{value}</dd>
             </div>
@@ -86,7 +92,7 @@ export default async function ReportsPage({
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <div className="bg-panel rounded-xl border p-5">
+        <div className="bg-panel border p-5">
           <h2 className="font-semibold">Alerts by severity</h2>
           <dl className="mt-3 grid grid-cols-3 gap-2">
             {Object.entries(report.alertsBySeverity).map(([label, value]) => (
@@ -97,7 +103,7 @@ export default async function ReportsPage({
             ))}
           </dl>
         </div>
-        <div className="bg-panel rounded-xl border p-5">
+        <div className="bg-panel border p-5">
           <h2 className="font-semibold">Alerts by status</h2>
           <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {Object.entries(report.alertsByStatus).map(([label, value]) => (
@@ -110,7 +116,7 @@ export default async function ReportsPage({
         </div>
       </section>
 
-      <section className="bg-panel rounded-xl border p-5">
+      <section className="bg-panel border p-5">
         <h2 className="font-semibold">Period metrics</h2>
         <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Object.entries(report.metrics).map(([label, value]) => (
@@ -132,7 +138,7 @@ export default async function ReportsPage({
         </dl>
       </section>
 
-      <section className="bg-panel rounded-xl border p-5">
+      <section className="bg-panel border-l-2 border-l-[var(--status-warning)] p-5">
         <h2 className="font-semibold">
           Partial Network Health Score: {report.health.score} ·{" "}
           {report.health.label}
@@ -146,7 +152,7 @@ export default async function ReportsPage({
       <section>
         <h2 className="mb-3 text-xl font-semibold">Top problem Devices</h2>
         {report.topProblemDevices.length ? (
-          <div className="overflow-x-auto rounded-xl border">
+          <div className="overflow-x-auto border">
             <table className="bg-panel w-full min-w-[36rem] text-left text-sm">
               <thead>
                 <tr className="border-b">
@@ -179,7 +185,10 @@ export default async function ReportsPage({
         <h2 className="mb-3 text-xl font-semibold">Recent Alerts</h2>
         <ul className="grid gap-3">
           {report.recentAlerts.map((alert) => (
-            <li className="bg-panel rounded-xl border p-4" key={alert.id}>
+            <li
+              className="bg-panel border-l-2 border-l-[var(--status-danger)] p-4"
+              key={alert.id}
+            >
               <p className="font-semibold">{alert.title}</p>
               <p className="text-muted text-sm">
                 {alert.deviceName} · {alert.severity} · {alert.status}

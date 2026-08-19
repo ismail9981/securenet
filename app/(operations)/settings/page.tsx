@@ -1,5 +1,6 @@
-import { Settings } from "lucide-react";
 import type { Metadata } from "next";
+
+import { OperationalPageHeader } from "@/components/foundation/OperationalPageHeader";
 
 import { alertRuleAdminService } from "@/modules/alerting/infrastructure/alert-rule-admin-service";
 import { hasPermission } from "@/modules/identity/domain/permissions";
@@ -30,15 +31,18 @@ export default async function SettingsPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8">
-      <header>
-        <div className="border-brand/25 bg-brand/10 text-brand mb-4 flex size-11 items-center justify-center rounded-xl border">
-          <Settings aria-hidden="true" className="size-5" />
-        </div>
-        <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
-          Global Demo configuration
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold sm:text-3xl">Settings</h1>
-      </header>
+      <OperationalPageHeader
+        description="Review global display configuration, AlertRule thresholds, and the effective role-capability matrix."
+        eyebrow="System administration"
+        index="07"
+        metadata={[
+          { label: "Access", value: canManage ? "MANAGE" : "READ ONLY" },
+          { label: "Timezone", value: settings.timezone },
+          { label: "Traffic", value: settings.trafficUnit },
+          { label: "Rules", value: canManage ? rules.length : "RESTRICTED" },
+        ]}
+        title="Settings"
+      />
 
       <SettingsConsole
         canManage={canManage}
@@ -50,7 +54,7 @@ export default async function SettingsPage() {
         <h2 className="mb-3 text-xl font-semibold" id="role-matrix">
           Read-only role matrix
         </h2>
-        <div className="overflow-x-auto rounded-xl border">
+        <div className="overflow-x-auto border">
           <table className="bg-panel w-full min-w-[38rem] text-left text-sm">
             <thead>
               <tr className="border-b">

@@ -29,7 +29,7 @@ function queryHref(query: DeviceListQuery, page: number): Route {
 
 function MobileDeviceCard({ device }: { readonly device: DeviceSummary }) {
   return (
-    <article className="bg-panel rounded-xl border p-4 md:hidden">
+    <article className="bg-panel border-l-2 border-l-[var(--accent-primary)] p-4 md:hidden">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <Link
@@ -111,12 +111,12 @@ export function DeviceList({
         ))}
       </div>
 
-      <div className="bg-panel hidden overflow-x-auto rounded-xl border md:block">
+      <div className="data-table-shell bg-panel hidden overflow-x-auto md:block">
         <table className="w-full min-w-[72rem] border-collapse text-left text-sm">
           <caption className="sr-only">
             Active SecureNet Demo device inventory
           </caption>
-          <thead className="bg-panel-raised text-muted text-xs">
+          <thead>
             <tr>
               {[
                 "Device",

@@ -12,13 +12,13 @@ export function DeviceFilters({
   return (
     <form
       action="/devices"
-      className="bg-panel grid gap-3 rounded-xl border p-4 md:grid-cols-2 xl:grid-cols-[minmax(14rem,1fr)_repeat(5,minmax(8rem,auto))_auto]"
+      className="bg-panel grid gap-3 border p-4 md:grid-cols-2 xl:grid-cols-[minmax(14rem,1fr)_repeat(5,minmax(8rem,auto))_auto]"
       method="get"
     >
       <label className="text-sm font-medium">
         Search
         <input
-          className="bg-background mt-1.5 min-h-11 w-full rounded-lg border px-3 text-sm"
+          className="bg-background mt-1.5 min-h-11 w-full border px-3 text-sm"
           defaultValue={query.search}
           name="search"
           placeholder="Name, hostname, or exact IP"
@@ -28,7 +28,7 @@ export function DeviceFilters({
       <label className="text-sm font-medium">
         Status
         <select
-          className="bg-background mt-1.5 min-h-11 w-full rounded-lg border px-3 text-sm"
+          className="bg-background mt-1.5 min-h-11 w-full border px-3 text-sm"
           defaultValue={query.statuses[0] ?? ""}
           name="status"
         >
@@ -43,7 +43,7 @@ export function DeviceFilters({
       <label className="text-sm font-medium">
         Type
         <select
-          className="bg-background mt-1.5 min-h-11 w-full rounded-lg border px-3 text-sm"
+          className="bg-background mt-1.5 min-h-11 w-full border px-3 text-sm"
           defaultValue={query.types[0] ?? ""}
           name="type"
         >
@@ -58,7 +58,7 @@ export function DeviceFilters({
       <label className="text-sm font-medium">
         Location
         <select
-          className="bg-background mt-1.5 min-h-11 w-full rounded-lg border px-3 text-sm"
+          className="bg-background mt-1.5 min-h-11 w-full border px-3 text-sm"
           defaultValue={query.locationId ?? ""}
           name="locationId"
         >
@@ -73,7 +73,7 @@ export function DeviceFilters({
       <label className="text-sm font-medium">
         Sort
         <select
-          className="bg-background mt-1.5 min-h-11 w-full rounded-lg border px-3 text-sm"
+          className="bg-background mt-1.5 min-h-11 w-full border px-3 text-sm"
           defaultValue={query.sort}
           name="sort"
         >
@@ -86,7 +86,7 @@ export function DeviceFilters({
       <label className="text-sm font-medium">
         Order
         <select
-          className="bg-background mt-1.5 min-h-11 w-full rounded-lg border px-3 text-sm"
+          className="bg-background mt-1.5 min-h-11 w-full border px-3 text-sm"
           defaultValue={query.order}
           name="order"
         >
@@ -95,7 +95,7 @@ export function DeviceFilters({
         </select>
       </label>
       <button
-        className="bg-brand min-h-11 self-end rounded-lg px-4 text-sm font-semibold text-slate-950"
+        className="bg-brand min-h-11 self-end px-4 text-sm font-semibold text-slate-950"
         type="submit"
       >
         Apply

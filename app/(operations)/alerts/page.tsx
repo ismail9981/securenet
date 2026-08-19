@@ -1,6 +1,7 @@
-import { Siren } from "lucide-react";
 import type { Metadata, Route } from "next";
 import Link from "next/link";
+
+import { OperationalPageHeader } from "@/components/foundation/OperationalPageHeader";
 
 import { alertService } from "@/modules/alerting/infrastructure/alert-service";
 import { AlertList } from "@/modules/alerting/presentation/AlertList";
@@ -50,28 +51,33 @@ export default async function AlertsPage({ searchParams }: Props) {
   const page = await alertService.list(query, { actor: session.user });
   return (
     <div className="mx-auto w-full max-w-7xl">
-      <header className="mb-6">
-        <div className="border-brand/25 bg-brand/10 text-brand mb-4 flex size-11 items-center justify-center rounded-xl border">
-          <Siren aria-hidden="true" className="size-5" />
-        </div>
-        <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
-          Incident response · Persisted Demo data
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-          Alerts
-        </h1>
-        <p className="text-muted mt-2 text-sm">
-          Synchronous rule-evaluation results with audited lifecycle controls.
-          Connected updates refresh this persisted Alert snapshot.
-        </p>
-      </header>
+      <OperationalPageHeader
+        description="Prioritize synchronous rule-evaluation results and inspect their audited lifecycle. Connected updates refresh this persisted snapshot."
+        eyebrow="Incident response"
+        index="03"
+        metadata={[
+          { label: "Total", value: page.meta.total },
+          {
+            label: "Critical",
+            value: page.meta.severitySummary.CRITICAL,
+            tone: "critical",
+          },
+          {
+            label: "Warning",
+            value: page.meta.severitySummary.WARNING,
+            tone: "warning",
+          },
+          { label: "Page", value: `${page.meta.page}/${page.meta.totalPages}` },
+        ]}
+        title="Alerts"
+      />
 
       <section
         aria-label="Severity summary"
         className="mb-6 grid grid-cols-3 gap-3"
       >
         {(["CRITICAL", "WARNING", "INFO"] as const).map((severity) => (
-          <div className="bg-panel rounded-xl border p-4" key={severity}>
+          <div className="bg-panel border-t p-4" key={severity}>
             <p className="text-muted text-xs">{severity}</p>
             <p className="mt-1 text-2xl font-semibold">
               {page.meta.severitySummary[severity]}
@@ -80,7 +86,7 @@ export default async function AlertsPage({ searchParams }: Props) {
         ))}
       </section>
 
-      <form className="bg-panel mb-6 grid gap-3 rounded-xl border p-4 sm:grid-cols-2 lg:grid-cols-4">
+      <form className="bg-panel mb-6 grid gap-3 border p-4 sm:grid-cols-2 lg:grid-cols-4">
         <label className="text-muted text-xs">
           Severity
           <select

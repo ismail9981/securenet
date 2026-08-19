@@ -17,7 +17,7 @@ export function DeviceStatusBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs font-semibold",
+        "inline-flex items-center gap-1.5 border px-2 py-1 font-mono text-[0.62rem] font-semibold tracking-[0.05em] uppercase",
         statusStyles[status],
       )}
     >

@@ -1,6 +1,7 @@
-import { ListTree } from "lucide-react";
 import type { Metadata, Route } from "next";
 import Link from "next/link";
+
+import { OperationalPageHeader } from "@/components/foundation/OperationalPageHeader";
 
 import { requireServerSession } from "@/modules/identity/infrastructure/server-session";
 import { eventService } from "@/modules/event-log/infrastructure/event-service";
@@ -51,22 +52,19 @@ export default async function EventsPage({ searchParams }: Props) {
   const page = await eventService.list(query, { actor: session.user });
   return (
     <div className="mx-auto w-full max-w-7xl">
-      <header className="mb-6">
-        <div className="border-brand/25 bg-brand/10 text-brand mb-4 flex size-11 items-center justify-center rounded-xl border">
-          <ListTree aria-hidden="true" className="size-5" />
-        </div>
-        <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
-          Operational history · Permanent Demo retention
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-          Events
-        </h1>
-        <p className="text-muted mt-2 text-sm">
-          Immutable Alert and device activity. Existing Sprint 2 AuditLog rows
-          were not fabricated into Events.
-        </p>
-      </header>
-      <form className="bg-panel mb-6 grid gap-3 rounded-xl border p-4 sm:grid-cols-2 lg:grid-cols-4">
+      <OperationalPageHeader
+        description="Scan immutable Alert, device, and simulation activity in chronological order. Audit history remains distinct from operational Events."
+        eyebrow="Operational history"
+        index="04"
+        metadata={[
+          { label: "Loaded", value: page.data.length },
+          { label: "Retention", value: "PERMANENT" },
+          { label: "Order", value: "NEWEST" },
+          { label: "Cursor", value: page.meta.nextCursor ? "MORE" : "END" },
+        ]}
+        title="Events"
+      />
+      <form className="bg-panel mb-6 grid gap-3 border p-4 sm:grid-cols-2 lg:grid-cols-4">
         <label className="text-muted text-xs sm:col-span-2">
           Search event messages
           <input
