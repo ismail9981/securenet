@@ -100,7 +100,7 @@ function TopologyCanvas({
         source: link.sourceDeviceId,
         target: link.targetDeviceId,
         label: `${link.connectionType} · ${link.status}`,
-        style: { stroke: edgeColor[link.status], strokeWidth: 2 },
+        style: { stroke: edgeColor[link.status], strokeWidth: 1.25 },
         labelStyle: { fill: "var(--text-secondary)", fontSize: 10 },
       })),
     [snapshot.links],
@@ -110,7 +110,7 @@ function TopologyCanvas({
 
   if (!snapshot.nodes.length) {
     return (
-      <section className="bg-panel rounded-xl border p-8 text-center">
+      <section className="bg-panel border p-8 text-center">
         <h2 className="font-semibold">No active Devices in Topology</h2>
         <p className="text-muted mt-2 text-sm">
           Active Devices appear here when persisted inventory is available.
@@ -123,7 +123,7 @@ function TopologyCanvas({
     <div className="space-y-6">
       <section
         aria-label="Interactive network topology"
-        className="bg-panel overflow-hidden rounded-xl border"
+        className="bg-panel overflow-hidden border"
       >
         <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3">
           <div>
@@ -135,7 +135,7 @@ function TopologyCanvas({
           <div className="flex flex-wrap gap-2" aria-label="Topology controls">
             {canSave ? (
               <button
-                className="bg-brand min-h-11 rounded-lg px-3 text-sm font-semibold text-slate-950"
+                className="bg-brand min-h-11 px-3 text-sm font-semibold text-slate-950"
                 onClick={() => {
                   setSaveStatus("Saving positions…");
                   void fetch("/api/v1/topology/positions", {
@@ -172,7 +172,7 @@ function TopologyCanvas({
             )}
             <button
               aria-label="Zoom in"
-              className="bg-panel-raised grid min-h-11 min-w-11 place-items-center rounded-lg border"
+              className="bg-panel-raised grid min-h-11 min-w-11 place-items-center border"
               onClick={() => void instance?.zoomIn({ duration: 200 })}
               type="button"
             >
@@ -180,14 +180,14 @@ function TopologyCanvas({
             </button>
             <button
               aria-label="Zoom out"
-              className="bg-panel-raised grid min-h-11 min-w-11 place-items-center rounded-lg border"
+              className="bg-panel-raised grid min-h-11 min-w-11 place-items-center border"
               onClick={() => void instance?.zoomOut({ duration: 200 })}
               type="button"
             >
               <Minus aria-hidden="true" className="size-4" />
             </button>
             <button
-              className="bg-panel-raised flex min-h-11 items-center gap-2 rounded-lg border px-3 text-sm"
+              className="bg-panel-raised flex min-h-11 items-center gap-2 border px-3 text-sm"
               onClick={() => void instance?.fitView({ duration: 200 })}
               type="button"
             >
@@ -195,7 +195,7 @@ function TopologyCanvas({
               Fit
             </button>
             <button
-              className="bg-panel-raised flex min-h-11 items-center gap-2 rounded-lg border px-3 text-sm"
+              className="bg-panel-raised flex min-h-11 items-center gap-2 border px-3 text-sm"
               onClick={() => {
                 setNodes([...deterministicTopologyLayout(snapshot.nodes)]);
                 void instance?.fitView({ duration: 200 });
@@ -213,7 +213,7 @@ function TopologyCanvas({
           </p>
         ) : null}
         <div className="overflow-x-auto">
-          <div className="h-[34rem] min-w-[48rem] sm:min-w-0">
+          <div className="h-[38rem] min-w-[48rem] sm:min-w-0 xl:h-[44rem]">
             <ReactFlow
               edges={[...edges]}
               fitView
@@ -228,14 +228,17 @@ function TopologyCanvas({
               onNodeClick={(_, node) => setSelectedId(node.id)}
               onNodesChange={onNodesChange}
             >
-              <Background color="var(--border-subtle)" gap={24} />
+              <Background color="var(--border-strong)" gap={32} size={1} />
             </ReactFlow>
           </div>
         </div>
       </section>
 
       {selected ? (
-        <section aria-live="polite" className="bg-panel rounded-xl border p-5">
+        <section
+          aria-live="polite"
+          className="bg-panel border-l-2 border-l-[var(--accent-primary)] p-5"
+        >
           <p className="text-brand text-xs font-semibold uppercase">
             Device summary
           </p>
@@ -244,7 +247,7 @@ function TopologyCanvas({
             {selected.hostname} · {selected.type} · {selected.status}
           </p>
           <Link
-            className="bg-brand mt-4 inline-flex min-h-11 items-center rounded-lg px-4 font-semibold text-slate-950"
+            className="bg-brand mt-4 inline-flex min-h-11 items-center px-4 font-semibold text-slate-950"
             href={`/devices/${selected.id}`}
           >
             Open Device Details
@@ -259,13 +262,16 @@ function TopologyCanvas({
         <p className="text-muted mt-1 text-sm">
           Complete text alternative for every active Device and connection.
         </p>
-        <ul className="mt-4 grid gap-3 md:grid-cols-2">
+        <ul className="mt-4 grid border-t md:grid-cols-2">
           {snapshot.nodes.map((node) => {
             const connected = connectedDeviceIds(node.id, snapshot.links)
               .map((id) => nodeById.get(id)?.hostname)
               .filter((hostname): hostname is string => Boolean(hostname));
             return (
-              <li className="bg-panel rounded-xl border p-4" key={node.id}>
+              <li
+                className="bg-panel border-r border-b p-4 transition-colors hover:bg-[var(--surface-raised)]"
+                key={node.id}
+              >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <Link
@@ -276,7 +282,7 @@ function TopologyCanvas({
                     </Link>
                     <p className="text-muted text-sm">{node.hostname}</p>
                   </div>
-                  <span className="bg-panel-raised rounded-full border px-2.5 py-1 text-xs font-semibold">
+                  <span className="bg-panel-raised border px-2.5 py-1 font-mono text-[0.62rem] font-semibold">
                     {node.status}
                   </span>
                 </div>

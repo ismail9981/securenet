@@ -16,10 +16,7 @@ export function DeviceDistribution({
   readonly total: number;
 }) {
   return (
-    <section
-      className="bg-panel rounded-xl border p-5"
-      aria-labelledby="distribution"
-    >
+    <section className="bg-panel border p-5" aria-labelledby="distribution">
       <h2 className="font-semibold" id="distribution">
         Device status distribution
       </h2>
@@ -45,10 +42,10 @@ export function DeviceDistribution({
                   <span className="text-muted text-xs">({percent}%)</span>
                 </span>
               </div>
-              <div className="bg-panel-raised h-1.5 overflow-hidden rounded-full">
+              <div className="bg-panel-raised h-px overflow-hidden">
                 <div
                   aria-hidden="true"
-                  className={`h-full rounded-full ${style.className}`}
+                  className={`h-full ${style.className}`}
                   style={{ width: `${percent}%` }}
                 />
               </div>

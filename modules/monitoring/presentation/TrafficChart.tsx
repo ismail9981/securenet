@@ -26,10 +26,7 @@ export function TrafficChart({
   );
 
   return (
-    <section
-      className="bg-panel rounded-xl border p-5"
-      aria-labelledby="traffic-title"
-    >
+    <section className="bg-panel border p-5" aria-labelledby="traffic-title">
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-semibold" id="traffic-title">

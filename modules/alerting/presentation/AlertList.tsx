@@ -72,7 +72,7 @@ export function AlertList({
 
   if (!page.data.length) {
     return (
-      <div className="bg-panel rounded-xl border p-8 text-center">
+      <div className="bg-panel border p-8 text-center">
         <h2 className="font-semibold">No alerts match these filters</h2>
         <p className="text-muted mt-2 text-sm">
           Clear filters to inspect the deterministic Demo alert history.
@@ -82,10 +82,10 @@ export function AlertList({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="border-t">
       {page.data.map((alert) => (
-        <details className="bg-panel rounded-xl border" key={alert.id}>
-          <summary className="min-h-16 cursor-pointer list-none p-4">
+        <details className="group bg-panel border-x border-b" key={alert.id}>
+          <summary className="min-h-16 cursor-pointer list-none p-4 transition-colors hover:bg-[var(--surface-raised)]">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <h2 className="font-semibold">{alert.title}</h2>
@@ -95,12 +95,12 @@ export function AlertList({
               </div>
               <div className="flex flex-wrap gap-2">
                 <span
-                  className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${badgeClass(alert.severity)}`}
+                  className={`border px-2.5 py-1 font-mono text-[0.62rem] font-semibold ${badgeClass(alert.severity)}`}
                 >
                   {alert.severity}
                 </span>
                 <span
-                  className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${badgeClass(alert.status)}`}
+                  className={`border px-2.5 py-1 font-mono text-[0.62rem] font-semibold ${badgeClass(alert.status)}`}
                 >
                   {alert.status.replaceAll("_", " ")}
                 </span>

@@ -1,5 +1,6 @@
-import { Network } from "lucide-react";
 import type { Metadata } from "next";
+
+import { OperationalPageHeader } from "@/components/foundation/OperationalPageHeader";
 
 import { requireServerSession } from "@/modules/identity/infrastructure/server-session";
 import { hasPermission } from "@/modules/identity/domain/permissions";
@@ -15,22 +16,23 @@ export default async function TopologyPage() {
   });
   return (
     <div className="mx-auto w-full max-w-7xl">
-      <header className="mb-6">
-        <div className="border-brand/25 bg-brand/10 text-brand mb-4 flex size-11 items-center justify-center rounded-xl border">
-          <Network aria-hidden="true" className="size-5" />
-        </div>
-        <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
-          Active network relationships · Persisted Demo data
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-          Topology
-        </h1>
-        <p className="text-muted mt-2 max-w-3xl text-sm">
-          Active Devices and documented connections. Links are visually
-          undirected; capacity remains unavailable and no connection editing is
-          provided.
-        </p>
-      </header>
+      <OperationalPageHeader
+        description="Explore active Devices and documented network connections. Links are visually undirected; capacity and connection editing remain unavailable."
+        eyebrow="Network relationships"
+        index="05"
+        metadata={[
+          { label: "Devices", value: snapshot.nodes.length },
+          { label: "Links", value: snapshot.links.length },
+          {
+            label: "Layout",
+            value: hasPermission(session.user.role, "SAVE_TOPOLOGY_POSITIONS")
+              ? "EDITABLE"
+              : "READ ONLY",
+          },
+          { label: "Source", value: "PERSISTED" },
+        ]}
+        title="Topology"
+      />
       <div
         aria-label="Topology status legend"
         className="mb-6 flex flex-wrap gap-2"
@@ -39,7 +41,7 @@ export default async function TopologyPage() {
           ["ONLINE", "DEGRADED", "OFFLINE", "MAINTENANCE", "UNKNOWN"] as const
         ).map((status) => (
           <span
-            className="bg-panel rounded-full border px-3 py-1.5 text-xs font-semibold"
+            className="bg-panel border px-3 py-1.5 font-mono text-[0.62rem] font-semibold"
             key={status}
           >
             {status}

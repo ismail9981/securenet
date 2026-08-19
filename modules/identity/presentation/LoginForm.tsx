@@ -90,14 +90,14 @@ export function LoginForm({ demoAccounts, demoPassword }: LoginFormProps) {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+    <div className="grid gap-8">
       <form
         aria-describedby={error ? "login-error" : undefined}
-        className="bg-panel rounded-xl border p-5 sm:p-6"
+        className="border-t pt-6"
         onSubmit={handleSubmit}
       >
         <div className="mb-6 flex items-start gap-3">
-          <div className="border-brand/25 bg-brand/10 text-brand grid size-10 shrink-0 place-items-center rounded-lg border">
+          <div className="text-brand grid size-10 shrink-0 place-items-center border">
             <ShieldCheck aria-hidden="true" className="size-5" />
           </div>
           <div>
@@ -114,7 +114,7 @@ export function LoginForm({ demoAccounts, demoPassword }: LoginFormProps) {
             Email
             <input
               autoComplete="username"
-              className="bg-background mt-2 min-h-11 w-full rounded-lg border px-3 text-sm placeholder:text-[var(--text-subtle)]"
+              className="bg-background mt-2 min-h-12 w-full border px-3 text-sm placeholder:text-[var(--text-subtle)]"
               name="email"
               onChange={(event) => setEmail(event.target.value)}
               required
@@ -126,7 +126,7 @@ export function LoginForm({ demoAccounts, demoPassword }: LoginFormProps) {
             Password
             <input
               autoComplete="current-password"
-              className="bg-background mt-2 min-h-11 w-full rounded-lg border px-3 text-sm placeholder:text-[var(--text-subtle)]"
+              className="bg-background mt-2 min-h-12 w-full border px-3 text-sm placeholder:text-[var(--text-subtle)]"
               name="password"
               onChange={(event) => setPassword(event.target.value)}
               required
@@ -154,7 +154,7 @@ export function LoginForm({ demoAccounts, demoPassword }: LoginFormProps) {
         </div>
 
         <button
-          className="bg-brand mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-[var(--accent-primary-hover)] disabled:cursor-not-allowed disabled:opacity-65"
+          className="bg-brand mt-2 inline-flex min-h-12 w-full items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-[var(--accent-primary-hover)] disabled:cursor-not-allowed disabled:opacity-65"
           disabled={isSubmitting}
           type="submit"
         >
@@ -167,10 +167,7 @@ export function LoginForm({ demoAccounts, demoPassword }: LoginFormProps) {
         </button>
       </form>
 
-      <aside
-        className="bg-panel rounded-xl border p-5"
-        aria-labelledby="demo-accounts"
-      >
+      <aside className="border-t pt-6" aria-labelledby="demo-accounts">
         <p className="text-info text-xs font-semibold tracking-[0.14em] uppercase">
           Demo-only access
         </p>
@@ -187,12 +184,9 @@ export function LoginForm({ demoAccounts, demoPassword }: LoginFormProps) {
           the public Demo password{" "}
           <code className="text-foreground font-mono">{demoPassword}</code>.
         </p>
-        <ul className="mt-4 space-y-3">
+        <ul className="mt-4 grid gap-px border bg-[var(--border-subtle)] sm:grid-cols-2 lg:grid-cols-3">
           {demoAccounts.map((account, index) => (
-            <li
-              className="bg-background rounded-lg border p-3"
-              key={account.role}
-            >
+            <li className="bg-background p-3" key={account.role}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-sm font-semibold">

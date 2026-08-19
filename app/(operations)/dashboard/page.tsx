@@ -10,6 +10,10 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { isPortfolioMode } from "@/lib/runtime-environment";
 import { DemoDataBadge } from "@/components/foundation/DemoDataBadge";
+import {
+  OperationalPageHeader,
+  OperationalSectionHeader,
+} from "@/components/foundation/OperationalPageHeader";
 import { requireServerSession } from "@/modules/identity/infrastructure/server-session";
 import { getDashboardSnapshot } from "@/modules/monitoring/application/get-dashboard-snapshot";
 import { PrismaDashboardRepository } from "@/modules/monitoring/infrastructure/prisma-dashboard-repository";
@@ -39,23 +43,28 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl">
-      <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
-            Network overview
-          </p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-            Dashboard
-          </h1>
-          <p className="text-muted mt-2 text-sm">
-            Persisted deterministic Demo simulation ·{" "}
-            {new Date(snapshot.generatedAt).toLocaleString("en-GB", {
+      <OperationalPageHeader
+        action={<DemoDataBadge />}
+        description="Monitor infrastructure health, operational state, and persisted demonstration telemetry from one authoritative workspace."
+        eyebrow="Network overview"
+        index="01"
+        metadata={[
+          { label: "Status", value: "LIVE", tone: "live" },
+          { label: "Nodes", value: summary.totalDevices },
+          {
+            label: "Critical",
+            value: summary.openCriticalAlerts,
+            tone: "critical",
+          },
+          {
+            label: "Last sync",
+            value: new Date(snapshot.generatedAt).toLocaleTimeString("en-GB", {
               timeZone: "Asia/Muscat",
-            })}
-          </p>
-        </div>
-        <DemoDataBadge />
-      </header>
+            }),
+          },
+        ]}
+        title="Dashboard"
+      />
 
       {session.user.role === "ADMIN" && !portfolioMode ? (
         <SimulationControl
@@ -68,9 +77,21 @@ export default async function DashboardPage() {
         />
       ) : null}
 
+      <OperationalSectionHeader
+        index="01.1"
+        title="Network health"
+        description="Approved health classification and fixed deductions."
+      />
+      <HealthScorePanel health={snapshot.networkHealth} />
+
+      <OperationalSectionHeader
+        index="01.2"
+        title="System status"
+        description="Current persisted device and alert totals."
+      />
       <section
         aria-label="Network summary"
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5"
+        className="metric-strip sm:grid-cols-2 xl:grid-cols-5"
       >
         <KpiCard
           icon={Server}
@@ -104,19 +125,18 @@ export default async function DashboardPage() {
         />
       </section>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
-        <HealthScorePanel health={snapshot.networkHealth} />
+      <div className="mt-10 grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
+        <DeviceDistribution
+          distribution={snapshot.deviceDistribution}
+          total={summary.totalDevices}
+        />
         <TrafficChart
           data={snapshot.traffic}
           rangeLabel={snapshot.rangeLabel}
         />
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
-        <DeviceDistribution
-          distribution={snapshot.deviceDistribution}
-          total={summary.totalDevices}
-        />
+      <div className="mt-6">
         <div className="grid gap-6 lg:grid-cols-2">
           <LatestAlerts alerts={snapshot.latestAlerts} />
           <RecentEvents events={snapshot.recentEvents} />

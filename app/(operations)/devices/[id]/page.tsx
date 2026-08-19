@@ -1,7 +1,9 @@
-import { ArrowLeft, CircleAlert, History, ServerCog } from "lucide-react";
+import { ArrowLeft, CircleAlert, History } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+import { OperationalPageHeader } from "@/components/foundation/OperationalPageHeader";
 
 import { hasPermission } from "@/modules/identity/domain/permissions";
 import { requireServerSession } from "@/modules/identity/infrastructure/server-session";
@@ -104,38 +106,49 @@ export default async function DeviceDetailsPage({
         Back to devices
       </Link>
 
-      <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="border-brand/25 bg-brand/10 text-brand mb-4 flex size-11 items-center justify-center rounded-xl border">
-            <ServerCog aria-hidden="true" className="size-5" />
-          </div>
-          <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
-            Device diagnostics · Persisted Demo data
-          </p>
-          <div className="mt-2 flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              {device.name}
-            </h1>
+      <OperationalPageHeader
+        action={
+          <div className="flex flex-wrap items-center gap-3">
             <DeviceStatusBadge status={device.status} />
+            {canManage ? (
+              <ArchiveDeviceButton
+                deviceId={device.id}
+                deviceName={device.name}
+              />
+            ) : (
+              <span className="bg-panel text-muted border px-3 py-2 font-mono text-[0.62rem] uppercase">
+                Read-only access
+              </span>
+            )}
           </div>
-          <p className="text-muted mt-2 font-mono text-sm">
-            {device.hostname} · {device.ipAddress}
-          </p>
-        </div>
-        {canManage ? (
-          <ArchiveDeviceButton deviceId={device.id} deviceName={device.name} />
-        ) : (
-          <span className="bg-panel text-muted rounded-lg border px-3 py-2 text-xs">
-            Read-only access
-          </span>
-        )}
-      </header>
+        }
+        description={
+          <>
+            <span className="font-mono">{device.hostname}</span> ·{" "}
+            <span className="font-mono">{device.ipAddress}</span> · persisted
+            diagnostic record
+          </>
+        }
+        eyebrow="Device diagnostics"
+        index="02.1"
+        metadata={[
+          { label: "Type", value: device.type },
+          { label: "Location", value: device.location.name },
+          {
+            label: "Alerts",
+            value: device.activeAlertCount ?? "N/A",
+            tone: device.activeAlertCount ? "critical" : "neutral",
+          },
+          { label: "Importance", value: `${device.importanceWeight}/5` },
+        ]}
+        title={device.name}
+      />
 
       <section aria-labelledby="overview">
         <h2 className="mb-4 text-xl font-semibold" id="overview">
           Overview
         </h2>
-        <dl className="bg-panel grid gap-px overflow-hidden rounded-xl border bg-[var(--border)] sm:grid-cols-2 lg:grid-cols-3">
+        <dl className="bg-panel grid gap-px overflow-hidden border bg-[var(--border)] sm:grid-cols-2 lg:grid-cols-3">
           {overview.map(([label, value]) => (
             <div className="bg-panel min-w-0 p-4" key={label}>
               <dt className="text-muted text-xs font-medium">{label}</dt>
@@ -181,7 +194,7 @@ export default async function DeviceDetailsPage({
       </div>
 
       {canManage ? (
-        <details className="bg-panel mt-8 rounded-xl border p-5">
+        <details className="bg-panel mt-8 border p-5">
           <summary className="text-brand min-h-11 cursor-pointer list-none font-semibold">
             Edit device
           </summary>

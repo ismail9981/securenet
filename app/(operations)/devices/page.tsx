@@ -1,5 +1,7 @@
-import { Plus, Server } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { Metadata } from "next";
+
+import { OperationalPageHeader } from "@/components/foundation/OperationalPageHeader";
 
 import { hasPermission } from "@/modules/identity/domain/permissions";
 import { requireServerSession } from "@/modules/identity/infrastructure/server-session";
@@ -54,26 +56,21 @@ export default async function DevicesPage({ searchParams }: DevicesPageProps) {
 
   return (
     <div className="mx-auto w-full max-w-[90rem]">
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <div className="border-brand/25 bg-brand/10 text-brand mb-4 flex size-11 items-center justify-center rounded-xl border">
-            <Server aria-hidden="true" className="size-5" />
-          </div>
-          <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
-            Inventory · Persisted Demo data
-          </p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-            Devices
-          </h1>
-          <p className="text-muted mt-2 max-w-3xl text-sm leading-6">
-            Search and inspect the PostgreSQL-backed 30-device Demo inventory.
-            Metrics are fixed fixtures and do not update automatically.
-          </p>
-        </div>
-      </header>
+      <OperationalPageHeader
+        description="Search, filter, and inspect the PostgreSQL-backed operational inventory. Metric snapshots remain deterministic demonstration data."
+        eyebrow="Asset inventory"
+        index="02"
+        metadata={[
+          { label: "Active", value: page.meta.total },
+          { label: "Page", value: `${page.meta.page}/${page.meta.totalPages}` },
+          { label: "Access", value: canManage ? "MANAGE" : "READ ONLY" },
+          { label: "Source", value: "POSTGRES" },
+        ]}
+        title="Devices"
+      />
 
       {canManage ? (
-        <details className="bg-panel mb-6 rounded-xl border p-4">
+        <details className="bg-panel mb-6 border p-4">
           <summary className="text-brand flex min-h-11 cursor-pointer list-none items-center gap-2 font-semibold">
             <Plus aria-hidden="true" className="size-4" />
             Add device
@@ -89,7 +86,7 @@ export default async function DevicesPage({ searchParams }: DevicesPageProps) {
           />
         </details>
       ) : (
-        <p className="bg-panel text-muted mb-6 rounded-xl border px-4 py-3 text-sm">
+        <p className="bg-panel text-muted mb-6 border-l-2 border-l-[var(--accent-primary)] px-4 py-3 text-sm">
           Your {session.user.role.replaceAll("_", " ").toLowerCase()} account
           has read-only device access.
         </p>

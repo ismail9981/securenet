@@ -1,5 +1,9 @@
 # SecureNet
 
+<p align="center">
+  <img src="public/screenshots/banner.png" alt="SecureNet Banner" width="100%">
+</p>
+
 SecureNet is a simulated Network Monitoring Center for understanding network health,
 device state, alerts, operational events, and topology from one interface. Version
 1.0 is a portfolio/demo product: it does **not** monitor a real network, discover
@@ -47,14 +51,15 @@ Manage network devices with real-time status and detailed information.
 
 ## ✨ Key Features
 
-- Real-time Dashboard
-- Device Monitoring
-- Network Topology
-- Alert Management
-- Event Logs
+- Real-time Network Monitoring Dashboard
+- Device Inventory Management
+- Interactive Network Topology
+- Alert Detection & Lifecycle Management
+- Event Logging & Audit Trail
 - Historical Metrics
-- Role-Based Access Control
-- Reports & Analytics
+- Role-Based Access Control (RBAC)
+- CSV Reports & Analytics
+- Responsive UI
 
 ## 🛠 Tech Stack
 
@@ -63,10 +68,11 @@ Manage network devices with real-time status and detailed information.
 - TypeScript
 - Tailwind CSS
 - PostgreSQL
-- Prisma
+- Prisma ORM
 - Zod
 - Vitest
 - Playwright
+- Render
 
 ## Approved stack
 

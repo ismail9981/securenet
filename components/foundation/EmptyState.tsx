@@ -9,7 +9,7 @@ export function EmptyState({ description, title }: EmptyStateProps) {
   return (
     <section
       aria-labelledby="empty-state-title"
-      className="bg-panel rounded-xl border border-dashed p-6 text-center"
+      className="bg-panel border border-dashed p-8 text-center"
     >
       <Inbox aria-hidden="true" className="text-muted mx-auto mb-3 size-6" />
       <h2 id="empty-state-title" className="font-semibold">

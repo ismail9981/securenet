@@ -19,10 +19,7 @@ export function LatestAlerts({
   readonly alerts: DashboardSnapshot["latestAlerts"];
 }) {
   return (
-    <section
-      className="bg-panel rounded-xl border"
-      aria-labelledby="latest-alerts"
-    >
+    <section className="bg-panel border" aria-labelledby="latest-alerts">
       <div className="flex items-center justify-between border-b px-5 py-4">
         <h2 className="font-semibold" id="latest-alerts">
           Latest alerts
@@ -41,7 +38,10 @@ export function LatestAlerts({
       ) : (
         <ul className="divide-y">
           {alerts.map((alert) => (
-            <li className="flex gap-3 px-5 py-4" key={alert.id}>
+            <li
+              className="group flex gap-3 px-5 py-4 transition-colors hover:bg-[var(--surface-raised)]"
+              key={alert.id}
+            >
               <AlertTriangle
                 aria-hidden="true"
                 className={`mt-0.5 size-4 shrink-0 ${
@@ -68,10 +68,7 @@ export function RecentEvents({
   readonly events: DashboardSnapshot["recentEvents"];
 }) {
   return (
-    <section
-      className="bg-panel rounded-xl border"
-      aria-labelledby="recent-events"
-    >
+    <section className="bg-panel border" aria-labelledby="recent-events">
       <div className="flex items-center justify-between border-b px-5 py-4">
         <h2 className="font-semibold" id="recent-events">
           Recent events
@@ -90,7 +87,10 @@ export function RecentEvents({
       ) : (
         <ul className="divide-y">
           {events.map((event) => (
-            <li className="flex gap-3 px-5 py-4" key={event.id}>
+            <li
+              className="group flex gap-3 px-5 py-4 transition-colors hover:bg-[var(--surface-raised)]"
+              key={event.id}
+            >
               <Clock3
                 aria-hidden="true"
                 className="text-info mt-0.5 size-4 shrink-0"
